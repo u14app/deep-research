@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
 /**
- * 测试 Prisma 与 SQLite 数据库连接的简单脚本
- * 使用方法: node scripts/test-prisma-db.js
+ * Test Prisma Database Connection
+ * node scripts/test-prisma-db.js
  */
 
 const { PrismaClient } = require('@prisma/client');
@@ -10,33 +10,33 @@ const path = require('path');
 const fs = require('fs');
 
 async function main() {
-  console.log('测试 Prisma 数据库连接...');
+  console.log('Testing Prisma Database Connection...');
   
-  // 检查数据目录是否存在
+  // Check if data directory exists, create it if not
   const dataDir = path.join(process.cwd(), 'data');
   if (!fs.existsSync(dataDir)) {
-    console.log('创建数据目录: data/');
+    console.log('Create DB Directory: data/');
     fs.mkdirSync(dataDir, { recursive: true });
   }
 
-  // 初始化Prisma客户端
+  // Initialize Prisma Client
   const prisma = new PrismaClient({
     log: ['query', 'info', 'warn', 'error'],
   });
 
   try {
-    // 连接数据库
+    // connect to the database
     await prisma.$connect();
-    console.log('✅ 数据库连接成功!');
+    console.log('Connected to the database!');
 
-    // 查询数据库以验证表结构
+    // check if the database tables exist
     try {
       const count = await prisma.syncData.count();
-      console.log(`✅ 数据库表结构验证成功! 共有 ${count} 条同步记录`);
+      console.log(`Database Checked, There are ${count} records.`);
       
-      // 创建测试记录
+      // Create a test record
       const testId = 'test-' + Date.now();
-      console.log('创建测试记录...');
+      console.log('Creating a test record...');
       await prisma.syncData.create({
         data: {
           id: testId,
@@ -44,46 +44,46 @@ async function main() {
           history: JSON.stringify([{
             id: 'test-history-' + Date.now(),
             createdAt: Date.now(),
-            title: '测试标题',
-            question: '测试问题',
-            questions: '子问题1\n子问题2',
-            finalReport: '测试最终报告',
-            query: '测试查询',
-            suggestion: '测试建议',
+            title: 'Test Title',
+            question: 'Test question',
+            questions: 'questions1\nquestions2',
+            finalReport: 'test report',
+            query: 'test query',
+            suggestion: 'test suggestion',
             tasks: [],
             feedback: ''
           }])
         }
       });
       
-      // 查询刚创建的记录
+      // Test the record
       const record = await prisma.syncData.findUnique({
         where: { id: testId }
       });
-      console.log('✅ 测试记录创建成功!');
-      console.log('记录ID:', record.id);
-      console.log('同步ID:', record.syncId);
-      console.log('更新时间:', record.updatedAt);
+      console.log('Test Record Created');
+      console.log('Record ID:', record.id);
+      console.log('SyncID:', record.syncId);
+      console.log('Update Time:', record.updatedAt);
       
-      // 删除测试记录
+      // Delete the test record
       await prisma.syncData.delete({
         where: { id: testId }
       });
-      console.log('✅ 测试记录已清理');
+      console.log('Test Record Deleted');
       
     } catch (error) {
-      console.error('❌ 数据库表结构验证失败:', error);
-      console.log('请检查是否已执行数据库迁移: npx prisma migrate dev');
+      console.error('Error when testing the table:', error);
+      console.log('Please try this: npx prisma migrate dev');
     }
   } catch (error) {
-    console.error('❌ 数据库连接失败:', error);
+    console.error('Error when connecting DB:', error);
   } finally {
     await prisma.$disconnect();
-    console.log('数据库连接已关闭');
+    console.log('DB Connection Closed');
   }
 }
 
 main().catch(error => {
-  console.error('测试失败:', error);
+  console.error('Testing Failed:', error);
   process.exit(1);
 });

@@ -37,7 +37,7 @@ function History({ open, onClose }: HistoryProps) {
   const { history, load, remove, syncWithServer, isSyncing } = useHistoryStore();
   const { accessPassword, syncId } = useSettingStore();
   
-  // 当组件打开且配置了访问密码和同步ID时，尝试同步
+  // If accessPassword and syncId are set, sync with server
   useEffect(() => {
     if (open && accessPassword && syncId) {
       syncWithServer();

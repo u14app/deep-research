@@ -13,11 +13,11 @@ datasource db {
   url      = "file:../data/sync.db"
 }
 
-// 研究历史记录的存储
+
 model SyncData {
   id        String   @id
   syncId    String
-  history   String   // JSON 字符串，存储 ResearchHistory[] 数组
+  history   String
   updatedAt DateTime @default(now()) @updatedAt
 
   @@index([syncId])
