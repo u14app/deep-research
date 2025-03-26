@@ -30,6 +30,17 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
+# database files
+*.db
+*.db-journal
+
+# Prisma
+prisma/.#*
+prisma/dev.db
+prisma/migrations
+prisma/seed.ts
+prisma/.cache
+
 # env files (can opt-in for committing if needed)
 .env*
 

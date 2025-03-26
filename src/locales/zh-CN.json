@@ -45,6 +45,8 @@
       "load": "加载",
       "delete": "删除",
       "close": "关闭",
+      "sync": "同步",
+      "syncing": "同步中...",
       "noHistory": "没有历史记录"
     }
   },
@@ -58,6 +60,8 @@
     "apiProxyLabel": "API 代理 URL",
     "accessPassword": "访问密码",
     "accessPasswordPlaceholder": "请输入服务器访问密码",
+    "syncId": "同步标识",
+    "syncIdPlaceholder": "输入标识以在设备间同步历史记录",
     "language": "系统语言",
     "save": "保存",
     "cancel": "取消"

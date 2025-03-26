@@ -1,7 +1,9 @@
 "use client";
 import { useTranslation } from "react-i18next";
-import { TrashIcon, FileOutput } from "lucide-react";
+import { TrashIcon, FileOutput, RefreshCw } from "lucide-react";
 import dayjs from "dayjs";
+import { useEffect } from "react";
+import { useSettingStore } from "@/store/setting";
 import {
   Dialog,
   DialogContent,
@@ -32,7 +34,15 @@ function formatDate(timestamp: number) {
 function History({ open, onClose }: HistoryProps) {
   const { t } = useTranslation();
   const { restore, reset } = useTaskStore();
-  const { history, load, remove } = useHistoryStore();
+  const { history, load, remove, syncWithServer, isSyncing } = useHistoryStore();
+  const { accessPassword, syncId } = useSettingStore();
+  
+  // 当组件打开且配置了访问密码和同步ID时，尝试同步
+  useEffect(() => {
+    if (open && accessPassword && syncId) {
+      syncWithServer();
+    }
+  }, [open, accessPassword, syncId, syncWithServer]);
 
   async function loadHistory(id: string) {
     const data = load(id);
@@ -54,8 +64,21 @@ function History({ open, onClose }: HistoryProps) {
   return (
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-screen-sm">
-        <DialogHeader>
+        <DialogHeader className="flex flex-row items-center justify-between">
           <DialogTitle>{t("research.history.title")}</DialogTitle>
+          {accessPassword && syncId && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="flex items-center gap-1"
+              onClick={() => syncWithServer()}
+              disabled={isSyncing}
+              title={t("research.history.sync")}
+            >
+              <RefreshCw className={`h-4 w-4 ${isSyncing ? "animate-spin" : ""}`} />
+              {isSyncing ? t("research.history.syncing") : t("research.history.sync")}
+            </Button>
+          )}
         </DialogHeader>
         <div className="max-h-96 overflow-y-auto">
           {history.length === 0 ? (

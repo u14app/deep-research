@@ -42,6 +42,7 @@ const formSchema = z.object({
   apiKey: z.string().optional(),
   apiProxy: z.string().optional(),
   accessPassword: z.string().optional(),
+  syncId: z.string().optional(),
   language: z.string().optional(),
 });
 
@@ -52,9 +53,9 @@ function Setting({ open, onClose }: SettingProps) {
     resolver: zodResolver(formSchema),
     defaultValues: async () => {
       return new Promise((resolve) => {
-        const { apiKey, apiProxy, accessPassword, language } =
+        const { apiKey, apiProxy, accessPassword, syncId, language } =
           useSettingStore.getState();
-        resolve({ apiKey, apiProxy, accessPassword, language });
+        resolve({ apiKey, apiProxy, accessPassword, syncId, language });
       });
     },
   });
@@ -141,6 +142,23 @@ function Setting({ open, onClose }: SettingProps) {
                         <Input
                           type="password"
                           placeholder={t("setting.accessPasswordPlaceholder")}
+                          {...field}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="syncId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        {t("setting.syncId")}
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder={t("setting.syncIdPlaceholder")}
                           {...field}
                         />
                       </FormControl>

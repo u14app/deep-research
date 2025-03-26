@@ -5,6 +5,7 @@ interface SettingStore {
   apiKey: string;
   apiProxy: string;
   accessPassword: string;
+  syncId: string;
   language: string;
 }
 
@@ -18,6 +19,7 @@ export const useSettingStore = create(
       apiKey: "",
       apiProxy: "",
       accessPassword: "",
+      syncId: "",
       language: "",
       update: (values) => set(values),
     }),

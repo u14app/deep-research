@@ -46,6 +46,8 @@
       "load": "Load",
       "delete": "Delete",
       "close": "Close",
+      "sync": "Sync",
+      "syncing": "Syncing...",
       "noHistory": "No history records"
     }
   },
@@ -59,6 +61,8 @@
     "apiProxyLabel": "Api Proxy Url",
     "accessPassword": "Access Password",
     "accessPasswordPlaceholder": "Please enter the server access password",
+    "syncId": "Synchronization ID",
+    "syncIdPlaceholder": "Enter an ID to sync history across devices",
     "language": "Language",
     "save": "Save",
     "cancel": "Cancel"
