@@ -5,13 +5,13 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "db:gen": "prisma generate",
-    "build": "prisma generate && next build",
-    "build:docker": "cross-env NEXT_PUBLIC_BUILD_MODE=standalone prisma generate && next build",
-    "build:export": "cross-env NEXT_PUBLIC_BUILD_MODE=export prisma generate && next build",
+    "db:gen": "prisma generate && prisma db push",
+    "build": "prisma generate && prisma db push && next build",
+    "build:docker": "cross-env NEXT_PUBLIC_BUILD_MODE=standalone prisma generate && prisma db push && next build",
+    "build:export": "cross-env NEXT_PUBLIC_BUILD_MODE=export prisma generate && prisma db push && next build",
     "start": "next start",
     "lint": "next lint",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate && prisma db push"
   },
   "dependencies": {
     "@ai-sdk/google": "^1.2.3",
