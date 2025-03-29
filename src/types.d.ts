@@ -20,6 +20,7 @@ interface Source {
 
 interface ResearchHistory {
   id: string;
+  syncId?: string;
   createdAt: number;
   updatedAt?: number;
   title: string;

@@ -1,0 +1,33 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// 历史记录模型，包含同步ID字段
+model ResearchHistory {
+  id           String   @id @default(cuid())
+  syncId       String
+  createdAt    DateTime
+  updatedAt    DateTime
+  title        String
+  question     String   @db.Text
+  questions    String   @db.Text
+  finalReport  String   @db.Text
+  query        String
+  suggestion   String   @db.Text
+  tasks        Json     // SearchTask[]
+  sources      Json     // Source[]
+  feedback     String   @db.Text
+
+  @@index([syncId]) // 为同步ID添加索引，便于查询
+}

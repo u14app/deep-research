@@ -34,6 +34,7 @@ import useAccurateTimer from "@/hooks/useAccurateTimer";
 import useDeepResearch from "@/hooks/useDeepResearch";
 import { useTaskStore } from "@/store/task";
 import { downloadFile } from "@/utils/file";
+import { useHistoryStore } from "@/store/history";
 
 const MilkdownEditor = dynamic(() => import("@/components/MilkdownEditor"));
 
@@ -92,6 +93,7 @@ function SearchResult() {
   const [milkdownEditor, setMilkdownEditor] = useState<Crepe>();
   const [isThinking, setIsThinking] = useState<boolean>(false);
   const [isWriting, setIsWriting] = useState<boolean>(false);
+  const historyStore = useHistoryStore();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -176,6 +178,12 @@ function SearchResult() {
     };
   }, []);
 
+  // update taskStore and historyStore
+  const handleLearningChange = (query: string, value: string) => {
+    taskStore.updateTask(query, { learning: value });
+    historyStore.update(taskStore.id, taskStore.backup());
+  };
+
   return (
     <section className="p-4 border rounded-md mt-4 print:hidden">
       <h3 className="font-semibold text-lg border-b mb-2 leading-10">
@@ -202,9 +210,7 @@ function SearchResult() {
                     />
                     <MilkdownEditor
                       value={item.learning}
-                      onChange={(value) =>
-                        taskStore.updateTask(item.query, { learning: value })
-                      }
+                      onChange={(value) => handleLearningChange(item.query, value)}
                       tools={
                         <>
                           <Button
