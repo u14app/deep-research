@@ -150,7 +150,7 @@ export const useHistoryStore = create(
           }
           
           // Add remaining local records to the merged list
-          for (const [_, localRecord] of localMap.entries()) {
+          for (const [, localRecord] of localMap.entries()) {
             syncHistoryWithServer(localRecord);
             mergedRecords.push(localRecord);
           }
