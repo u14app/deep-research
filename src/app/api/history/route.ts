@@ -59,6 +59,7 @@ export async function GET(request: NextRequest) {
     
     return NextResponse.json({ history });
   } catch (error) {
+    console.error('Error fetching history records:', error);
     return NextResponse.json(
       { 
         error: {
