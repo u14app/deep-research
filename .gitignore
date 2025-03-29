@@ -10,6 +10,12 @@
 !.yarn/releases
 !.yarn/versions
 
+# Prisma
+prisma/.#*
+prisma/migrations
+prisma/seed.ts
+prisma/.cache
+
 # testing
 /coverage
 

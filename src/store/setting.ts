@@ -5,6 +5,7 @@ export interface SettingStore {
   apiKey: string;
   apiProxy: string;
   accessPassword: string;
+  syncId: string;
   thinkingModel: string;
   networkingModel: string;
   language: string;
@@ -19,6 +20,7 @@ export const defaultValues: SettingStore = {
   apiKey: "",
   apiProxy: "",
   accessPassword: "",
+  syncId: "",
   thinkingModel: "gemini-2.0-flash-thinking-exp",
   networkingModel: "gemini-2.0-flash-exp",
   language: "",

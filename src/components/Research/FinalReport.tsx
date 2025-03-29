@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Separator } from "@/components/ui/separator";
 import { useTaskStore } from "@/store/task";
+import { useHistoryStore } from "@/store/history";
 import { getSystemPrompt } from "@/utils/deep-research";
 import { downloadFile } from "@/utils/file";
 
@@ -20,6 +21,7 @@ const Artifact = dynamic(() => import("@/components/Artifact"));
 function FinalReport() {
   const { t } = useTranslation();
   const taskStore = useTaskStore();
+  const historyStore = useHistoryStore();
 
   function getFinakReportContent() {
     const { finalReport, sources } = useTaskStore.getState();
@@ -50,6 +52,12 @@ function FinalReport() {
     document.title = originalTitle;
   }
 
+  // update taskStore and historyStore
+  const handleEditorChange = (value: string) => {
+    taskStore.updateFinalReport(value);
+    historyStore.update(taskStore.id, taskStore.backup());
+  };
+
   return (
     <section className="p-4 border rounded-md mt-4 print:border-none">
       <h3 className="font-semibold text-lg border-b mb-2 leading-10 print:hidden">
@@ -63,7 +71,7 @@ function FinalReport() {
             <MilkdownEditor
               className="min-h-72"
               value={taskStore.finalReport}
-              onChange={(value) => taskStore.updateFinalReport(value)}
+              onChange={handleEditorChange}
               tools={
                 <>
                   <div className="px-1">
@@ -72,7 +80,7 @@ function FinalReport() {
                   <Artifact
                     value={taskStore.finalReport}
                     systemInstruction={getSystemPrompt()}
-                    onChange={taskStore.updateFinalReport}
+                    onChange={handleEditorChange}
                     buttonClassName="float-menu-button"
                     dropdownMenuSideOffset={8}
                     tooltipSideOffset={8}

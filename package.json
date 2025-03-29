@@ -5,11 +5,13 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build",
-    "build:docker": "cross-env NEXT_PUBLIC_BUILD_MODE=standalone next build",
-    "build:export": "cross-env NEXT_PUBLIC_BUILD_MODE=export next build",
+    "db:gen": "prisma generate",
+    "build": "prisma generate && next build",
+    "build:docker": "cross-env NEXT_PUBLIC_BUILD_MODE=standalone prisma generate && next build",
+    "build:export": "cross-env NEXT_PUBLIC_BUILD_MODE=export prisma generate && next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@ai-sdk/google": "^1.2.3",
@@ -17,6 +19,7 @@
     "@hookform/resolvers": "^4.1.2",
     "@milkdown/crepe": "^7.6.4",
     "@milkdown/kit": "^7.6.4",
+    "@prisma/client": "^6.5.0",
     "@radix-ui/react-accordion": "^1.2.3",
     "@radix-ui/react-dialog": "^1.1.6",
     "@radix-ui/react-dropdown-menu": "^2.1.6",
@@ -44,6 +47,7 @@
     "next": "^15.2.4",
     "next-themes": "^0.4.4",
     "p-limit": "^6.2.0",
+    "prisma": "^6.5.0",
     "radash": "^12.1.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

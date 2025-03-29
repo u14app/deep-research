@@ -91,6 +91,9 @@ Follow these steps to get Deep Research up and running on your local browser.
 
    # (Optional) Injected script code can be used for statistics or error tracking.
    HEAD_SCRIPTS=
+
+   # (Optional) Database URL (Required for server History Sync)
+   DATABASE_URL="postgresql://user:password@localhost:5432/deep_research?schema=public"
    ```
 
    **Important Notes on Environment Variables:**
@@ -99,6 +102,8 @@ Follow these steps to get Deep Research up and running on your local browser.
    - `API_PROXY_BASE_URL`: **Optional.** If you need to use a proxy server for API requests, configure this variable with your proxy server's base URL. This is relevant for server-side API calls.
    - `ACCESS_PASSWORD`: **Optional but highly recommended for server-side deployments.** Set a strong password to protect your server-side API endpoints. This password will be required to access server-side API functionalities.
    - `HEAD_SCRIPTS`: **Optional** Injected script code can be used for statistics or error tracking.
+
+   - `DATABASE_URL`: **Optional** Postgresql Database URL is used for server History Sync. If you are using vercel, you can use the Storage in dashboard to create a database.
 
    **Privacy Reminder:** These environment variables are primarily used for **server-side API calls**. When using the **local API mode**, no API keys or server-side configurations are needed, further enhancing your privacy.
    **Multi-key Support:** Supports multiple keys, each key is separated by `,`, i.e. `key1,key2,key3`. **Cloudflare cannot use multi-key for the time being because the official build script does not support Next.js 15.**
