@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { streamText, smoothStream } from "ai";
+import { streamText } from "ai";
 import { parsePartialJson } from "@ai-sdk/ui-utils";
 import { useTranslation } from "react-i18next";
 import Plimit from "p-limit";
@@ -23,7 +23,7 @@ import { parseError } from "@/utils/error";
 import { pick, flat } from "radash";
 
 function getResponseLanguagePrompt(lang: string) {
-  return `**Respond in ${lang}**`;
+  return `**Respond in ${lang} language**`;
 }
 
 function removeJsonMarkdown(text: string) {
@@ -51,6 +51,7 @@ function useDeepResearch() {
   const taskStore = useTaskStore();
   const { createProvider } = useModelProvider();
   const [status, setStatus] = useState<string>("");
+  const settingStore = useSettingStore();
 
   async function askQuestions() {
     const { thinkingModel, language } = useSettingStore.getState();
@@ -64,7 +65,6 @@ function useDeepResearch() {
         generateQuestionsPrompt(question),
         getResponseLanguagePrompt(language),
       ].join("\n\n"),
-      experimental_transform: smoothStream(),
       onError: handleError,
     });
     let content = "";
@@ -76,12 +76,11 @@ function useDeepResearch() {
   }
 
   async function runSearchTask(queries: SearchTask[]) {
-    const { networkingModel, language } = useSettingStore.getState();
+    const { networkingModel, language, searchLanguage } = useSettingStore.getState();
     setStatus(t("research.common.research"));
-    const plimit = Plimit(1);
-    for await (const item of queries) {
-      await plimit(async () => {
-        let content = "";
+    const plimit = Plimit(settingStore.searchConcurrency || 1);
+    const call = async (item: SearchTask) => {
+      let content = "";
         const sources: Source[] = [];
         taskStore.updateTask(item.query, { state: "processing" });
         const provider = createProvider("google");
@@ -95,9 +94,8 @@ function useDeepResearch() {
           system: getSystemPrompt(),
           prompt: [
             processSearchResultPrompt(item.query, item.researchGoal),
-            getResponseLanguagePrompt(language),
+            getResponseLanguagePrompt(searchLanguage === 'auto' ? language : searchLanguage),
           ].join("\n\n"),
-          experimental_transform: smoothStream(),
           onError: handleError,
         });
         for await (const part of searchResult.fullStream) {
@@ -112,8 +110,9 @@ function useDeepResearch() {
         }
         taskStore.updateTask(item.query, { state: "completed", sources });
         return content;
-      });
     }
+    const list = queries.map(item => plimit(() =>call(item)))
+    await Promise.all(list)
   }
 
   async function reviewSearchResult() {
@@ -129,7 +128,6 @@ function useDeepResearch() {
         reviewSerpQueriesPrompt(query, learnings, suggestion),
         getResponseLanguagePrompt(language),
       ].join("\n\n"),
-      experimental_transform: smoothStream(),
       onError: handleError,
     });
 
@@ -175,7 +173,6 @@ function useDeepResearch() {
         writeFinalReportPrompt(query, learnings),
         getResponseLanguagePrompt(language),
       ].join("\n\n"),
-      experimental_transform: smoothStream(),
       onError: handleError,
     });
     let content = "";
@@ -199,7 +196,7 @@ function useDeepResearch() {
   }
 
   async function deepResearch() {
-    const { thinkingModel, language } = useSettingStore.getState();
+    const { thinkingModel, language, searchLanguage } = useSettingStore.getState();
     const { query } = useTaskStore.getState();
     setStatus(t("research.common.thinking"));
     try {
@@ -210,9 +207,8 @@ function useDeepResearch() {
         system: getSystemPrompt(),
         prompt: [
           generateSerpQueriesPrompt(query),
-          getResponseLanguagePrompt(language),
+          getResponseLanguagePrompt(searchLanguage === 'auto' ? language : searchLanguage),
         ].join("\n\n"),
-        experimental_transform: smoothStream(),
         onError: handleError,
       });
 
