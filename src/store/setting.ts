@@ -8,6 +8,8 @@ export interface SettingStore {
   thinkingModel: string;
   networkingModel: string;
   language: string;
+  searchLanguage: string;
+  searchConcurrency: number;
   theme: string;
 }
 
@@ -22,6 +24,8 @@ export const defaultValues: SettingStore = {
   thinkingModel: "gemini-2.0-flash-thinking-exp",
   networkingModel: "gemini-2.0-flash-exp",
   language: "",
+  searchLanguage: "auto",
+  searchConcurrency: 3,
   theme: "system",
 };
 

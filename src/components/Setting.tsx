@@ -1,7 +1,7 @@
 "use client";
 import { useLayoutEffect, useState, useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { RefreshCw } from "lucide-react";
+import { RefreshCw, Info } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -40,6 +40,12 @@ import {
 } from "@/utils/models";
 import { cn } from "@/utils/style";
 import { omit, capitalize } from "radash";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 type SettingProps = {
   open: boolean;
@@ -55,6 +61,8 @@ const formSchema = z.object({
   thinkingModel: z.string(),
   networkingModel: z.string(),
   language: z.string().optional(),
+  searchLanguage: z.string().optional(),
+  searchConcurrency: z.number().min(1).max(10),
   theme: z.string().optional(),
 });
 
@@ -360,6 +368,74 @@ function Setting({ open, onClose }: SettingProps) {
                       </SelectContent>
                     </Select>
                   </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="searchLanguage"
+              render={({ field }) => (
+                <FormItem className="from-item">
+                  <FormLabel className="col-span-1">
+                    {t("setting.searchLanguage")}
+                  </FormLabel>
+                  <FormControl>
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger className="col-span-3">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="max-sm:max-h-48">
+                        <SelectItem value="auto">
+                          {t("setting.auto")}
+                        </SelectItem>
+                        <SelectItem value="zh-CN">
+                          {t("setting.chinese")}
+                        </SelectItem>
+                        <SelectItem value="en-US">
+                          {t("setting.english")}
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="searchConcurrency"
+              render={({ field }) => (
+                <FormItem className="from-item">
+                  <div className="flex items-center gap-1">
+                    <FormLabel className="col-span-1">
+                      {t("setting.searchConcurrency")}
+                    </FormLabel>
+                  </div>
+                  <FormControl>
+                    <Input 
+                      type="number"
+                      min="1" 
+                      max="10"
+                      value={field.value}
+                      onChange={(e) => {
+                        const value = parseInt(e.target.value);
+                        if (!isNaN(value) && value >= 1 && value <= 10) {
+                          field.onChange(value);
+                        }
+                      }}
+                    />
+                  </FormControl>
+                  <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span className="">
+                            <Info className="h-4 w-4 " />
+                          </span>
+                        </TooltipTrigger>
+                        <TooltipContent side="top">
+                          <p>{t("setting.searchConcurrencyTip")}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                 </FormItem>
               )}
             />
