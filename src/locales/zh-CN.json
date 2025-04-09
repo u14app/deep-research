@@ -49,7 +49,11 @@
       "load": "加载",
       "delete": "删除",
       "close": "关闭",
-      "noHistory": "没有历史记录"
+      "noHistory": "没有历史记录",
+      "sync": "同步",
+      "syncing": "同步中...",
+      "syncSuccess": "同步完成",
+      "syncFailed": "同步失败"
     }
   },
   "artifact": {
@@ -106,6 +110,8 @@
     "apiUrlLabel": "API 链接",
     "accessPassword": "访问密码",
     "accessPasswordPlaceholder": "请输入服务器访问密码",
+    "syncId": "同步ID",
+    "syncIdPlaceholder": "请输入您的唯一同步ID",
     "thinkingModel": "思维模型",
     "networkingModel": "联网模型",
     "thinkingModels": "思维模型（推荐）",

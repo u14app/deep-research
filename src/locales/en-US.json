@@ -49,7 +49,11 @@
       "load": "Load",
       "delete": "Delete",
       "close": "Close",
-      "noHistory": "No history records"
+      "noHistory": "No history records",
+      "sync": "Sync",
+      "syncing": "Syncing...",
+      "syncSuccess": "Sync completed",
+      "syncFailed": "Sync failed"
     }
   },
   "artifact": {
@@ -106,6 +110,8 @@
     "apiUrlLabel": "Api Url",
     "accessPassword": "Access Password",
     "accessPasswordPlaceholder": "Please enter the server access password",
+    "syncId": "Sync ID",
+    "syncIdPlaceholder": "Please enter your unique sync ID",
     "thinkingModel": "Thinking Model",
     "networkingModel": "Networking Model",
     "thinkingModels": "Thinking Models (Recommend)",

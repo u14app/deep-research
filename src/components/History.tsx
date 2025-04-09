@@ -1,7 +1,8 @@
 "use client";
 import { useTranslation } from "react-i18next";
-import { TrashIcon, FileOutput } from "lucide-react";
+import { TrashIcon, FileOutput, RefreshCw } from "lucide-react";
 import dayjs from "dayjs";
+import { useSettingStore } from "@/store/setting";
 import {
   Dialog,
   DialogContent,
@@ -31,13 +32,12 @@ function formatDate(timestamp: number) {
 
 function History({ open, onClose }: HistoryProps) {
   const { t } = useTranslation();
-  const { backup, restore, reset } = useTaskStore();
-  const { history, load, update, remove } = useHistoryStore();
+  const { restore, reset } = useTaskStore();
+  const { history, load, remove, syncWithServer, syncInProgress } = useHistoryStore();
+  const { accessPassword, syncId } = useSettingStore();
 
   async function loadHistory(id: string) {
-    const { id: currentId } = useTaskStore.getState();
     const data = load(id);
-    if (currentId) update(currentId, backup());
     if (data) {
       reset();
       restore(data);
@@ -56,8 +56,20 @@ function History({ open, onClose }: HistoryProps) {
   return (
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-screen-sm">
-        <DialogHeader>
+        <DialogHeader className="flex flex-row items-center justify-between">
           <DialogTitle>{t("research.history.title")}</DialogTitle>
+          {accessPassword && syncId && (
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={syncInProgress}
+              onClick={() => syncWithServer()}
+              className="flex gap-1 items-center"
+            >
+              <RefreshCw className={`h-4 w-4 ${syncInProgress ? 'animate-spin' : ''}`} />
+              {syncInProgress ? t("research.history.syncing") : t("research.history.sync")}
+            </Button>
+          )}
         </DialogHeader>
         <div className="max-h-96 overflow-y-auto">
           {history.length === 0 ? (
@@ -93,7 +105,7 @@ function History({ open, onClose }: HistoryProps) {
                       </Button>
                     </TableCell>
                     <TableCell className="text-center whitespace-nowrap">
-                      {formatDate(item.createdAt)}
+                      {formatDate(item.createdAt) ? formatDate(item.createdAt) : "未定义"}
                     </TableCell>
                     <TableCell className="text-center">
                       <div className="flex justify-center">

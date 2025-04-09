@@ -52,6 +52,7 @@ const formSchema = z.object({
   apiKey: z.string().optional(),
   apiProxy: z.string().optional(),
   accessPassword: z.string().optional(),
+  syncId: z.string().optional(),
   thinkingModel: z.string(),
   networkingModel: z.string(),
   language: z.string().optional(),
@@ -113,6 +114,7 @@ function Setting({ open, onClose }: SettingProps) {
       apiKey: form.getValues("apiKey"),
       apiProxy: form.getValues("apiProxy"),
       accessPassword: form.getValues("accessPassword"),
+      syncId: form.getValues("syncId"),
     });
   }
 
@@ -199,6 +201,24 @@ function Setting({ open, onClose }: SettingProps) {
                         <Input
                           type="password"
                           placeholder={t("setting.accessPasswordPlaceholder")}
+                          {...field}
+                          onBlur={() => handleValueChange()}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="syncId"
+                  render={({ field }) => (
+                    <FormItem className="from-item">
+                      <FormLabel className="col-span-1">
+                        {t("setting.syncId")}
+                      </FormLabel>
+                      <FormControl className="col-span-3">
+                        <Input
+                          placeholder={t("setting.syncIdPlaceholder")}
                           {...field}
                           onBlur={() => handleValueChange()}
                         />

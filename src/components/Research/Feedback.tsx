@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import useDeepResearch from "@/hooks/useDeepResearch";
 import useAccurateTimer from "@/hooks/useAccurateTimer";
 import { useTaskStore } from "@/store/task";
+import { useHistoryStore } from "@/store/history";
 
 const MilkdownEditor = dynamic(() => import("@/components/MilkdownEditor"));
 
@@ -46,6 +47,7 @@ function Feedback() {
   useEffect(() => {
     form.setValue("feedback", taskStore.feedback);
   }, [taskStore.feedback, form]);
+  const historyStore = useHistoryStore();
 
   async function handleSubmit(values: z.infer<typeof formSchema>) {
     const { question, questions, setFeedback } = useTaskStore.getState();
@@ -65,6 +67,11 @@ function Feedback() {
       accurateTimerStop();
     }
   }
+  // update taskStore and historyStore
+  const handleEditorChange = (value: string) => {
+    taskStore.updateQuestions(value);
+    historyStore.update(taskStore.id, taskStore.backup());
+  };
 
   return (
     <section className="p-4 border rounded-md mt-4 print:hidden">
@@ -78,7 +85,7 @@ function Feedback() {
           <MilkdownEditor
             className="prose prose-slate dark:prose-invert max-w-full mt-6 min-h-20"
             value={taskStore.questions}
-            onChange={(value) => taskStore.updateQuestions(value)}
+            onChange={handleEditorChange}
           ></MilkdownEditor>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(handleSubmit)}>
