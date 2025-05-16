@@ -1,0 +1,299 @@
+{
+    "title": "Deep Research",
+    "theme": "Tema",
+    "openSource": "Código Abierto",
+    "copyright": "Creado con ❤️ por el equipo de {{name}}",
+    "searchPlaceholder": "Por favor, introduce palabras clave",
+    "research": {
+      "common": {
+        "startThinking": "Empezar a Pensar",
+        "rethinking": "Repensando",
+        "thinkingQuestion": "Procesando Pregunta...",
+        "writeReportPlan": "Redactar Plan de Informe",
+        "rewriteReportPlan": "Reescribir Plan de Informe",
+        "startResearch": "Iniciar Investigación",
+        "restartResearch": "Reiniciar Investigación",
+        "writeReport": "Redactar Informe",
+        "continueResearch": "Continuar Investigación",
+        "indepthResearch": "Investigación a Fondo",
+        "rewriteReport": "Reescribir Informe",
+        "sources": "Fuentes",
+        "thinking": "Pensando...",
+        "research": "Investigando...",
+        "writing": "Redactando...",
+        "newResearch": "Nueva Investigación",
+        "addToKnowledgeBase": "Añadir a la Base de Conocimiento",
+        "addToKnowledgeBaseTip": "Añadido a la Base de Conocimiento",
+        "restudy": "Reestudiar",
+        "edit": "Editar",
+        "save": "Guardar",
+        "copy": "Copiar",
+        "export": "Exportar",
+        "delete": "Eliminar"
+      },
+      "topic": {
+        "title": "1. Definición de la investigación",
+        "topicLabel": "1.1 Temas de investigación",
+        "topicPlaceholder": "Detalla el tema o temas de la investigación..."
+      },
+      "feedback": {
+        "title": "2. Formulación de preguntas",
+        "emptyTip": "Esperando definición de la investigación...",
+        "feedbackLabel": "Tu Respuesta (Opcional)",
+        "feedbackPlaceholder": "Puedes responder lo que quieras...",
+        "questions": "2.1 Preguntas del Sistema",
+        "reportPlan": "2.2 Plan de informe de la investigación"
+      },
+      "searchResult": {
+        "title": "3. Recopilación de Información",
+        "emptyTip": "Esperando tarea de investigación...",
+        "suggestionLabel": "Sugerencias de investigación (Opcional)",
+        "suggestionPlaceholder": "Indica si deseas añadir nuevos temas o ajustar la dirección de la investigación...",
+        "references": "Referencias"
+      },
+      "finalReport": {
+        "title": "4. Informe Final",
+        "emptyTip": "Esperando a que se recopile la información...",
+        "researchedInfor": "Se investigaron {{total}} sitios web",
+        "localResearchedInfor": "Se investigaron {{total}} recursos locales",
+        "writingRequirementLabel": "Requisitos de redacción (opcional)",
+        "writingRequirementPlaceholder": "Puedes indicar cualquier requisito relacionado con la redacción del informe."
+      }
+    },
+    "history": {
+      "title": "Historial",
+      "description": "El historial de investigación se almacena localmente en el navegador y solo guarda las investigaciones completadas.",
+      "name": "Título",
+      "emptyTip": "No hay registros en el historial",
+      "date": "Fecha",
+      "actions": "Acción",
+      "import": "Importar",
+      "importTip": "Importar Investigación",
+      "importSuccess": "{{title}} importado correctamente.",
+      "importFailed": "Falló la importación de {{title}}.",
+      "load": "Cargar",
+      "export": "Exportar",
+      "delete": "Eliminar",
+      "loadMore": "Cargar Más Historial",
+      "close": "Cerrar",
+      "noHistory": "No hay registros en el historial"
+    },
+    "knowledge": {
+      "title": "Base de Conocimiento Local",
+      "description": "Una base de conocimiento almacenada localmente en el navegador.",
+      "create": "Crear",
+      "createTip": "Crear nuevo conocimiento",
+      "emptyTip": "Sin Contenido",
+      "name": "Nombre",
+      "size": "Tamaño",
+      "date": "Fecha",
+      "action": "Acción",
+      "add": "Añadir",
+      "edit": "Editar",
+      "delete": "Eliminar",
+      "loadMore": "Cargar Más Conocimientos",
+      "resource": "Recurso",
+      "fileInfor": "Subido por el usuario el {{createdAt}}.",
+      "urlInfor": "Obtenido por el usuario el {{createdAt}}.",
+      "createInfor": "Creado por el usuario el {{createdAt}}.",
+      "webCrawler": "Rastreador Web",
+      "webCrawlerTip": "El rastreador web obtiene el contenido de la página de la URL especificada a través del servidor y devuelve los datos en formato Markdown.",
+      "urlPlaceholder": "Por favor, introduce la URL...",
+      "urlError": "Por favor, introduce una URL válida",
+      "localCrawler": "Rastreador Local",
+      "clear": "Limpiar",
+      "fetch": "Obtener",
+      "localResourceTitle": "1.2 Recursos de investigación locales (opcional)",
+      "addResource": "Añadir Recurso",
+      "addResourceMessage": "{{title}} ha sido añadido al recurso.",
+      "resourceNotFound": "Recurso no encontrado",
+      "knowledge": "Conocimiento",
+      "localFile": "Archivo Local",
+      "webPage": "Página Web",
+      "editor": {
+        "title": "Título",
+        "titlePlaceholder": "Por favor, introduce un título...",
+        "content": "Contenido (Markdown)",
+        "back": "Volver",
+        "reset": "Restablecer",
+        "submit": "Enviar"
+      }
+    },
+    "artifact": {
+      "AIWrite": "Escritura con IA",
+      "writingPromptTip": "Por favor, introduce las indicaciones de escritura...",
+      "readingLevel": "Nivel de Lectura",
+      "PhD": "Doctorado",
+      "college": "Universitario",
+      "teenager": "Adolescente",
+      "child": "Infantil",
+      "pirate": "Pirata",
+      "adjustLength": "Ajustar Longitud",
+      "longest": "Más largo",
+      "long": "Largo",
+      "shorter": "Más corto",
+      "shortest": "El más corto",
+      "translate": "Traducir",
+      "continuation": "Continuación",
+      "addEmojis": "Añadir Emojis",
+      "send": "Enviar"
+    },
+    "editor": {
+      "copy": "Copiar",
+      "tooltip": {
+        "bold": "Negrita",
+        "italic": "Cursiva",
+        "strikethrough": "Tachado",
+        "code": "Código",
+        "math": "Matemáticas",
+        "link": "Enlace",
+        "quote": "Cita"
+      },
+      "slash": {
+        "heading": {
+          "name": "Encabezado",
+          "description": "Insertar Encabezado"
+        },
+        "h1": {
+          "name": "Encabezado 1",
+          "description": "Insertar Encabezado 1"
+        },
+        "h2": {
+          "name": "Encabezado 2",
+          "description": "Insertar Encabezado 2"
+        },
+        "h3": {
+          "name": "Encabezado 3",
+          "description": "Insertar Encabezado 3"
+        },
+        "h4": {
+          "name": "Encabezado 4",
+          "description": "Insertar Encabezado 4"
+        },
+        "h5": {
+          "name": "Encabezado 5",
+          "description": "Insertar Encabezado 5"
+        },
+        "h6": {
+          "name": "Encabezado 6",
+          "description": "Insertar Encabezado 6"
+        },
+        "list": {
+          "name": "Lista",
+          "description": "Insertar Lista"
+        },
+        "ul": {
+          "name": "Lista de Viñetas",
+          "description": "Insertar Elemento de Lista de Viñetas"
+        },
+        "ol": {
+          "name": "Lista Ordenada",
+          "description": "Insertar Elemento de Lista Ordenada"
+        },
+        "todo": {
+          "name": "Lista de Tareas",
+          "description": "Insertar Elemento de Lista de Tareas"
+        },
+        "advanced": {
+          "name": "Avanzado",
+          "description": "Comandos Avanzados"
+        },
+        "link": {
+          "name": "Enlace",
+          "description": "Insertar Enlace"
+        },
+        "image": {
+          "name": "Imagen",
+          "description": "Insertar Imagen"
+        },
+        "code": {
+          "name": "Bloque de Código",
+          "description": "Insertar Bloque de Código"
+        },
+        "math": {
+          "name": "Bloque de Matemáticas",
+          "description": "Insertar Bloque de Matemáticas"
+        },
+        "table": {
+          "name": "Tabla",
+          "description": "Insertar una tabla 3x3"
+        },
+        "quote": {
+          "name": "Cita",
+          "description": "Insertar Cita"
+        },
+        "horizontal": {
+          "name": "Línea Horizontal",
+          "description": "Insertar Línea Horizontal"
+        }
+      },
+      "placeholder": "Por favor, introduce texto, o escribe \"/ \" para usar comandos"
+    },
+    "setting": {
+      "title": "Configuración",
+      "description": "Todos los ajustes se guardan en el navegador del usuario.",
+      "model": "Modelo",
+      "general": "General",
+      "provider": "Proveedor de IA",
+      "providerTip": "Proveedor de servicios de IA. Para servicios de agregación de IA como One Api y New Api, selecciona `Compatible con OpenAI`.",
+      "openAICompatible": "Compatible con OpenAI",
+      "free": "Gratuito",
+      "mode": "Modo de API",
+      "modeTip": "En modo local, todas las solicitudes se envían directamente desde el navegador. En modo proxy, todas las solicitudes se reenvían a través del servidor proxy.",
+      "local": "Local",
+      "proxy": "Proxy",
+      "apiKeyLabel": "Clave API",
+      "apiKeyPlaceholder": "Por favor, introduce la clave API del modelo",
+      "apiUrlLabel": "URL Base de la API",
+      "apiUrlPlaceholder": "Por favor, introduce la URL base de la API",
+      "resourceNameLabel": "Nombre del Recurso",
+      "resourceNamePlaceholder": "Por favor, introduce el nombre del recurso",
+      "apiVersionLabel": "Versión de la API",
+      "apiVersionPlaceholder": "Por favor, introduce la versión de la API",
+      "accessPassword": "Contraseña de Acceso",
+      "accessPasswordPlaceholder": "Por favor, introduce la contraseña de acceso al servidor",
+      "accessPasswordTip": "La autenticación API del lado del servidor evita el uso indebido de la API por aplicaciones externas.",
+      "thinkingModel": "Modelo de Pensamiento",
+      "thinkingModelTip": "El modelo central utilizado en la investigación profunda, se recomienda utilizar el modelo de pensamiento.",
+      "networkingModel": "Modelo de Tareas",
+      "networkingModelTip": "El modelo utilizado para tareas secundarias, se recomiendan modelos de alto rendimiento.",
+      "recommendedModels": "Modelos Recomendados",
+      "basicModels": "Modelos Básicos",
+      "modelListLoadingPlaceholder": "Por favor, selecciona un modelo",
+      "modelListPlaceholder": "Por favor, introduce el nombre del modelo",
+      "refresh": "Haz clic para Actualizar Modelo",
+      "modelListLoading": "Cargando lista de modelos",
+      "search": "Búsqueda",
+      "webSearch": "Búsqueda Web",
+      "webSearchTip": "La búsqueda web permite obtener los datos más recientes y ayuda a reducir las `alucinaciones` del modelo. Se recomienda activarla.",
+      "enable": "Activar",
+      "disable": "Desactivar",
+      "searchProvider": "Proveedor de Búsqueda",
+      "searchProviderTip": "Proveedores de servicios de búsqueda. Algunos modelos tienen capacidades de búsqueda en red incorporadas, mientras que la mayoría necesita depender de motores de búsqueda de terceros para lograr esta funcionalidad.",
+      "modelBuiltin": "Integrado en el Modelo",
+      "bocha": "Bocha",
+      "parallelSearch": "Búsqueda Paralela",
+      "parallelSearchTip": "La búsqueda paralela ayuda a acelerar el proceso de recopilación de datos, pero una tasa demasiado alta puede activar el límite de solicitudes por minuto del modelo.",
+      "searchResults": "Resultados de Búsqueda",
+      "searchResultsTip": "El número máximo de búsquedas web. Algunos motores de búsqueda no admiten este parámetro.",
+      "searchApiKeyPlaceholder": "Por favor, introduce tu Clave API",
+      "searchScope": "Ámbito de Búsqueda",
+      "all": "Todo",
+      "academic": "Académico",
+      "language": "Idioma",
+      "languageTip": "El sistema seleccionará automáticamente el idioma de la interfaz según el idioma del navegador del usuario. Al mismo tiempo, también afectará el idioma de respuesta del modelo de IA.",
+      "system": "Sistema",
+      "light": "Claro",
+      "dark": "Oscuro",
+      "debug": "Modo Depuración",
+      "debugTip": "El modo depuración permite a los usuarios capturar errores con mayor detalle. Normalmente, no se recomienda su activación.",
+      "resetSetting": "Restablecer Ajustes",
+      "resetAllSettings": "Restablecer ajustes y limpiar la caché",
+      "resetSettingWarning": "Esta operación borrará todos los datos e inicializará el proyecto.",
+      "version": "Versión actual",
+      "checkForUpdate": "Buscar actualizaciones",
+      "save": "Guardar",
+      "confirm": "Confirmar",
+      "cancel": "Cancelar"
+    }
+  }

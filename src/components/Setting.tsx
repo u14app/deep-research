@@ -3173,6 +3173,7 @@ function Setting({ open, onClose }: SettingProps) {
                           <SelectContent>
                             <SelectItem value="en-US">English</SelectItem>
                             <SelectItem value="zh-CN">简体中文</SelectItem>
+                            <SelectItem value="es-ES">Español</SelectItem>
                           </SelectContent>
                         </Select>
                       </FormControl>
