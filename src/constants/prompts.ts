@@ -228,7 +228,7 @@ Please write according to the user's writing requirements:
 </REQUIREMENT>
 
 Write a final report based on the report plan using the learnings from research.
-Make it as as detailed as possible, aim for 5 pages or more, the more the better, include ALL the learnings from research.
+Make it as detailed as possible, aim for 5 pages or more, the more the better, include ALL the learnings from research.
 **Including meaningful images from the previous research in the report is very helpful.**
 **Respond only the final report content, and no additional text before or after.**`;
 
