@@ -37,6 +37,7 @@ import { useTaskStore } from "@/store/task";
 import { useKnowledgeStore } from "@/store/knowledge";
 import { getSystemPrompt } from "@/utils/deep-research/prompts";
 import { downloadFile } from "@/utils/file";
+import { markdownToDoc } from "@/utils/markdown";
 
 const MagicDown = dynamic(() => import("@/components/MagicDown"));
 const Artifact = dynamic(() => import("@/components/Artifact"));
@@ -133,6 +134,16 @@ function FinalReport() {
     toast.message(t("research.common.addToKnowledgeBaseTip"));
   }
 
+  function handleDownloadWord() {
+    // markdownToDoc returns HTML that Word can read as a legacy .doc file
+    const docHtml = markdownToDoc(getFinakReportContent());
+    downloadFile(
+      docHtml,
+      `${taskStore.title}.doc`,
+      "application/msword;charset=utf-8"
+    );
+  }
+
   async function handleDownloadPDF() {
     const originalTitle = document.title;
     document.title = taskStore.title;
@@ -226,6 +237,12 @@ function FinalReport() {
                       >
                         <FileText />
                         <span>Markdown</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => handleDownloadWord()}
+                      >
+                        <FileText />
+                        <span>Word</span>
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         className="max-md:hidden"
