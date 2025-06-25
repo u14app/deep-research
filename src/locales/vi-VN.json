@@ -1,0 +1,332 @@
+{
+  "title": "Nghiên Cứu Sâu",
+  "theme": "Chủ Đề",
+  "openSource": "Mã Nguồn Mở",
+  "copyright": "Tạo với ❤️ bởi nhóm {{name}}",
+  "searchPlaceholder": "Vui lòng nhập từ khóa",
+  "research": {
+    "common": {
+      "startThinking": "Bắt đầu suy nghĩ",
+      "rethinking": "Suy nghĩ lại",
+      "thinkingQuestion": "Đang suy nghĩ câu hỏi...",
+      "writeReportPlan": "Viết kế hoạch báo cáo",
+      "rewriteReportPlan": "Viết lại kế hoạch báo cáo",
+      "startResearch": "Bắt đầu nghiên cứu",
+      "restartResearch": "Nghiên cứu lại",
+      "writeReport": "Viết báo cáo",
+      "continueResearch": "Tiếp tục nghiên cứu",
+      "indepthResearch": "Nghiên cứu sâu hơn",
+      "rewriteReport": "Viết lại báo cáo",
+      "sources": "Nguồn",
+      "thinking": "Đang suy nghĩ...",
+      "research": "Đang nghiên cứu...",
+      "writing": "Đang viết...",
+      "newResearch": "Nghiên cứu mới",
+      "addToKnowledgeBase": "Thêm vào cơ sở tri thức",
+      "addToKnowledgeBaseTip": "Đã thêm vào cơ sở tri thức",
+      "restudy": "Nghiên cứu lại",
+      "edit": "Chỉnh sửa",
+      "save": "Lưu",
+      "copy": "Sao chép",
+      "export": "Xuất",
+      "delete": "Xóa"
+    },
+    "topic": {
+      "title": "1. Chủ Đề Nghiên Cứu",
+      "topicLabel": "1.1 Chủ đề nghiên cứu",
+      "topicPlaceholder": "Bất kỳ câu hỏi nào bạn muốn biết..."
+    },
+    "feedback": {
+      "title": "2. Đặt Câu Hỏi",
+      "emptyTip": "Đang chờ chủ đề nghiên cứu...",
+      "feedbackLabel": "Câu trả lời của bạn (không bắt buộc)",
+      "feedbackPlaceholder": "Bạn có thể trả lời bất kỳ điều gì bạn muốn...",
+      "questions": "2.1 Câu hỏi hệ thống",
+      "reportPlan": "2.2 Kế hoạch báo cáo nghiên cứu"
+    },
+    "searchResult": {
+      "title": "3. Thu Thập Thông Tin",
+      "emptyTip": "Đang chờ nhiệm vụ nghiên cứu...",
+      "suggestionLabel": "Gợi ý nghiên cứu (không bắt buộc)",
+      "suggestionPlaceholder": "Có muốn thêm hoặc điều chỉnh hướng nghiên cứu không...",
+      "references": "Tài liệu tham khảo",
+      "relatedImages": "Hình ảnh liên quan"
+    },
+    "finalReport": {
+      "title": "4. Báo Cáo Cuối Cùng",
+      "emptyTip": "Đang chờ tổng hợp dữ liệu...",
+      "researchedInfor": "Đã nghiên cứu {{total}} trang web",
+      "localResearchedInfor": "Đã nghiên cứu {{total}} tài nguyên cục bộ",
+      "writingRequirementLabel": "Yêu cầu viết (không bắt buộc)",
+      "writingRequirementPlaceholder": "Bạn có thể nêu bất kỳ yêu cầu nào liên quan đến việc viết báo cáo."
+    }
+  },
+  "history": {
+    "title": "Lịch Sử",
+    "description": "Lịch sử nghiên cứu được lưu trữ cục bộ trong trình duyệt và chỉ lưu các nghiên cứu đã hoàn thành.",
+    "name": "Tiêu đề",
+    "emptyTip": "Không có bản ghi lịch sử",
+    "date": "Ngày",
+    "actions": "Hành động",
+    "import": "Nhập khẩu",
+    "importTip": "Nhập nghiên cứu",
+    "importSuccess": "{{title}} đã nhập thành công.",
+    "importFailed": "{{title}} nhập thất bại.",
+    "load": "Tải",
+    "export": "Xuất",
+    "delete": "Xóa",
+    "loadMore": "Tải thêm lịch sử",
+    "close": "Đóng",
+    "noHistory": "Không có bản ghi lịch sử"
+  },
+  "knowledge": {
+    "title": "Cơ Sở Tri Thức Cục Bộ",
+    "description": "Cơ sở tri thức được lưu trữ cục bộ trong trình duyệt.",
+    "create": "Tạo mới",
+    "createTip": "Tạo tri thức mới",
+    "emptyTip": "Không có nội dung",
+    "name": "Tên",
+    "size": "Kích thước",
+    "date": "Ngày",
+    "action": "Hành động",
+    "add": "Thêm",
+    "edit": "Chỉnh sửa",
+    "delete": "Xóa",
+    "loadMore": "Tải thêm tri thức",
+    "resource": "Tài nguyên",
+    "fileInfor": "Tải lên bởi người dùng lúc {{createdAt}}.",
+    "urlInfor": "Lấy từ người dùng lúc {{createdAt}}.",
+    "createInfor": "Tạo bởi người dùng lúc {{createdAt}}.",
+    "webCrawler": "Thu thập web",
+    "webCrawlerTip": "Trình thu thập web lấy nội dung trang từ URL chỉ định và trả về dữ liệu dạng Markdown.",
+    "urlPlaceholder": "Vui lòng nhập URL...",
+    "urlError": "Vui lòng nhập URL hợp lệ",
+    "localCrawler": "Thu thập cục bộ",
+    "clear": "Xóa",
+    "fetch": "Lấy dữ liệu",
+    "localResourceTitle": "1.2 Tài nguyên nghiên cứu cục bộ (không bắt buộc)",
+    "addResource": "Thêm tài nguyên",
+    "addResourceMessage": "{{title}} đã được thêm vào tài nguyên.",
+    "resourceNotFound": "Không tìm thấy tài nguyên",
+    "knowledge": "Tri thức",
+    "localFile": "Tệp cục bộ",
+    "webPage": "Trang web",
+    "editor": {
+      "title": "Tiêu đề",
+      "titlePlaceholder": "Vui lòng nhập tiêu đề...",
+      "content": "Nội dung (Markdown)",
+      "back": "Quay lại",
+      "reset": "Đặt lại",
+      "submit": "Gửi"
+    }
+  },
+  "artifact": {
+    "AIWrite": "AI Viết",
+    "writingPromptTip": "Vui lòng nhập yêu cầu viết...",
+    "readingLevel": "Trình độ đọc",
+    "PhD": "Tiến sĩ",
+    "college": "Đại học",
+    "teenager": "Thiếu niên",
+    "child": "Trẻ em",
+    "pirate": "Cướp biển",
+    "adjustLength": "Điều chỉnh độ dài",
+    "longest": "Dài nhất",
+    "long": "Dài",
+    "shorter": "Ngắn hơn",
+    "shortest": "Ngắn nhất",
+    "translate": "Dịch",
+    "continuation": "Tiếp tục",
+    "addEmojis": "Thêm Emoji",
+    "send": "Gửi"
+  },
+  "knowledgeGraph": {
+    "action": "Tạo sơ đồ tri thức",
+    "regenerate": "Tạo lại",
+    "edit": "Chỉnh sửa",
+    "view": "Xem"
+  },
+  "editor": {
+    "copy": "Sao chép",
+    "mermaid": {
+      "downloadSvg": "Tải xuống dưới dạng hình ảnh",
+      "copyText": "Sao chép văn bản",
+      "zoomIn": "Phóng to",
+      "zoomOut": "Thu nhỏ",
+      "resize": "Thay đổi kích thước"
+    },
+    "tooltip": {
+      "bold": "In đậm",
+      "italic": "In nghiêng",
+      "strikethrough": "Gạch ngang",
+      "code": "Mã",
+      "math": "Công thức",
+      "link": "Liên kết",
+      "quote": "Trích dẫn"
+    },
+    "slash": {
+      "heading": {
+        "name": "Tiêu đề",
+        "description": "Chèn tiêu đề"
+      },
+      "h1": {
+        "name": "Tiêu đề 1",
+        "description": "Chèn tiêu đề 1"
+      },
+      "h2": {
+        "name": "Tiêu đề 2",
+        "description": "Chèn tiêu đề 2"
+      },
+      "h3": {
+        "name": "Tiêu đề 3",
+        "description": "Chèn tiêu đề 3"
+      },
+      "h4": {
+        "name": "Tiêu đề 4",
+        "description": "Chèn tiêu đề 4"
+      },
+      "h5": {
+        "name": "Tiêu đề 5",
+        "description": "Chèn tiêu đề 5"
+      },
+      "h6": {
+        "name": "Tiêu đề 6",
+        "description": "Chèn tiêu đề 6"
+      },
+      "list": {
+        "name": "Danh sách",
+        "description": "Chèn danh sách"
+      },
+      "ul": {
+        "name": "Danh sách chấm",
+        "description": "Chèn mục danh sách chấm"
+      },
+      "ol": {
+        "name": "Danh sách số",
+        "description": "Chèn mục danh sách số"
+      },
+      "todo": {
+        "name": "Danh sách việc cần làm",
+        "description": "Chèn mục danh sách việc cần làm"
+      },
+      "advanced": {
+        "name": "Nâng cao",
+        "description": "Lệnh nâng cao"
+      },
+      "link": {
+        "name": "Liên kết",
+        "description": "Chèn liên kết"
+      },
+      "image": {
+        "name": "Hình ảnh",
+        "description": "Chèn hình ảnh"
+      },
+      "code": {
+        "name": "Khối mã",
+        "description": "Chèn khối mã"
+      },
+      "math": {
+        "name": "Khối công thức",
+        "description": "Chèn khối công thức"
+      },
+      "table": {
+        "name": "Bảng",
+        "description": "Chèn bảng 3x3"
+      },
+      "quote": {
+        "name": "Trích dẫn",
+        "description": "Chèn trích dẫn"
+      },
+      "horizontal": {
+        "name": "Đường ngang",
+        "description": "Chèn đường kẻ ngang"
+      }
+    },
+    "placeholder": "Vui lòng nhập văn bản, hoặc nhập \"/\" để sử dụng lệnh"
+  },
+  "setting": {
+    "title": "Cài Đặt",
+    "description": "Tất cả cài đặt được lưu trong trình duyệt của người dùng.",
+    "model": "Mô Hình",
+    "general": "Hệ Thống",
+    "provider": "Nhà cung cấp AI",
+    "providerTip": "Dịch vụ AI tổng hợp như One API hoặc New API nên chọn `Tương thích OpenAI`.",
+    "openAICompatible": "Tương thích OpenAI",
+    "free": "Miễn phí",
+    "mode": "Chế Độ API",
+    "modeTip": "Trong chế độ cục bộ, tất cả yêu cầu được gửi trực tiếp bởi trình duyệt. Trong chế độ proxy, tất cả yêu cầu đi qua máy chủ.",
+    "local": "Cục bộ",
+    "proxy": "Proxy",
+    "apiKeyLabel": "Khóa API",
+    "apiKeyPlaceholder": "Vui lòng nhập khóa API",
+    "apiUrlLabel": "URL Cơ Sở API",
+    "apiUrlPlaceholder": "Vui lòng nhập URL cơ sở của API",
+    "resourceNameLabel": "Tên Tài Nguyên",
+    "resourceNamePlaceholder": "Vui lòng nhập tên tài nguyên",
+    "apiVersionLabel": "Phiên bản API",
+    "apiVersionPlaceholder": "Vui lòng nhập phiên bản API",
+    "accessPassword": "Mật khẩu truy cập",
+    "accessPasswordPlaceholder": "Vui lòng nhập mật khẩu truy cập máy chủ",
+    "accessPasswordTip": "Xác thực API phía máy chủ giúp ngăn API bị lạm dụng từ ứng dụng ngoài.",
+    "thinkingModel": "Mô hình suy nghĩ",
+    "thinkingModelTip": "Mô hình chính dùng cho nghiên cứu sâu, nên chọn mô hình chuyên về suy nghĩ.",
+    "networkingModel": "Mô hình nhiệm vụ",
+    "networkingModelTip": "Mô hình dùng cho nhiệm vụ phụ, nên chọn mô hình có đầu ra cao.",
+    "recommendedModels": "Mô hình được đề xuất",
+    "basicModels": "Mô hình cơ bản",
+    "modelListLoadingPlaceholder": "Vui lòng chọn mô hình",
+    "modelListPlaceholder": "Vui lòng nhập tên mô hình",
+    "refresh": "Làm mới danh sách mô hình",
+    "modelListLoading": "Đang tải danh sách mô hình",
+    "search": "Tìm kiếm",
+    "webSearch": "Tìm kiếm web",
+    "webSearchTip": "Tìm kiếm web giúp lấy dữ liệu mới và giảm ảo tưởng của mô hình. Nên bật.",
+    "enable": "Bật",
+    "disable": "Tắt",
+    "searchProvider": "Nhà cung cấp tìm kiếm",
+    "searchProviderTip": "Một số mô hình tích hợp sẵn tìm kiếm web, còn lại cần bên thứ ba hỗ trợ.",
+    "modelBuiltin": "Tích hợp mô hình",
+    "bocha": "Bocha",
+    "parallelSearch": "Tìm kiếm song song",
+    "parallelSearchTip": "Tăng tốc thu thập dữ liệu, nhưng có thể bị giới hạn số yêu cầu/phút.",
+    "searchResults": "Kết quả tìm kiếm",
+    "searchResultsTip": "Số lượng kết quả tìm kiếm tối đa.",
+    "searchApiKeyPlaceholder": "Vui lòng nhập khóa API tìm kiếm",
+    "searchScope": "Phạm vi tìm kiếm",
+    "scopeValue": {
+      "all": "Tất cả",
+      "academic": "Học thuật",
+      "general": "Tổng quát",
+      "news": "Tin tức",
+      "researchPaper": "Bài nghiên cứu",
+      "financial": "Tài chính",
+      "company": "Công ty",
+      "personalSite": "Trang cá nhân",
+      "github": "Github",
+      "linkedin": "LinkedIn",
+      "pdf": "PDF"
+    },
+    "language": "Ngôn ngữ",
+    "languageTip": "Hệ thống sẽ tự chọn ngôn ngữ dựa theo trình duyệt.",
+    "system": "Hệ thống",
+    "light": "Sáng",
+    "dark": "Tối",
+    "debug": "Gỡ lỗi",
+    "debugTip": "Chế độ gỡ lỗi giúp phát hiện lỗi yêu cầu. Thông thường không cần bật.",
+    "PWA": "Cài đặt PWA",
+    "PWATip": "Ứng dụng web hiện đại (PWA) mang lại trải nghiệm như ứng dụng gốc.",
+    "installlPWA": "Cài đặt ứng dụng trình duyệt (PWA)",
+    "resetSetting": "Đặt lại cài đặt",
+    "resetAllSettings": "Đặt lại và xóa bộ nhớ đệm",
+    "resetSettingWarning": "Thao tác này sẽ xóa tất cả dữ liệu và khởi tạo lại dự án.",
+    "version": "Phiên bản hiện tại",
+    "checkForUpdate": "Kiểm tra cập nhật",
+    "experimental": "Thử nghiệm",
+    "references": "Tài liệu tham khảo",
+    "referencesTip": "Thêm liên kết tham khảo vào kết quả và báo cáo. Có thể không hỗ trợ tốt với mô hình nhỏ.",
+    "citationImage": "Hình ảnh trích dẫn",
+    "citationImageTip": "Bật hình ảnh tham khảo để chèn hình minh họa vào báo cáo.",
+    "save": "Lưu",
+    "confirm": "Xác nhận",
+    "cancel": "Hủy"
+  }
+}
