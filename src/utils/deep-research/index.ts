@@ -16,6 +16,15 @@ import { isNetworkingModel } from "@/utils/model";
 import { ThinkTagStreamProcessor, removeJsonMarkdown } from "@/utils/text";
 import { pick, unique, flat, isFunction } from "radash";
 
+const modelMaxTokens: Record<string, number> = {
+  "gemini-2.5-pro": 65536,
+  "gemini-2.5-flash": 65536,
+  "gemini-2.5-flash-preview-05-20": 64000,
+  "gemini-2.5-flash-lite-preview": 65536,
+  "gemini-2.0-flash": 8192,
+  "gemini-2.0-flash-lite": 8192,
+};
+
 export interface DeepResearchOptions {
   AIProvider: {
     baseURL: string;
@@ -81,17 +90,23 @@ class DeepResearch {
   async getThinkingModel() {
     const { AIProvider } = this.options;
     const AIProviderBaseOptions = pick(AIProvider, ["baseURL", "apiKey"]);
-    return await createAIProvider({
+    const modelName = await createAIProvider({
       provider: AIProvider.provider,
       model: AIProvider.thinkingModel,
       ...AIProviderBaseOptions,
     });
+    const modelKey = typeof modelName === 'string' ? modelName : String(modelName);
+    const maxTokens = modelMaxTokens[modelKey] || 4096;
+    return {
+      model: modelName,
+      maxTokens: maxTokens,
+    };
   }
 
   async getTaskModel() {
     const { AIProvider } = this.options;
     const AIProviderBaseOptions = pick(AIProvider, ["baseURL", "apiKey"]);
-    return await createAIProvider({
+    const modelName = await createAIProvider({
       provider: AIProvider.provider,
       model: AIProvider.taskModel,
       settings:
@@ -101,6 +116,12 @@ class DeepResearch {
           : undefined,
       ...AIProviderBaseOptions,
     });
+    const modelKey = typeof modelName === 'string' ? modelName : String(modelName);
+    const maxTokens = modelMaxTokens[modelKey] || 4096;
+    return {
+      model: modelName,
+      maxTokens: maxTokens,
+    };
   }
 
   getResponseLanguagePrompt() {
@@ -112,13 +133,15 @@ class DeepResearch {
   async writeReportPlan(query: string): Promise<string> {
     this.onMessage("progress", { step: "report-plan", status: "start" });
     const thinkTagStreamProcessor = new ThinkTagStreamProcessor();
+    const { model, maxTokens } = await this.getThinkingModel();
     const result = streamText({
-      model: await this.getThinkingModel(),
+      model,
       system: getSystemPrompt(),
       prompt: [
         writeReportPlanPrompt(query),
         this.getResponseLanguagePrompt(),
       ].join("\n\n"),
+      maxTokens,
     });
     let content = "";
     this.onMessage("message", { type: "text", text: "<report-plan>\n" });
@@ -152,8 +175,9 @@ class DeepResearch {
   ): Promise<DeepResearchSearchTask[]> {
     this.onMessage("progress", { step: "serp-query", status: "start" });
     const thinkTagStreamProcessor = new ThinkTagStreamProcessor();
+    const { model } = await this.getThinkingModel();
     const { text } = await generateText({
-      model: await this.getThinkingModel(),
+      model,
       system: getSystemPrompt(),
       prompt: [
         generateSerpQueriesPrompt(reportPlan),
@@ -243,12 +267,13 @@ class DeepResearch {
         };
 
         searchResult = streamText({
-          model: await this.getTaskModel(),
+          model: await this.getTaskModel().model,
           system: getSystemPrompt(),
           prompt: [
             processResultPrompt(item.query, item.researchGoal),
             this.getResponseLanguagePrompt(),
           ].join("\n\n"),
+          maxTokens: await this.getTaskModel().maxTokens,
           tools: await getTools(),
           providerOptions: getProviderOptions(),
         });
@@ -268,7 +293,7 @@ class DeepResearch {
           throw new Error(errorMessage);
         }
         searchResult = streamText({
-          model: await this.getTaskModel(),
+          model: await this.getTaskModel().model,
           system: getSystemPrompt(),
           prompt: [
             processSearchResultPrompt(
@@ -279,6 +304,7 @@ class DeepResearch {
             ),
             this.getResponseLanguagePrompt(),
           ].join("\n\n"),
+          maxTokens: await this.getTaskModel().maxTokens,
         });
       }
 
@@ -398,8 +424,11 @@ class DeepResearch {
       flat(tasks.map((item) => item.images || [])),
       (item) => item.url
     );
+    const { model } = await this.getThinkingModel();
+    const modelKey = typeof model === 'string' ? model : String(model);
+    const maxTokens = modelMaxTokens[modelKey] || 4096;
     const result = streamText({
-      model: await this.getThinkingModel(),
+      model,
       system: [getSystemPrompt(), outputGuidelinesPrompt].join("\n\n"),
       prompt: [
         writeFinalReportPrompt(
@@ -413,6 +442,7 @@ class DeepResearch {
         ),
         this.getResponseLanguagePrompt(),
       ].join("\n\n"),
+      maxTokens,
     });
     let content = "";
     this.onMessage("message", { type: "text", text: "<final-report>\n" });

@@ -228,6 +228,22 @@ Please write according to the user's writing requirements, if any:
 {requirement}
 </REQUIREMENT>
 
+When presenting comparisons, structured data, or feature lists, use Markdown tables.
+**Markdown Table Syntax Reminder:**
+- Start the table with a header row, separating columns with | (pipe) characters.
+- The second row must contain only dashes (-) and pipes to define the header.
+- Each subsequent row represents data, with columns separated by pipes.
+- Do not use HTML or other table formats.
+- Example:
+\`\`\`
+| Feature         | Option A | Option B |
+|-----------------|----------|----------|
+| Current Rating  | 100A     | 120A     |
+| IP Rating       | IP67     | IP69K    |
+\`\`\`
+- Ensure there are no extra line breaks inside the table block.
+- Respond only with valid Markdown.
+
 Write a final report based on the report plan using the learnings from research.
 Make it as detailed as possible, aim for 5 pages or more, the more the better, include ALL the learnings from research.
 **Respond only the final report content, and no additional text before or after.**`;
