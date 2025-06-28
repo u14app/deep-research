@@ -33,6 +33,15 @@ import { pick, flat, unique } from "radash";
 type ProviderOptions = Record<string, Record<string, JSONValue>>;
 type Tools = Record<string, Tool>;
 
+const modelMaxTokens: Record<string, number> = {
+  "gemini-2.5-pro": 65536,
+  "gemini-2.5-flash": 65536,
+  "gemini-2.5-flash-preview-05-20": 64000,
+  "gemini-2.5-flash-lite-preview": 65536,
+  "gemini-2.0-flash": 8192,
+  "gemini-2.0-flash-lite": 8192,
+};
+
 function getResponseLanguagePrompt() {
   return `\n\n**Respond in the same language as the user's language**`;
 }
@@ -62,14 +71,18 @@ function useDeepResearch() {
     const { thinkingModel } = getModel();
     setStatus(t("research.common.thinking"));
     const thinkTagStreamProcessor = new ThinkTagStreamProcessor();
+    const modelName = await createModelProvider(thinkingModel);
+    const modelKey = typeof modelName === 'string' ? modelName : String(modelName);
+    const maxTokens = modelMaxTokens[modelKey] || 4096;
     const result = streamText({
-      model: await createModelProvider(thinkingModel),
+      model: modelName,
       system: getSystemPrompt(),
       prompt: [
         generateQuestionsPrompt(question),
         getResponseLanguagePrompt(),
       ].join("\n\n"),
       experimental_transform: smoothTextStream(smoothTextStreamType),
+      maxTokens: maxTokens,
       onError: handleError,
     });
     let content = "";
@@ -99,13 +112,17 @@ function useDeepResearch() {
     const { thinkingModel } = getModel();
     setStatus(t("research.common.thinking"));
     const thinkTagStreamProcessor = new ThinkTagStreamProcessor();
+    const modelName = await createModelProvider(thinkingModel);
+    const modelKey = typeof modelName === 'string' ? modelName : String(modelName);
+    const maxTokens = modelMaxTokens[modelKey] || 4096;
     const result = streamText({
-      model: await createModelProvider(thinkingModel),
+      model: modelName,
       system: getSystemPrompt(),
       prompt: [writeReportPlanPrompt(query), getResponseLanguagePrompt()].join(
         "\n\n"
       ),
       experimental_transform: smoothTextStream(smoothTextStreamType),
+      maxTokens: maxTokens,
       onError: handleError,
     });
     let content = "";
@@ -146,19 +163,23 @@ function useDeepResearch() {
 
     const { networkingModel } = getModel();
     const thinkTagStreamProcessor = new ThinkTagStreamProcessor();
-    const searchResult = streamText({
-      model: await createModelProvider(networkingModel),
+    const modelName = await createModelProvider(networkingModel);
+    const modelKey = typeof modelName === 'string' ? modelName : String(modelName);
+    const maxTokens = modelMaxTokens[modelKey] || 4096;
+    const result = streamText({
+      model: modelName,
       system: getSystemPrompt(),
       prompt: [
         processSearchKnowledgeResultPrompt(query, researchGoal, knowledges),
         getResponseLanguagePrompt(),
       ].join("\n\n"),
       experimental_transform: smoothTextStream(smoothTextStreamType),
+      maxTokens: maxTokens,
       onError: handleError,
     });
     let content = "";
     let reasoning = "";
-    for await (const part of searchResult.fullStream) {
+    for await (const part of result.fullStream) {
       if (part.type === "text-delta") {
         thinkTagStreamProcessor.processChunk(
           part.textDelta,
@@ -309,6 +330,7 @@ function useDeepResearch() {
                   getResponseLanguagePrompt(),
                 ].join("\n\n"),
                 experimental_transform: smoothTextStream(smoothTextStreamType),
+                maxTokens: modelMaxTokens[networkingModel] || 4096,
                 onError: handleError,
               });
             } else {
@@ -322,6 +344,7 @@ function useDeepResearch() {
                 tools: getTools(networkingModel),
                 providerOptions: getProviderOptions(networkingModel),
                 experimental_transform: smoothTextStream(smoothTextStreamType),
+                maxTokens: modelMaxTokens[networkingModel] || 4096,
                 onError: handleError,
               });
             }
@@ -334,6 +357,7 @@ function useDeepResearch() {
                 getResponseLanguagePrompt(),
               ].join("\n\n"),
               experimental_transform: smoothTextStream(smoothTextStreamType),
+              maxTokens: modelMaxTokens[networkingModel] || 4096,
               onError: (err) => {
                 taskStore.updateTask(item.query, { state: "failed" });
                 handleError(err);
@@ -425,14 +449,18 @@ function useDeepResearch() {
     setStatus(t("research.common.research"));
     const learnings = tasks.map((item) => item.learning);
     const thinkTagStreamProcessor = new ThinkTagStreamProcessor();
+    const modelName = await createModelProvider(thinkingModel);
+    const modelKey = typeof modelName === 'string' ? modelName : String(modelName);
+    const maxTokens = modelMaxTokens[modelKey] || 4096;
     const result = streamText({
-      model: await createModelProvider(thinkingModel),
+      model: modelName,
       system: getSystemPrompt(),
       prompt: [
         reviewSerpQueriesPrompt(reportPlan, learnings, suggestion),
         getResponseLanguagePrompt(),
       ].join("\n\n"),
       experimental_transform: smoothTextStream(smoothTextStreamType),
+      maxTokens: maxTokens,
       onError: handleError,
     });
 
@@ -504,8 +532,11 @@ function useDeepResearch() {
     const enableCitationImage = images.length > 0 && citationImage === "enable";
     const enableReferences = sources.length > 0 && references === "enable";
     const thinkTagStreamProcessor = new ThinkTagStreamProcessor();
+    const modelName = await createModelProvider(thinkingModel);
+    const modelKey = typeof modelName === 'string' ? modelName : String(modelName);
+    const maxTokens = modelMaxTokens[modelKey] || 4096;
     const result = streamText({
-      model: await createModelProvider(thinkingModel),
+      model: modelName,
       system: [getSystemPrompt(), outputGuidelinesPrompt].join("\n\n"),
       prompt: [
         writeFinalReportPrompt(
@@ -522,6 +553,7 @@ function useDeepResearch() {
         getResponseLanguagePrompt(),
       ].join("\n\n"),
       experimental_transform: smoothTextStream(smoothTextStreamType),
+      maxTokens: maxTokens,
       onError: handleError,
     });
     let content = "";
@@ -578,14 +610,18 @@ function useDeepResearch() {
     setStatus(t("research.common.thinking"));
     try {
       const thinkTagStreamProcessor = new ThinkTagStreamProcessor();
+      const modelName = await createModelProvider(thinkingModel);
+      const modelKey = typeof modelName === 'string' ? modelName : String(modelName);
+      const maxTokens = modelMaxTokens[modelKey] || 4096;
       const result = streamText({
-        model: await createModelProvider(thinkingModel),
+        model: modelName,
         system: getSystemPrompt(),
         prompt: [
           generateSerpQueriesPrompt(reportPlan),
           getResponseLanguagePrompt(),
         ].join("\n\n"),
         experimental_transform: smoothTextStream(smoothTextStreamType),
+        maxTokens: maxTokens,
         onError: handleError,
       });
 
