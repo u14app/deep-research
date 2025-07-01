@@ -332,6 +332,8 @@
     "line": "行",
     "save": "保存",
     "confirm": "确认",
-    "cancel": "取消"
+    "cancel": "取消",
+    "useLocalResource": "只使用本地资源",
+    "useLocalResourceTip": "开启后，研究和网页爬取仅使用本地资源，不会发起外部网络请求。"
   }
 }

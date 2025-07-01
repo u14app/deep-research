@@ -332,6 +332,8 @@
     "line": "Línea",
     "save": "Guardar",
     "confirm": "Confirmar",
-    "cancel": "Cancelar"
+    "cancel": "Cancelar",
+    "useLocalResource": "Solo usar recursos locales",
+    "useLocalResourceTip": "Al habilitarlo, solo se utilizarán recursos locales para la investigación y el rastreo web. No se realizarán solicitudes externas."
   }
 }

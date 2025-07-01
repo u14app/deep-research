@@ -332,6 +332,8 @@
     "line": "Line",
     "save": "Save",
     "confirm": "Confirm",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "useLocalResource": "Use Local Resource Only",
+    "useLocalResourceTip": "When enabled, only local resources will be used for research and web crawling. No external network requests will be made."
   }
 }

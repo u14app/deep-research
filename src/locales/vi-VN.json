@@ -332,6 +332,8 @@
     "line": "Dòng",
     "save": "Lưu",
     "confirm": "Xác nhận",
-    "cancel": "Hủy"
+    "cancel": "Hủy",
+    "useLocalResource": "Chỉ sử dụng tài nguyên cục bộ",
+    "useLocalResourceTip": "Khi bật, chỉ sử dụng tài nguyên cục bộ cho nghiên cứu và thu thập dữ liệu web. Không gửi yêu cầu ra ngoài."
   }
 }

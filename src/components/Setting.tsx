@@ -3471,8 +3471,8 @@ function Setting({ open, onClose }: SettingProps) {
                   render={({ field }) => (
                     <FormItem className="from-item">
                       <FormLabel className="from-label">
-                        只使用本地资源
-                        <HelpTip tip="启用后，若存在本地资源，将仅使用本地资源内容回答问题，跳过联网搜索和模型自有知识。" />
+                        {t("setting.useLocalResource")}
+                        <HelpTip tip={t("setting.useLocalResourceTip")} />
                       </FormLabel>
                       <FormControl>
                         <Select
@@ -3486,8 +3486,8 @@ function Setting({ open, onClose }: SettingProps) {
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="1">启用</SelectItem>
-                            <SelectItem value="0">禁用</SelectItem>
+                            <SelectItem value="1">{t("setting.enable")}</SelectItem>
+                            <SelectItem value="0">{t("setting.disable")}</SelectItem>
                           </SelectContent>
                         </Select>
                       </FormControl>
