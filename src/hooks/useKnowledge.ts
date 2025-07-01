@@ -171,6 +171,17 @@ function useKnowledge() {
               content = await extractText(rid, filename, chunk);
             } else {
               content = chunk;
+              // Save to knowledge store for non-XML/HTML content
+              const currentTime = Date.now();
+              knowledgeStore.save({
+                id: rid,
+                title: filename,
+                content,
+                type: "file",
+                fileMeta,
+                createdAt: currentTime,
+                updatedAt: currentTime,
+              });
             }
             updateResource(rid, {
               name: filename,
