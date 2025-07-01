@@ -163,6 +163,7 @@ const formSchema = z.object({
   references: z.string().optional(),
   citationImage: z.string().optional(),
   smoothTextStreamType: z.enum(["character", "word", "line"]).optional(),
+  onlyUseLocalResource: z.boolean().optional(),
 });
 
 function convertModelName(name: string) {
@@ -3460,6 +3461,30 @@ function Setting({ open, onClose }: SettingProps) {
                             </SelectItem>
                           </SelectContent>
                         </Select>
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="onlyUseLocalResource"
+                  render={({ field }) => (
+                    <FormItem className="from-item">
+                      <FormLabel className="from-label">
+                        只使用本地资源
+                      </FormLabel>
+                      <FormControl>
+                        <div className="flex items-center gap-2 py-2">
+                          <input
+                            id="onlyUseLocalResource"
+                            type="checkbox"
+                            checked={form.watch("onlyUseLocalResource") ?? false}
+                            onChange={(e) =>
+                              form.setValue("onlyUseLocalResource", e.target.checked)
+                            }
+                          />
+                          <HelpTip tip="启用后，若存在本地资源，将仅使用本地资源内容回答问题，跳过联网搜索和模型自有知识。" />
+                        </div>
                       </FormControl>
                     </FormItem>
                   )}

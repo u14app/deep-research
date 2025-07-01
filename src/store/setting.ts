@@ -71,6 +71,7 @@ export interface SettingStore {
   references: string;
   citationImage: string;
   smoothTextStreamType: "character" | "word" | "line";
+  onlyUseLocalResource: boolean;
 }
 
 interface SettingFunction {
@@ -148,6 +149,7 @@ export const defaultValues: SettingStore = {
   references: "enable",
   citationImage: "enable",
   smoothTextStreamType: "word",
+  onlyUseLocalResource: false,
 };
 
 export const useSettingStore = create(
