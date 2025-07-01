@@ -3472,19 +3472,24 @@ function Setting({ open, onClose }: SettingProps) {
                     <FormItem className="from-item">
                       <FormLabel className="from-label">
                         只使用本地资源
+                        <HelpTip tip="启用后，若存在本地资源，将仅使用本地资源内容回答问题，跳过联网搜索和模型自有知识。" />
                       </FormLabel>
                       <FormControl>
-                        <div className="flex items-center gap-2 py-2">
-                          <input
-                            id="onlyUseLocalResource"
-                            type="checkbox"
-                            checked={form.watch("onlyUseLocalResource") ?? false}
-                            onChange={(e) =>
-                              form.setValue("onlyUseLocalResource", e.target.checked)
-                            }
-                          />
-                          <HelpTip tip="启用后，若存在本地资源，将仅使用本地资源内容回答问题，跳过联网搜索和模型自有知识。" />
-                        </div>
+                        <Select
+                          value={field.value ? "1" : "0"}
+                          onValueChange={v => {
+                            field.onChange(v === "1");
+                            form.setValue("onlyUseLocalResource", v === "1");
+                          }}
+                        >
+                          <SelectTrigger className="form-field">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="1">启用</SelectItem>
+                            <SelectItem value="0">禁用</SelectItem>
+                          </SelectContent>
+                        </Select>
                       </FormControl>
                     </FormItem>
                   )}
