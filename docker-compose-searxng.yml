@@ -1,0 +1,26 @@
+services:
+  searxng:
+    image: docker.io/searxng/searxng:latest
+    volumes:
+      - ./searxng:/etc/searxng:rw
+    ports:
+      - 4000:8080
+    networks:
+      - deep-research-network
+    restart: unless-stopped
+
+  app:
+    image: ghcr.io/u14app/deep-research:latest
+    container_name: deep-research
+    environment:
+      - SEARXNG_API_BASE_URL=http://searxng:8080
+    env_file:
+      - .env
+    ports:
+      - "3333:3000"
+    networks:
+      - deep-research-network
+    restart: unless-stopped
+
+networks:
+  deep-research-network:

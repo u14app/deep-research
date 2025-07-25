@@ -1,0 +1,17 @@
+use_default_settings: true
+
+general:
+  instance_name: "searxng"
+
+search:
+  autocomplete: "google"
+  formats:
+    - html
+    - json
+
+server:
+  secret_key: "1234567890abcdefghijklmnopqrstuvwxyz" # Is overwritten by ${SEARXNG_SECRET}
+
+engines:
+  - name: wolframalpha
+    disabled: false

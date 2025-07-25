@@ -1,9 +1,6 @@
 # (Optional) Server API Access Password for enhanced security
 ACCESS_PASSWORD=
 
-# (Deprecated) Server-side Gemini API Proxy URL. Default, `https://generativelanguage.googleapis.com`
-API_PROXY_BASE_URL=
-
 # (Optional) Server-side Gemini API Key (Required for server API calls)
 GOOGLE_GENERATIVE_AI_API_KEY=
 # (Optional) Server-side Gemini API Proxy URL. Default, `https://generativelanguage.googleapis.com`
@@ -65,7 +62,7 @@ OPENAI_COMPATIBLE_API_BASE_URL=
 # (Optional) Server-side pollinations.ai API Proxy URL. Default, `https://text.pollinations.ai/openai`
 POLLINATIONS_API_BASE_URL=
 
-# (Optional) Server-side Ollama API Proxy URL. Default, `http://0.0.0.0:11434`
+# (Optional) Server-side Ollama API Proxy URL. Default, `http://host.docker.internal:11434`
 OLLAMA_API_BASE_URL=
 
 # (Optional) Server-side Tavily API Key (Required for server API calls)
@@ -88,7 +85,7 @@ BOCHA_API_KEY=
 # (Optional) Server-side Bocha API Proxy URL. Default, `https://api.bochaai.com`
 BOCHA_API_BASE_URL=
 
-# (Optional) Server-side Searxng API Proxy URL. Default, `http://0.0.0.0:8080`
+# (Optional) Server-side Searxng API Proxy URL. Default, `http://host.docker.internal:8080`
 SEARXNG_API_BASE_URL=
 
 # (Optional) MCP Server AI provider

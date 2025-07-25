@@ -139,7 +139,7 @@ Currently the project supports deployment to Cloudflare, but you need to follow 
 
 ```bash
 docker pull xiangfa/deep-research:latest
-docker run -d --name deep-research -p 3333:3000 xiangfa/deep-research
+docker run -d --name deep-research -p 3333:3000 ghcr.io/u14app/deep-research:latest
 ```
 
 You can also specify additional environment variables:
@@ -149,7 +149,7 @@ docker run -d --name deep-research \
    -p 3333:3000 \
    -e ACCESS_PASSWORD=your-password \
    -e GOOGLE_GENERATIVE_AI_API_KEY=AIzaSy... \
-   xiangfa/deep-research
+   ghcr.io/u14app/deep-research:latest
 ```
 
 or build your own docker image:
@@ -167,13 +167,12 @@ Deploy using `docker-compose.yml`:
 version: '3.9'
 services:
    deep-research:
-      image: xiangfa/deep-research
+      image: ghcr.io/u14app/deep-research:latest
       container_name: deep-research
-      environment:
-         - ACCESS_PASSWORD=your-password
-         - GOOGLE_GENERATIVE_AI_API_KEY=AIzaSy...
+      env_file:
+        - .env
       ports:
-         - 3333:3000
+        - 3333:3000
 ```
 
 or build your own docker compose:
