@@ -16,7 +16,7 @@ export interface HistoryStore {
 
 interface HistoryActions {
   save: (taskStore: TaskStore) => string;
-  load: (id: string) => TaskStore | void;
+  load: (id: string) => TaskStore | undefined;
   update: (id: string, taskStore: TaskStore) => boolean;
   remove: (id: string) => boolean;
 }

@@ -20,7 +20,7 @@ async function getTextContent(file: string | ArrayBuffer) {
         .filter((item) => "str" in item)
         .map((item) => item.str)
         .join(" ");
-      fullText += pageText + "\n"; // 可以添加换行符来区分页面
+      fullText += `${pageText}\n`; // 可以添加换行符来区分页面
     }
 
     return fullText;

@@ -161,11 +161,11 @@ export class UriTemplate {
       case "+":
         return encoded.join(",");
       case "#":
-        return "#" + encoded.join(",");
+        return `#${encoded.join(",")}`;
       case ".":
-        return "." + encoded.join(".");
+        return `.${encoded.join(".")}`;
       case "/":
-        return "/" + encoded.join("/");
+        return `/${encoded.join("/")}`;
       default:
         return encoded.join(",");
     }
@@ -219,9 +219,9 @@ export class UriTemplate {
     if (part.operator === "?" || part.operator === "&") {
       for (let i = 0; i < part.names.length; i++) {
         const name = part.names[i] || "";
-        const prefix = i === 0 ? "\\" + part.operator : "&";
+        const prefix = i === 0 ? `\\${part.operator}` : "&";
         patterns.push({
-          pattern: prefix + this.escapeRegExp(name) + "=([^&]+)",
+          pattern: `${prefix + this.escapeRegExp(name)}=([^&]+)`,
           name,
         });
       }
@@ -243,7 +243,7 @@ export class UriTemplate {
         pattern = "\\.([^/,]+)";
         break;
       case "/":
-        pattern = "/" + (part.exploded ? "([^/]+(?:,[^/]+)*)" : "([^/,]+)");
+        pattern = `/${part.exploded ? "([^/]+(?:,[^/]+)*)" : "([^/,]+)"}`;
         break;
       default:
         pattern = "([^/]+)";

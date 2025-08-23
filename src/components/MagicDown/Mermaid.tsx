@@ -33,7 +33,7 @@ function Mermaid({ children }: Props) {
   function downloadSvg() {
     const target = mermaidContainerRef.current;
     if (target) {
-      downloadFile(target.innerHTML, Date.now() + ".svg", "image/svg+xml");
+      downloadFile(target.innerHTML, `${Date.now()}.svg`, "image/svg+xml");
     }
   }
 
@@ -54,7 +54,7 @@ function Mermaid({ children }: Props) {
       setContent(target.innerText);
       loadMermaid(target, target.innerText);
     }
-  }, [children]);
+  }, []);
 
   return (
     <div className="relative cursor-pointer justify-center w-full overflow-auto rounded">

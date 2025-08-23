@@ -1,5 +1,5 @@
+import type { ReadableStreamController } from "node:stream/web";
 import { customAlphabet } from "nanoid";
-import type { ReadableStreamController } from "stream/web";
 import type { Transport } from "./shared/transport";
 import {
   isInitializeRequest,

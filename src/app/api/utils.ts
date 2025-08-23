@@ -65,7 +65,7 @@ export function getAIProviderBaseURL(provider: string) {
     case "google-vertex":
       return completePath(GOOGLE_VERTEX_API_BASE_URL);
     default:
-      throw new Error("Unsupported Provider: " + provider);
+      throw new Error(`Unsupported Provider: ${provider}`);
   }
 }
 
@@ -94,7 +94,7 @@ export function getAIProviderApiKey(provider: string) {
     case "ollama":
       return "";
     default:
-      throw new Error("Unsupported Provider: " + provider);
+      throw new Error(`Unsupported Provider: ${provider}`);
   }
 }
 
@@ -113,7 +113,7 @@ export function getSearchProviderBaseURL(provider: string) {
     case "model":
       return "";
     default:
-      throw new Error("Unsupported Provider: " + provider);
+      throw new Error(`Unsupported Provider: ${provider}`);
   }
 }
 
@@ -131,6 +131,6 @@ export function getSearchProviderApiKey(provider: string) {
     case "model":
       return "";
     default:
-      throw new Error("Unsupported Provider: " + provider);
+      throw new Error(`Unsupported Provider: ${provider}`);
   }
 }

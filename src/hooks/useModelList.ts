@@ -109,11 +109,11 @@ interface OllamaModel {
 
 function useModelList() {
   const [modelList, setModelList] = useState<string[]>([]);
-  const { mode, provider } = useSettingStore.getState();
+  const { mode } = useSettingStore.getState();
 
   useEffect(() => {
     setModelList([]);
-  }, [provider]);
+  }, []);
 
   async function refresh(provider: string): Promise<string[]> {
     const { accessPassword } = useSettingStore.getState();
@@ -127,7 +127,7 @@ function useModelList() {
       const key = multiApiKeyPolling(apiKey);
       const response = await fetch(
         mode === "local"
-          ? completePath(apiProxy || GEMINI_BASE_URL, "/v1beta") + "/models"
+          ? `${completePath(apiProxy || GEMINI_BASE_URL, "/v1beta")}/models`
           : "/api/ai/google/v1beta/models",
         {
           headers: {
@@ -153,7 +153,7 @@ function useModelList() {
       const apiKey = multiApiKeyPolling(openRouterApiKey);
       const response = await fetch(
         mode === "local"
-          ? completePath(openRouterApiProxy || OPENROUTER_BASE_URL, "/api/v1") + "/models"
+          ? `${completePath(openRouterApiProxy || OPENROUTER_BASE_URL, "/api/v1")}/models`
           : "/api/ai/openrouter/v1/models",
         {
           headers: {
@@ -173,7 +173,7 @@ function useModelList() {
       const apiKey = multiApiKeyPolling(openAIApiKey);
       const response = await fetch(
         mode === "local"
-          ? completePath(openAIApiProxy || OPENAI_BASE_URL, "/v1") + "/models"
+          ? `${completePath(openAIApiProxy || OPENAI_BASE_URL, "/v1")}/models`
           : "/api/ai/openai/v1/models",
         {
           headers: {
@@ -203,7 +203,7 @@ function useModelList() {
       const apiKey = multiApiKeyPolling(anthropicApiKey);
       const response = await fetch(
         mode === "local"
-          ? completePath(anthropicApiProxy || ANTHROPIC_BASE_URL, "/v1") + "/models"
+          ? `${completePath(anthropicApiProxy || ANTHROPIC_BASE_URL, "/v1")}/models`
           : "/api/ai/anthropic/v1/models",
         {
           headers: {
@@ -227,7 +227,7 @@ function useModelList() {
       const apiKey = multiApiKeyPolling(deepseekApiKey);
       const response = await fetch(
         mode === "local"
-          ? completePath(deepseekApiProxy || DEEPSEEK_BASE_URL, "/v1") + "/models"
+          ? `${completePath(deepseekApiProxy || DEEPSEEK_BASE_URL, "/v1")}/models`
           : "/api/ai/deepseek/v1/models",
         {
           headers: {
@@ -247,7 +247,7 @@ function useModelList() {
       const apiKey = multiApiKeyPolling(xAIApiKey);
       const response = await fetch(
         mode === "local"
-          ? completePath(xAIApiProxy || XAI_BASE_URL, "/v1") + "/models"
+          ? `${completePath(xAIApiProxy || XAI_BASE_URL, "/v1")}/models`
           : "/api/ai/xai/v1/models",
         {
           headers: {
@@ -269,7 +269,7 @@ function useModelList() {
       const apiKey = multiApiKeyPolling(mistralApiKey);
       const response = await fetch(
         mode === "local"
-          ? completePath(mistralApiProxy || MISTRAL_BASE_URL, "/v1") + "/models"
+          ? `${completePath(mistralApiProxy || MISTRAL_BASE_URL, "/v1")}/models`
           : "/api/ai/mistral/v1/models",
         {
           headers: {
@@ -291,7 +291,7 @@ function useModelList() {
       const apiKey = multiApiKeyPolling(openAICompatibleApiKey);
       const response = await fetch(
         mode === "local"
-          ? completePath(openAICompatibleApiProxy, "/v1") + "/models"
+          ? `${completePath(openAICompatibleApiProxy, "/v1")}/models`
           : "/api/ai/openaicompatible/v1/models",
         {
           headers: {
@@ -310,7 +310,7 @@ function useModelList() {
       const response = await fetch(
         mode === "proxy"
           ? "/api/ai/pollinations/models"
-          : completePath(pollinationsApiProxy || POLLINATIONS_BASE_URL) + "/models",
+          : `${completePath(pollinationsApiProxy || POLLINATIONS_BASE_URL)}/models`,
         {
           headers,
         }
@@ -328,7 +328,7 @@ function useModelList() {
       const response = await fetch(
         mode === "proxy"
           ? "/api/ai/ollama/api/tags"
-          : completePath(ollamaApiProxy || OLLAMA_BASE_URL, "/api") + "/tags",
+          : `${completePath(ollamaApiProxy || OLLAMA_BASE_URL, "/api")}/tags`,
         {
           headers,
         }

@@ -128,6 +128,6 @@ export async function createAIProvider({
     const ollama = createOllama(config);
     return ollama(model, settings);
   } else {
-    throw new Error("Unsupported Provider: " + provider);
+    throw new Error(`Unsupported Provider: ${provider}`);
   }
 }

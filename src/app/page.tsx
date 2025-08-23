@@ -26,13 +26,13 @@ function Home() {
     setOpenKnowledge,
   } = useGlobalStore();
 
-  const { theme } = useSettingStore();
+  // const { theme } = useSettingStore();
   const { setTheme } = useTheme();
 
   useLayoutEffect(() => {
     const settingStore = useSettingStore.getState();
     setTheme(settingStore.theme);
-  }, [theme, setTheme]);
+  }, [setTheme]);
   return (
     <div className="max-lg:max-w-screen-md max-w-screen-lg mx-auto px-4">
       <Header />

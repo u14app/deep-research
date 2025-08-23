@@ -32,7 +32,7 @@ function useModelProvider() {
           options.baseURL = completePath(apiProxy || GEMINI_BASE_URL, "/v1beta");
           options.apiKey = multiApiKeyPolling(apiKey);
         } else {
-          options.baseURL = location.origin + "/api/ai/google/v1beta";
+          options.baseURL = `${location.origin}/api/ai/google/v1beta`;
         }
         break;
       }
@@ -57,7 +57,7 @@ function useModelProvider() {
             }
           }
         } else {
-          options.baseURL = location.origin + "/api/ai/google-vertex";
+          options.baseURL = `${location.origin}/api/ai/google-vertex`;
         }
         break;
       }
@@ -67,7 +67,7 @@ function useModelProvider() {
           options.baseURL = completePath(openAIApiProxy || OPENAI_BASE_URL, "/v1");
           options.apiKey = multiApiKeyPolling(openAIApiKey);
         } else {
-          options.baseURL = location.origin + "/api/ai/openai/v1";
+          options.baseURL = `${location.origin}/api/ai/openai/v1`;
         }
         break;
       }
@@ -81,7 +81,7 @@ function useModelProvider() {
           };
           options.apiKey = multiApiKeyPolling(anthropicApiKey);
         } else {
-          options.baseURL = location.origin + "/api/ai/anthropic/v1";
+          options.baseURL = `${location.origin}/api/ai/anthropic/v1`;
         }
         break;
       }
@@ -91,7 +91,7 @@ function useModelProvider() {
           options.baseURL = completePath(deepseekApiProxy || DEEPSEEK_BASE_URL, "/v1");
           options.apiKey = multiApiKeyPolling(deepseekApiKey);
         } else {
-          options.baseURL = location.origin + "/api/ai/deepseek/v1";
+          options.baseURL = `${location.origin}/api/ai/deepseek/v1`;
         }
         break;
       }
@@ -101,7 +101,7 @@ function useModelProvider() {
           options.baseURL = completePath(xAIApiProxy || XAI_BASE_URL, "/v1");
           options.apiKey = multiApiKeyPolling(xAIApiKey);
         } else {
-          options.baseURL = location.origin + "/api/ai/xai/v1";
+          options.baseURL = `${location.origin}/api/ai/xai/v1`;
         }
         break;
       }
@@ -111,7 +111,7 @@ function useModelProvider() {
           options.baseURL = completePath(mistralApiProxy || MISTRAL_BASE_URL, "/v1");
           options.apiKey = multiApiKeyPolling(mistralApiKey);
         } else {
-          options.baseURL = location.origin + "/api/ai/mistral/v1";
+          options.baseURL = `${location.origin}/api/ai/mistral/v1`;
         }
         break;
       }
@@ -124,7 +124,7 @@ function useModelProvider() {
             apiVersion: azureApiVersion,
           };
         } else {
-          options.baseURL = location.origin + "/api/ai/azure";
+          options.baseURL = `${location.origin}/api/ai/azure`;
         }
         break;
       }
@@ -134,7 +134,7 @@ function useModelProvider() {
           options.baseURL = completePath(openRouterApiProxy || OPENROUTER_BASE_URL, "/api/v1");
           options.apiKey = multiApiKeyPolling(openRouterApiKey);
         } else {
-          options.baseURL = location.origin + "/api/ai/openrouter/api/v1";
+          options.baseURL = `${location.origin}/api/ai/openrouter/api/v1`;
         }
         break;
       }
@@ -145,7 +145,7 @@ function useModelProvider() {
           options.baseURL = completePath(openAICompatibleApiProxy, "/v1");
           options.apiKey = multiApiKeyPolling(openAICompatibleApiKey);
         } else {
-          options.baseURL = location.origin + "/api/ai/openaicompatible/v1";
+          options.baseURL = `${location.origin}/api/ai/openaicompatible/v1`;
         }
         break;
       }
@@ -154,7 +154,7 @@ function useModelProvider() {
         if (mode === "local") {
           options.baseURL = completePath(pollinationsApiProxy || POLLINATIONS_BASE_URL, "/v1");
         } else {
-          options.baseURL = location.origin + "/api/ai/pollinations/v1";
+          options.baseURL = `${location.origin}/api/ai/pollinations/v1`;
         }
         break;
       }
@@ -163,7 +163,7 @@ function useModelProvider() {
         if (mode === "local") {
           options.baseURL = completePath(ollamaApiProxy || OLLAMA_BASE_URL, "/api");
         } else {
-          options.baseURL = location.origin + "/api/ai/ollama/api";
+          options.baseURL = `${location.origin}/api/ai/ollama/api`;
           options.headers = {
             Authorization: generateSignature(accessPassword, Date.now()),
           };
@@ -270,7 +270,7 @@ function useModelProvider() {
         };
       }
       default:
-        throw new Error("Unsupported Provider: " + provider);
+        throw new Error(`Unsupported Provider: ${provider}`);
     }
   }
 
@@ -322,7 +322,7 @@ function useModelProvider() {
       case "ollama":
         return true;
       default:
-        throw new Error("Unsupported Provider: " + provider);
+        throw new Error(`Unsupported Provider: ${provider}`);
     }
   }
 

@@ -116,7 +116,7 @@ function useArtifact({ value, onChange }: ArtifactProps) {
       experimental_transform: smoothTextStream(smoothTextStreamType),
       onError: handleError,
     });
-    let text = value + "\n";
+    let text = `${value}\n`;
     for await (const textPart of result.textStream) {
       text += textPart;
       onChange(text);

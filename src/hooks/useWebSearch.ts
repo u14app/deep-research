@@ -19,7 +19,7 @@ function useWebSearch() {
           options.baseURL = tavilyApiProxy;
           options.apiKey = multiApiKeyPolling(tavilyApiKey);
         } else {
-          options.baseURL = location.origin + "/api/search/tavily";
+          options.baseURL = `${location.origin}/api/search/tavily`;
         }
         options.scope = tavilyScope;
         break;
@@ -30,7 +30,7 @@ function useWebSearch() {
           options.baseURL = firecrawlApiProxy;
           options.apiKey = multiApiKeyPolling(firecrawlApiKey);
         } else {
-          options.baseURL = location.origin + "/api/search/firecrawl";
+          options.baseURL = `${location.origin}/api/search/firecrawl`;
         }
         break;
       }
@@ -40,7 +40,7 @@ function useWebSearch() {
           options.baseURL = exaApiProxy;
           options.apiKey = multiApiKeyPolling(exaApiKey);
         } else {
-          options.baseURL = location.origin + "/api/search/exa";
+          options.baseURL = `${location.origin}/api/search/exa`;
         }
         options.scope = exaScope;
         break;
@@ -51,7 +51,7 @@ function useWebSearch() {
           options.baseURL = bochaApiProxy;
           options.apiKey = multiApiKeyPolling(bochaApiKey);
         } else {
-          options.baseURL = location.origin + "/api/search/bocha";
+          options.baseURL = `${location.origin}/api/search/bocha`;
         }
         break;
       }
@@ -60,7 +60,7 @@ function useWebSearch() {
         if (mode === "local") {
           options.baseURL = searxngApiProxy;
         } else {
-          options.baseURL = location.origin + "/api/search/searxng";
+          options.baseURL = `${location.origin}/api/search/searxng`;
         }
         options.scope = searxngScope;
         break;

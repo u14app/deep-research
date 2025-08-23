@@ -308,6 +308,6 @@ export async function createSearchProvider({
         }) as ImageSource[],
     };
   } else {
-    throw new Error("Unsupported Provider: " + provider);
+    throw new Error(`Unsupported Provider: ${provider}`);
   }
 }

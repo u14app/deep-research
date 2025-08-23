@@ -187,13 +187,13 @@ export function parseWord(file: File, config: Partial<OfficeParserConfig>): Prom
           responseText.push(
             Array.from(xmlParagraphNodesList)
               // Filter paragraph nodes than do not have any text nodes which are identifiable by w:t tag
-              .filter((paragraphNode) => paragraphNode.getElementsByTagName("w:t").length != 0)
+              .filter((paragraphNode) => paragraphNode.getElementsByTagName("w:t").length !== 0)
               .map((paragraphNode) => {
                 // Find text nodes with w:t tags
                 const xmlTextNodeList = paragraphNode.getElementsByTagName("w:t");
                 // Join the texts within this paragraph node without any spaces or delimiters.
                 return Array.from(xmlTextNodeList)
-                  .filter((textNode) => textNode.childNodes[0] && textNode.childNodes[0].nodeValue)
+                  .filter((textNode) => textNode.childNodes[0]?.nodeValue)
                   .map((textNode) => textNode.childNodes[0]?.nodeValue ?? "")
                   .join("");
               })
@@ -225,8 +225,8 @@ export function parsePowerPoint(
           const matchedANumber = parseInt(a.filename.match(slideNumberRegex)?.at(1) || "0", 10);
           const matchedBNumber = parseInt(b.filename.match(slideNumberRegex)?.at(1) || "0", 10);
 
-          const aNumber = isNaN(matchedANumber) ? Infinity : matchedANumber;
-          const bNumber = isNaN(matchedBNumber) ? Infinity : matchedBNumber;
+          const aNumber = Number.isNaN(matchedANumber) ? Infinity : matchedANumber;
+          const bNumber = Number.isNaN(matchedBNumber) ? Infinity : matchedBNumber;
 
           return (
             aNumber - bNumber ||
@@ -236,7 +236,7 @@ export function parsePowerPoint(
 
         // Verify if atleast the slides xml files exist in the extracted files list.
         if (
-          files.length == 0 ||
+          files.length === 0 ||
           !files.map((file) => file.filename).some((filename) => filename.match(slidesRegex))
         )
           handleError(ERRORMSG.fileCorrupted(file.name), config.outputErrorToConsole);
@@ -276,12 +276,12 @@ export function parsePowerPoint(
           responseText.push(
             Array.from(xmlParagraphNodesList)
               // Filter paragraph nodes than do not have any text nodes which are identifiable by a:t tag
-              .filter((paragraphNode) => paragraphNode.getElementsByTagName("a:t").length != 0)
+              .filter((paragraphNode) => paragraphNode.getElementsByTagName("a:t").length !== 0)
               .map((paragraphNode) => {
                 /** Find text nodes with a:t tags */
                 const xmlTextNodeList = paragraphNode.getElementsByTagName("a:t");
                 return Array.from(xmlTextNodeList)
-                  .filter((textNode) => textNode.childNodes[0] && textNode.childNodes[0].nodeValue)
+                  .filter((textNode) => textNode.childNodes[0]?.nodeValue)
                   .map((textNode) => textNode.childNodes[0]?.nodeValue ?? "")
                   .join("");
               })
@@ -311,12 +311,12 @@ export function parseExcel(
       file,
       (x) =>
         [sheetsRegex, drawingsRegex, chartsRegex].some((fileRegex) => x.match(fileRegex)) ||
-        x == stringsFilePath
+        x === stringsFilePath
     )
       .then((files: ExtractedFiles[]) => {
         // Verify if atleast the slides xml files exist in the extracted files list.
         if (
-          files.length == 0 ||
+          files.length === 0 ||
           !files.map((file) => file.filename).some((filename) => filename.match(sheetsRegex))
         )
           handleError(ERRORMSG.fileCorrupted(file.name), config.outputErrorToConsole);
@@ -326,7 +326,7 @@ export function parseExcel(
           drawingFiles: files.filter((file) => file.filename.match(drawingsRegex)),
           chartFiles: files.filter((file) => file.filename.match(chartsRegex)),
           sharedStringsFile:
-            files.filter((file) => file.filename == stringsFilePath)[0] || undefined,
+            files.filter((file) => file.filename === stringsFilePath)[0] || undefined,
         };
       })
       // ********************************** excel xml files explanation ***************************************
@@ -360,21 +360,22 @@ export function parseExcel(
         /** Function to check if the given c node is a valid inline string node. */
         function isValidInlineStringCNode(cNode: Element) {
           // Initial check to see if the passed node is a cNode
-          if (cNode.tagName.toLowerCase() != "c") return false;
-          if (cNode.getAttribute("t") != "inlineStr") return false;
+          if (cNode.tagName.toLowerCase() !== "c") return false;
+          if (cNode.getAttribute("t") !== "inlineStr") return false;
           const childNodesNamedIs = cNode.getElementsByTagName("is");
-          if (childNodesNamedIs.length != 1) return false;
+          if (childNodesNamedIs.length !== 1) return false;
           const childNodesNamedT = childNodesNamedIs[0]?.getElementsByTagName("t");
-          if (!childNodesNamedT || childNodesNamedT.length != 1) return false;
+          if (!childNodesNamedT || childNodesNamedT.length !== 1) return false;
           return (
-            childNodesNamedT[0]?.childNodes[0] && childNodesNamedT[0]?.childNodes[0].nodeValue != ""
+            childNodesNamedT[0]?.childNodes[0] &&
+            childNodesNamedT[0]?.childNodes[0].nodeValue !== ""
           );
         }
 
         /** Function to check if the given c node has a valid v node */
         function hasValidVNodeInCNode(cNode: Element) {
           const vNode = cNode.getElementsByTagName("v")[0];
-          return vNode && vNode.childNodes[0] && vNode.childNodes[0].nodeValue != "";
+          return vNode?.childNodes[0] && vNode.childNodes[0].nodeValue !== "";
         }
 
         /** Find text nodes with t tags in sharedStrings xml file. If the sharedStringsFile is not present, we return an empty array. */
@@ -407,7 +408,7 @@ export function parseExcel(
                 // Processing if this c node has a valid v node.
                 if (hasValidVNodeInCNode(cNode)) {
                   /** Flag whether this node's value represents an index in the shared string array */
-                  const isIndexInSharedStrings = cNode.getAttribute("t") == "s";
+                  const isIndexInSharedStrings = cNode.getAttribute("t") === "s";
 
                   /** Find value nodes represented by v tags */
                   const cNodeValue = cNode.getElementsByTagName("v")[0]?.childNodes[0]?.nodeValue;
@@ -439,12 +440,12 @@ export function parseExcel(
           responseText.push(
             Array.from(drawingsXmlParagraphNodesList)
               // Filter paragraph nodes than do not have any text nodes which are identifiable by a:t tag
-              .filter((paragraphNode) => paragraphNode.getElementsByTagName("a:t").length != 0)
+              .filter((paragraphNode) => paragraphNode.getElementsByTagName("a:t").length !== 0)
               .map((paragraphNode) => {
                 /** Find text nodes with a:t tags */
                 const xmlTextNodeList = paragraphNode.getElementsByTagName("a:t");
                 return Array.from(xmlTextNodeList)
-                  .filter((textNode) => textNode.childNodes[0] && textNode.childNodes[0].nodeValue)
+                  .filter((textNode) => textNode.childNodes[0]?.nodeValue)
                   .map((textNode) => textNode.childNodes[0]?.nodeValue ?? "")
                   .join("");
               })
@@ -460,7 +461,7 @@ export function parseExcel(
           /** Store all the text content to respond */
           responseText.push(
             Array.from(chartsXmlCVNodesList)
-              .filter((cVNode) => cVNode.childNodes[0] && cVNode.childNodes[0].nodeValue)
+              .filter((cVNode) => cVNode.childNodes[0]?.nodeValue)
               .map((cVNode) => cVNode.childNodes[0]?.nodeValue ?? "")
               .join(config.newlineDelimiter ?? "\n")
           );
@@ -482,7 +483,7 @@ export function parseOpenOffice(
   const objectContentFilesRegex = /Object \d+\/content.xml/g;
 
   return new Promise((resolve, reject) => {
-    extractFiles(file, (x) => x == mainContentFilePath || !!x.match(objectContentFilesRegex))
+    extractFiles(file, (x) => x === mainContentFilePath || !!x.match(objectContentFilesRegex))
       .then((files) => {
         // Verify if atleast the content xml file exists in the extracted files list.
         if (!files.map((file) => file.filename).includes(mainContentFilePath))
@@ -490,7 +491,7 @@ export function parseOpenOffice(
 
         return {
           mainContentFile:
-            files.filter((file) => file.filename == mainContentFilePath)[0] || undefined,
+            files.filter((file) => file.filename === mainContentFilePath)[0] || undefined,
           objectContentFiles: files.filter((file) => file.filename.match(objectContentFilesRegex)),
         };
       })
@@ -538,8 +539,8 @@ export function parseOpenOffice(
           isFirstRecursion: boolean
         ) {
           if (!node) return;
-          if (!node.childNodes || node.childNodes.length == 0) {
-            if (node.parentNode?.nodeName.indexOf("text") == 0 && node.nodeValue) {
+          if (!node.childNodes || node.childNodes.length === 0) {
+            if (node.parentNode?.nodeName.indexOf("text") === 0 && node.nodeValue) {
               if (isNotesNode(node.parentNode) && (config.putNotesAtLast || config.ignoreNotes)) {
                 notesText.push(node.nodeValue);
                 if (allowedTextTags.includes(node.parentNode.nodeName) && !isFirstRecursion)
@@ -559,7 +560,7 @@ export function parseOpenOffice(
 
         /** Checks if the given node has an ancestor which is a notes tag. We use this information to put the notes in the response text and its position. */
         function isNotesNode(node: Node) {
-          if (node.nodeName == notesTag) return true;
+          if (node.nodeName === notesTag) return true;
           if (node.parentNode) return isNotesNode(node.parentNode);
           return false;
         }
@@ -595,7 +596,7 @@ export function parseOpenOffice(
             xmlTextNodesList
               // Add every text information from within this textNode and combine them together.
               .map((textNode) => extractAllTextsFromNode(textNode))
-              .filter((text) => text != "")
+              .filter((text) => text !== "")
               .join(config.newlineDelimiter ?? "\n")
           );
         });
