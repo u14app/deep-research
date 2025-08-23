@@ -1,41 +1,35 @@
 "use client";
-import dynamic from "next/dynamic";
-import { useState, useMemo, useEffect } from "react";
-import { useTranslation } from "react-i18next";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Download,
+  FileSpreadsheet,
   FileText,
-  Signature,
   LoaderCircle,
   NotebookText,
+  Signature,
   Waypoints,
-  FileSpreadsheet,
 } from "lucide-react";
+import dynamic from "next/dynamic";
+import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
+import { z } from "zod";
 import { Button } from "@/components/Internal/Button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-} from "@/components/ui/form";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Textarea } from "@/components/ui/textarea";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Separator } from "@/components/ui/separator";
+import { Textarea } from "@/components/ui/textarea";
 import useAccurateTimer from "@/hooks/useAccurateTimer";
 import useDeepResearch from "@/hooks/useDeepResearch";
 import useKnowledge from "@/hooks/useKnowledge";
-import { useTaskStore } from "@/store/task";
 import { useKnowledgeStore } from "@/store/knowledge";
+import { useTaskStore } from "@/store/task";
 import { getSystemPrompt } from "@/utils/deep-research/prompts";
 import { downloadFile } from "@/utils/file";
 import { markdownToDoc } from "@/utils/markdown";
@@ -53,17 +47,11 @@ function FinalReport() {
   const taskStore = useTaskStore();
   const { status, writeFinalReport } = useDeepResearch();
   const { generateId } = useKnowledge();
-  const {
-    formattedTime,
-    start: accurateTimerStart,
-    stop: accurateTimerStop,
-  } = useAccurateTimer();
+  const { formattedTime, start: accurateTimerStart, stop: accurateTimerStop } = useAccurateTimer();
   const [isWriting, setIsWriting] = useState<boolean>(false);
   const [openKnowledgeGraph, setOpenKnowledgeGraph] = useState<boolean>(false);
   const taskFinished = useMemo(() => {
-    const unfinishedTasks = taskStore.tasks.filter(
-      (task) => task.state !== "completed"
-    );
+    const unfinishedTasks = taskStore.tasks.filter((task) => task.state !== "completed");
     return taskStore.tasks.length > 0 && unfinishedTasks.length === 0;
   }, [taskStore.tasks]);
 
@@ -98,9 +86,7 @@ function FinalReport() {
             `## ${t("research.finalReport.localResearchedInfor", {
               total: resources.length,
             })}`,
-            `${resources
-              .map((source, idx) => `${idx + 1}. ${source.name}`)
-              .join("\n")}`,
+            `${resources.map((source, idx) => `${idx + 1}. ${source.name}`).join("\n")}`,
           ].join("\n")
         : "",
       sources.length > 0
@@ -110,10 +96,7 @@ function FinalReport() {
               total: sources.length,
             })}`,
             `${sources
-              .map(
-                (source, idx) =>
-                  `${idx + 1}. [${source.title || source.url}][${idx + 1}]`
-              )
+              .map((source, idx) => `${idx + 1}. [${source.title || source.url}][${idx + 1}]`)
               .join("\n")}`,
           ].join("\n")
         : "",
@@ -136,21 +119,13 @@ function FinalReport() {
   }
 
   function handleDownloadMarkdown() {
-    downloadFile(
-      getFinakReportContent(),
-      `${taskStore.title}.md`,
-      "text/markdown;charset=utf-8"
-    );
+    downloadFile(getFinakReportContent(), `${taskStore.title}.md`, "text/markdown;charset=utf-8");
   }
 
   function handleDownloadWord() {
     // markdownToDoc returns HTML that Word can read as a legacy .doc file
     const docHtml = markdownToDoc(getFinakReportContent());
-    downloadFile(
-      docHtml,
-      `${taskStore.title}.doc`,
-      "application/msword;charset=utf-8"
-    );
+    downloadFile(docHtml, `${taskStore.title}.doc`, "application/msword;charset=utf-8");
   }
 
   async function handleDownloadPDF() {
@@ -230,14 +205,8 @@ function FinalReport() {
                         <Download />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent
-                      className="print:hidden"
-                      side="left"
-                      sideOffset={8}
-                    >
-                      <DropdownMenuItem
-                        onClick={() => handleDownloadMarkdown()}
-                      >
+                    <DropdownMenuContent className="print:hidden" side="left" sideOffset={8}>
+                      <DropdownMenuItem onClick={() => handleDownloadMarkdown()}>
                         <FileText />
                         <span>Markdown</span>
                       </DropdownMenuItem>
@@ -312,9 +281,7 @@ function FinalReport() {
                     <FormControl>
                       <Textarea
                         rows={3}
-                        placeholder={t(
-                          "research.finalReport.writingRequirementPlaceholder"
-                        )}
+                        placeholder={t("research.finalReport.writingRequirementPlaceholder")}
                         disabled={isWriting}
                         {...field}
                       />
@@ -322,11 +289,7 @@ function FinalReport() {
                   </FormItem>
                 )}
               />
-              <Button
-                className="w-full mt-4"
-                type="submit"
-                disabled={isWriting}
-              >
+              <Button className="w-full mt-4" type="submit" disabled={isWriting}>
                 {isWriting ? (
                   <>
                     <LoaderCircle className="animate-spin" />

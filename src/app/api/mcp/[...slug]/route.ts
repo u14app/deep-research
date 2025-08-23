@@ -1,19 +1,10 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { SSEServerTransport } from "@/libs/mcp-server/sse";
 import { initMcpServer } from "../server";
 
 export const runtime = "edge";
 export const dynamic = "force-dynamic";
-export const preferredRegion = [
-  "cle1",
-  "iad1",
-  "pdx1",
-  "sfo1",
-  "sin1",
-  "syd1",
-  "hnd1",
-  "kix1",
-];
+export const preferredRegion = ["cle1", "iad1", "pdx1", "sfo1", "sin1", "syd1", "hnd1", "kix1"];
 
 // In-memory storage for active transport sessions.
 // In a production app, consider a more robust distributed cache or state store.
@@ -36,10 +27,7 @@ export async function GET(): Promise<NextResponse> {
   activeTransports.set(sessionId, transport);
 
   transport.onerror = (error) => {
-    return NextResponse.json(
-      { code: 500, message: error.message },
-      { status: 500 }
-    );
+    return NextResponse.json({ code: 500, message: error.message }, { status: 500 });
   };
 
   transport.onclose = () => {

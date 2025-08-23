@@ -1,7 +1,7 @@
 import { customAlphabet } from "nanoid";
-import { Transport } from "./shared/transport";
 import type { ReadableStreamController } from "stream/web";
-import { JSONRPCMessage, JSONRPCMessageSchema } from "./types";
+import type { Transport } from "./shared/transport";
+import { type JSONRPCMessage, JSONRPCMessageSchema } from "./types";
 
 interface SSEServerTransportOptions {
   endpoint: string;
@@ -181,8 +181,7 @@ export class SSEServerTransport implements Transport {
         const endpointUrl = new URL(this._endpoint, dummyBase);
         endpointUrl.searchParams.set("sessionId", this._sessionId);
 
-        const relativeUrlWithSession =
-          endpointUrl.pathname + endpointUrl.search + endpointUrl.hash;
+        const relativeUrlWithSession = endpointUrl.pathname + endpointUrl.search + endpointUrl.hash;
 
         // Send the event
         // The 'id' field for this SSE event is not strictly necessary per the spec for the endpoint event,
@@ -191,14 +190,9 @@ export class SSEServerTransport implements Transport {
         const endpointEventData = `event: endpoint\ndata: ${relativeUrlWithSession}\n\n`;
         try {
           controller.enqueue(encoder.encode(endpointEventData));
-          console.log(
-            `[${this._sessionId}] Sent 'endpoint' event: ${relativeUrlWithSession}`
-          );
+          console.log(`[${this._sessionId}] Sent 'endpoint' event: ${relativeUrlWithSession}`);
         } catch (error) {
-          console.error(
-            `[${this._sessionId}] Failed to enqueue endpoint event:`,
-            error
-          );
+          console.error(`[${this._sessionId}] Failed to enqueue endpoint event:`, error);
           // If enqueue fails immediately, the stream might be broken
           controller.error(new Error("Failed to enqueue initial SSE event."));
         }
@@ -255,9 +249,7 @@ export class SSEServerTransport implements Transport {
       // This could mean the client connected via GET, got the endpoint, but
       // the SSE connection subsequently failed/closed before they POSTed.
       // Return 404 Not Found (session stream is not active).
-      console.warn(
-        `[${this._sessionId}] Received POST but SSE stream is not active.`
-      );
+      console.warn(`[${this._sessionId}] Received POST but SSE stream is not active.`);
       return new Response(
         JSON.stringify({
           jsonrpc: "2.0",
@@ -301,10 +293,7 @@ export class SSEServerTransport implements Transport {
       // Handle the message, which will validate and call onmessage
       await this.handleMessage(rawMessage);
     } catch (error) {
-      console.error(
-        `[${this._sessionId}] Failed to handle message after parsing:`,
-        error
-      );
+      console.error(`[${this._sessionId}] Failed to handle message after parsing:`, error);
       // If handleMessage throws (likely due to Zod validation error or onmessage handler error)
       // Return a JSON-RPC Invalid Request error response
       return new Response(
@@ -312,10 +301,7 @@ export class SSEServerTransport implements Transport {
           jsonrpc: "2.0",
           error: {
             code:
-              error instanceof Error &&
-              error.message.includes("Invalid Request")
-                ? -32600
-                : -32603, // Use Invalid Request or Internal Error
+              error instanceof Error && error.message.includes("Invalid Request") ? -32600 : -32603, // Use Invalid Request or Internal Error
             message: `Message handling error: ${String(error)}`,
             data: String(error),
           },
@@ -344,9 +330,7 @@ export class SSEServerTransport implements Transport {
       parsedMessage = JSONRPCMessageSchema.parse(message);
     } catch (error) {
       // Wrap Zod errors as Invalid Request
-      const validationError = new Error(
-        `Invalid Request: Message validation failed - ${error}`
-      );
+      const validationError = new Error(`Invalid Request: Message validation failed - ${error}`);
       this.onerror?.(validationError);
       throw validationError; // Re-throw to be caught by handlePostMessage for proper response
     }
@@ -359,9 +343,7 @@ export class SSEServerTransport implements Transport {
       this.onmessage?.(parsedMessage);
     } catch (error) {
       // Catch errors *within* the onmessage handler
-      const messageHandlerError = new Error(
-        `Error in onmessage handler: ${error}`
-      );
+      const messageHandlerError = new Error(`Error in onmessage handler: ${error}`);
       this.onerror?.(messageHandlerError);
       // Decide whether to re-throw to potentially return a 500 or just log
       // Re-throwing allows handlePostMessage to return an error response.
@@ -380,10 +362,7 @@ export class SSEServerTransport implements Transport {
       this._sseController?.close();
       if (this.onclose) this.onclose();
     } catch (error) {
-      console.error(
-        `[${this._sessionId}] Error during controller.close():`,
-        error
-      );
+      console.error(`[${this._sessionId}] Error during controller.close():`, error);
       this.onerror?.(error as Error); // Report closing error
     }
     this._sseController = undefined; // Ensure controller is cleared immediately
@@ -399,9 +378,7 @@ export class SSEServerTransport implements Transport {
    */
   async send(message: JSONRPCMessage): Promise<void> {
     if (!this._sseController) {
-      const error = new Error(
-        `[${this._sessionId}] Cannot send message: SSE stream not active.`
-      );
+      const error = new Error(`[${this._sessionId}] Cannot send message: SSE stream not active.`);
       console.error(error.message);
       // Decide if sending when not connected should be a hard error or silent discard.
       // Original code throws, let's keep that behavior.
@@ -419,9 +396,7 @@ export class SSEServerTransport implements Transport {
       // for typical message rates in web apps.
       // If desiredSize is null, the stream is closed.
       if (this._sseController.desiredSize === null) {
-        const error = new Error(
-          `[${this._sessionId}] Cannot send message: SSE stream is closed.`
-        );
+        const error = new Error(`[${this._sessionId}] Cannot send message: SSE stream is closed.`);
         console.error(error.message);
         // The cancel handler should have cleared _sseController, but double check.
         this._sseController = undefined;
@@ -431,9 +406,7 @@ export class SSEServerTransport implements Transport {
       // console.log(`[${this._sessionId}] Sent message (SSE event ID: ${this._messageIdCounter - 1})`); // Debug log
     } catch (error) {
       // Catch synchronous errors during enqueue (e.g. controller already errored)
-      const sendError = new Error(
-        `[${this._sessionId}] Failed to enqueue SSE message: ${error}`
-      );
+      const sendError = new Error(`[${this._sessionId}] Failed to enqueue SSE message: ${error}`);
       console.error(sendError.message);
       this.onerror?.(sendError); // Report the error via the transport's error handler
       // Re-throw the error as the message failed to send

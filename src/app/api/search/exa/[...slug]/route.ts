@@ -1,19 +1,10 @@
-import { NextResponse, type NextRequest } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { EXA_BASE_URL } from "@/constants/urls";
 
 export const runtime = "edge";
-export const preferredRegion = [
-  "cle1",
-  "iad1",
-  "pdx1",
-  "sfo1",
-  "sin1",
-  "syd1",
-  "hnd1",
-  "kix1",
-];
+export const preferredRegion = ["cle1", "iad1", "pdx1", "sfo1", "sin1", "syd1", "hnd1", "kix1"];
 
-const API_PROXY_BASE_URL = process.env.EXA_API_BASE_URL || EXA_BASE_URL;
+const API_PROXY_BASE_URL = process.env["EXA_API_BASE_URL"] || EXA_BASE_URL;
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
@@ -38,10 +29,8 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     if (error instanceof Error) {
       console.error(error);
-      return NextResponse.json(
-        { code: 500, message: error.message },
-        { status: 500 }
-      );
+      return NextResponse.json({ code: 500, message: error.message }, { status: 500 });
     }
+    return NextResponse.json({ code: 500, message: "Unknown error occurred" }, { status: 500 });
   }
 }

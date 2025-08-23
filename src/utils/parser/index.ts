@@ -22,10 +22,7 @@ const TextFormatFileMimeTypes = [
 ];
 
 export async function fileParser(file: File): Promise<string> {
-  if (
-    file.type.startsWith("text/") ||
-    TextFormatFileMimeTypes.includes(file.type)
-  ) {
+  if (file.type.startsWith("text/") || TextFormatFileMimeTypes.includes(file.type)) {
     return await readTextFromFile(file);
   } else if (
     file.type.startsWith("application/vnd.openxmlformats-officedocument") ||

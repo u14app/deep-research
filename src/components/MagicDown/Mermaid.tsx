@@ -1,16 +1,9 @@
-import { useRef, useEffect, useState, type ReactNode } from "react";
-import { useTranslation } from "react-i18next";
-import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import copy from "copy-to-clipboard";
+import { Copy, CopyCheck, Download, RefreshCcw, ZoomIn, ZoomOut } from "lucide-react";
 import { customAlphabet } from "nanoid";
-import {
-  Download,
-  Copy,
-  CopyCheck,
-  ZoomIn,
-  ZoomOut,
-  RefreshCcw,
-} from "lucide-react";
+import { type ReactNode, useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { TransformComponent, TransformWrapper } from "react-zoom-pan-pinch";
 import { Button } from "@/components/Internal/Button";
 import { downloadFile } from "@/utils/file";
 

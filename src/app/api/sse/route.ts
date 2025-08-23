@@ -1,25 +1,16 @@
-import { NextResponse, type NextRequest } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import DeepResearch from "@/utils/deep-research";
 import { multiApiKeyPolling } from "@/utils/model";
 import {
-  getAIProviderBaseURL,
   getAIProviderApiKey,
-  getSearchProviderBaseURL,
+  getAIProviderBaseURL,
   getSearchProviderApiKey,
+  getSearchProviderBaseURL,
 } from "../utils";
 
 export const runtime = "edge";
 export const dynamic = "force-dynamic";
-export const preferredRegion = [
-  "cle1",
-  "iad1",
-  "pdx1",
-  "sfo1",
-  "sin1",
-  "syd1",
-  "hnd1",
-  "kix1",
-];
+export const preferredRegion = ["cle1", "iad1", "pdx1", "sfo1", "sin1", "syd1", "hnd1", "kix1"];
 
 export async function POST(req: NextRequest) {
   const {
@@ -47,28 +38,27 @@ export async function POST(req: NextRequest) {
         )
       );
 
+      const aiApiKey = multiApiKeyPolling(getAIProviderApiKey(provider));
+      const searchApiKey = multiApiKeyPolling(getSearchProviderApiKey(searchProvider));
+
       const deepResearch = new DeepResearch({
-        language,
+        ...(language && { language }),
         AIProvider: {
           baseURL: getAIProviderBaseURL(provider),
-          apiKey: multiApiKeyPolling(getAIProviderApiKey(provider)),
+          ...(aiApiKey && { apiKey: aiApiKey }),
           provider,
           thinkingModel,
           taskModel,
         },
         searchProvider: {
           baseURL: getSearchProviderBaseURL(searchProvider),
-          apiKey: multiApiKeyPolling(getSearchProviderApiKey(searchProvider)),
+          ...(searchApiKey && { apiKey: searchApiKey }),
           provider: searchProvider,
-          maxResult,
+          ...(maxResult && { maxResult }),
         },
         onMessage: (event, data) => {
           if (event === "progress") {
-            console.log(
-              `[${data.step}]: ${data.name ? `"${data.name}" ` : ""}${
-                data.status
-              }`
-            );
+            console.log(`[${data.step}]: ${data.name ? `"${data.name}" ` : ""}${data.status}`);
             if (data.step === "final-report" && data.status === "end") {
               controller.close();
             }
@@ -77,9 +67,7 @@ export async function POST(req: NextRequest) {
             controller.close();
           }
           controller.enqueue(
-            encoder.encode(
-              `event: ${event}\ndata: ${JSON.stringify(data)})}\n\n`
-            )
+            encoder.encode(`event: ${event}\ndata: ${JSON.stringify(data)})}\n\n`)
           );
         },
       });

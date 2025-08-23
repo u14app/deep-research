@@ -1,5 +1,5 @@
-import type { GoogleVertexProviderSettings } from "@ai-sdk/google-vertex/edge";
 import type { AzureOpenAIProviderSettings } from "@ai-sdk/azure";
+import type { GoogleVertexProviderSettings } from "@ai-sdk/google-vertex/edge";
 
 export interface AIProviderOptions {
   provider: string;
@@ -22,116 +22,99 @@ export async function createAIProvider({
 }: AIProviderOptions) {
   if (provider === "google") {
     const { createGoogleGenerativeAI } = await import("@ai-sdk/google");
-    const google = createGoogleGenerativeAI({
-      baseURL,
-      apiKey,
-    });
+    const config: any = { baseURL };
+    if (apiKey) config.apiKey = apiKey;
+    const google = createGoogleGenerativeAI(config);
     return google(model, settings);
   } else if (provider === "google-vertex") {
     const { createVertex } = await import("@ai-sdk/google-vertex/edge");
     const googleVertexOptions: GoogleVertexProviderSettings = {};
     if (auth) {
-      googleVertexOptions.project = auth.project;
-      googleVertexOptions.location = auth.location;
+      if (auth["project"]) googleVertexOptions.project = auth["project"];
+      if (auth["location"]) googleVertexOptions.location = auth["location"];
     }
     if (baseURL) {
       googleVertexOptions.baseURL = baseURL;
     }
-    if (auth?.clientEmail && auth?.privateKey) {
-      googleVertexOptions.googleCredentials = {
-        clientEmail: auth.clientEmail,
-        privateKey: auth.privateKey,
-        privateKeyId: auth.privateKeyId,
+    if (auth?.["clientEmail"] && auth?.["privateKey"]) {
+      const creds: any = {
+        clientEmail: auth["clientEmail"],
+        privateKey: auth["privateKey"],
       };
+      if (auth["privateKeyId"]) creds.privateKeyId = auth["privateKeyId"];
+      googleVertexOptions.googleCredentials = creds;
     }
     const googleVertex = createVertex(googleVertexOptions);
     return googleVertex(model, settings);
   } else if (provider === "openai") {
     const { createOpenAI } = await import("@ai-sdk/openai");
-    const openai = createOpenAI({
-      baseURL,
-      apiKey,
-    });
-    return model.startsWith("gpt-4o")
-      ? openai.responses(model)
-      : openai(model, settings);
+    const config: any = { baseURL };
+    if (apiKey) config.apiKey = apiKey;
+    const openai = createOpenAI(config);
+    return model.startsWith("gpt-4o") ? openai.responses(model) : openai(model, settings);
   } else if (provider === "anthropic") {
     const { createAnthropic } = await import("@ai-sdk/anthropic");
-    const anthropic = createAnthropic({
-      baseURL,
-      apiKey,
-      headers,
-    });
+    const config: any = { baseURL };
+    if (apiKey) config.apiKey = apiKey;
+    if (headers) config.headers = headers;
+    const anthropic = createAnthropic(config);
     return anthropic(model, settings);
   } else if (provider === "deepseek") {
     const { createDeepSeek } = await import("@ai-sdk/deepseek");
-    const deepseek = createDeepSeek({
-      baseURL,
-      apiKey,
-    });
+    const config: any = { baseURL };
+    if (apiKey) config.apiKey = apiKey;
+    const deepseek = createDeepSeek(config);
     return deepseek(model, settings);
   } else if (provider === "xai") {
     const { createXai } = await import("@ai-sdk/xai");
-    const xai = createXai({
-      baseURL,
-      apiKey,
-    });
+    const config: any = { baseURL };
+    if (apiKey) config.apiKey = apiKey;
+    const xai = createXai(config);
     return xai(model, settings);
   } else if (provider === "mistral") {
     const { createMistral } = await import("@ai-sdk/mistral");
-    const mistral = createMistral({
-      baseURL,
-      apiKey,
-    });
+    const config: any = { baseURL };
+    if (apiKey) config.apiKey = apiKey;
+    const mistral = createMistral(config);
     return mistral(model, settings);
   } else if (provider === "azure") {
     const { createAzure } = await import("@ai-sdk/azure");
     const azureOptions: AzureOpenAIProviderSettings = {};
     if (auth) {
-      azureOptions.resourceName = auth.resourceName;
-      azureOptions.apiKey = auth.apiKey;
-      azureOptions.apiVersion = auth.apiVersion;
+      if (auth["resourceName"]) azureOptions.resourceName = auth["resourceName"];
+      if (auth["apiKey"]) azureOptions.apiKey = auth["apiKey"];
+      if (auth["apiVersion"]) azureOptions.apiVersion = auth["apiVersion"];
     }
     if (baseURL) {
       azureOptions.baseURL = baseURL;
-      azureOptions.apiKey = apiKey;
+      if (apiKey) azureOptions.apiKey = apiKey;
     }
     const azure = createAzure(azureOptions);
     return azure(model, settings);
   } else if (provider === "openrouter") {
     const { createOpenRouter } = await import("@openrouter/ai-sdk-provider");
-    const openrouter = createOpenRouter({
-      baseURL,
-      apiKey,
-    });
+    const config: any = { baseURL };
+    if (apiKey) config.apiKey = apiKey;
+    const openrouter = createOpenRouter(config);
     return openrouter(model, settings);
   } else if (provider === "openaicompatible") {
-    const { createOpenAICompatible } = await import(
-      "@ai-sdk/openai-compatible"
-    );
-    const openaicompatible = createOpenAICompatible({
-      name: "openaicompatible",
-      baseURL,
-      apiKey,
-    });
+    const { createOpenAICompatible } = await import("@ai-sdk/openai-compatible");
+    const config: any = { name: "openaicompatible", baseURL };
+    if (apiKey) config.apiKey = apiKey;
+    const openaicompatible = createOpenAICompatible(config);
     return openaicompatible(model, settings);
   } else if (provider === "pollinations") {
-    const { createOpenAICompatible } = await import(
-      "@ai-sdk/openai-compatible"
-    );
-    const pollinations = createOpenAICompatible({
-      name: "pollinations",
-      baseURL,
-      apiKey,
-    });
+    const { createOpenAICompatible } = await import("@ai-sdk/openai-compatible");
+    const config: any = { name: "pollinations", baseURL };
+    if (apiKey) config.apiKey = apiKey;
+    const pollinations = createOpenAICompatible(config);
     return pollinations(model, settings);
   } else if (provider === "ollama") {
     const { createOllama } = await import("ollama-ai-provider");
     const local = global.location || {};
-    const ollama = createOllama({
+    const config: any = {
       baseURL,
-      headers,
-      fetch: async (input, init) => {
+      fetch: async (input: RequestInfo | URL, init?: RequestInit) => {
         const headers = (init?.headers || {}) as Record<string, string>;
         if (!baseURL?.startsWith(local.origin)) delete headers["Authorization"];
         return await fetch(input, {
@@ -140,7 +123,9 @@ export async function createAIProvider({
           credentials: "omit",
         });
       },
-    });
+    };
+    if (headers) config.headers = headers;
+    const ollama = createOllama(config);
     return ollama(model, settings);
   } else {
     throw new Error("Unsupported Provider: " + provider);

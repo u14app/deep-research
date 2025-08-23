@@ -1,15 +1,15 @@
 import { customAlphabet } from "nanoid";
-import { Transport } from "./shared/transport";
+import type { ReadableStreamController } from "stream/web";
+import type { Transport } from "./shared/transport";
 import {
   isInitializeRequest,
   isJSONRPCError,
   isJSONRPCRequest,
   isJSONRPCResponse,
-  JSONRPCMessage,
+  type JSONRPCMessage,
   JSONRPCMessageSchema,
-  RequestId,
+  type RequestId,
 } from "./types";
-import type { ReadableStreamController } from "stream/web";
 
 export type StreamId = string;
 export type EventId = string;
@@ -170,8 +170,7 @@ export class StreamableHTTPServerTransport implements Transport {
   private sessionIdGenerator: (() => string) | undefined;
   private _started: boolean = false;
   // Map streamId to the ReadableStream controller for SSE streams
-  private _streamMapping: Map<string, ReadableStreamController<Uint8Array>> =
-    new Map();
+  private _streamMapping: Map<string, ReadableStreamController<Uint8Array>> = new Map();
   // Maps request ID to stream ID for POST requests resulting in SSE streams
   private _requestToStreamMapping: Map<RequestId, string> = new Map();
   // In SSE mode, stores responses waiting for the entire batch to be ready before closing the stream.
@@ -375,48 +374,34 @@ export class StreamableHTTPServerTransport implements Transport {
         // Store the controller keyed by streamId
         this._streamMapping.set(streamId, controller);
         this.onerror?.(
-          new Error(
-            `SSE Stream [${streamId}] started for session ${
-              this.sessionId || "stateless"
-            }`
-          )
+          new Error(`SSE Stream [${streamId}] started for session ${this.sessionId || "stateless"}`)
         ); // Debug log
 
         // If replaying is needed, do it now
         if (options?.lastEventId && this._eventStore) {
           try {
             this.onerror?.(
-              new Error(
-                `Replaying events for stream [${streamId}] after ${options.lastEventId}`
-              )
+              new Error(`Replaying events for stream [${streamId}] after ${options.lastEventId}`)
             ); // Debug
             await this._eventStore.replayEventsAfter(options.lastEventId, {
               send: async (eventId, message) => {
                 // Ensure the stream is still active before enqueuing
                 if (!this._streamMapping.has(streamId)) {
-                  this.onerror?.(
-                    new Error(`Stream [${streamId}] closed during replay.`)
-                  );
+                  this.onerror?.(new Error(`Stream [${streamId}] closed during replay.`));
                   // Stop replaying if stream is gone
                   return; // Decide if this should throw or just stop
                 }
                 if (!this.writeSSEEvent(controller, message, eventId)) {
                   // Failed to enqueue replayed event - potentially the stream is full or closing
                   this.onerror?.(
-                    new Error(
-                      `Failed to enqueue replayed event ${eventId} for stream ${streamId}`
-                    )
+                    new Error(`Failed to enqueue replayed event ${eventId} for stream ${streamId}`)
                   );
                   // Decide how to handle enqueue failure during replay - closing seems appropriate
-                  controller.error(
-                    new Error("Failed to enqueue replayed events")
-                  );
+                  controller.error(new Error("Failed to enqueue replayed events"));
                 }
               },
             });
-            this.onerror?.(
-              new Error(`Finished replaying events for stream [${streamId}]`)
-            ); // Debug
+            this.onerror?.(new Error(`Finished replaying events for stream [${streamId}]`)); // Debug
           } catch (error) {
             this.onerror?.(error as Error);
             // Close stream on replay error
@@ -441,10 +426,7 @@ export class StreamableHTTPServerTransport implements Transport {
         // Cleanup mappings when the client disconnects or the stream is closed from our side
         this._streamMapping.delete(streamId);
         // Also clean up any request mappings pointing to this stream
-        for (const [
-          reqId,
-          mappedStreamId,
-        ] of this._requestToStreamMapping.entries()) {
+        for (const [reqId, mappedStreamId] of this._requestToStreamMapping.entries()) {
           if (mappedStreamId === streamId) {
             this._requestToStreamMapping.delete(reqId);
             // Clear any pending responses for these requests
@@ -454,9 +436,7 @@ export class StreamableHTTPServerTransport implements Transport {
               this._pendingJsonResponses
                 .get(reqId)
                 ?.reject(
-                  new Error(
-                    `Stream closed before JSON response could be processed: ${reason}`
-                  )
+                  new Error(`Stream closed before JSON response could be processed: ${reason}`)
                 );
               this._pendingJsonResponses.delete(reqId);
             }
@@ -511,9 +491,7 @@ export class StreamableHTTPServerTransport implements Transport {
       return true; // Indicate success
     } catch (error) {
       // Catch synchronous errors during enqueue (e.g. controller is already errored)
-      this.onerror?.(
-        new Error(`Failed to enqueue SSE event ${eventId || "no-id"}: ${error}`)
-      );
+      this.onerror?.(new Error(`Failed to enqueue SSE event ${eventId || "no-id"}: ${error}`));
       return false; // Indicate failure
     }
   }
@@ -561,8 +539,7 @@ export class StreamableHTTPServerTransport implements Transport {
             jsonrpc: "2.0",
             error: {
               code: -32000,
-              message:
-                "Unsupported Media Type: Content-Type must be application/json",
+              message: "Unsupported Media Type: Content-Type must be application/json",
             },
             id: null,
           }),
@@ -659,8 +636,7 @@ export class StreamableHTTPServerTransport implements Transport {
               jsonrpc: "2.0",
               error: {
                 code: -32600,
-                message:
-                  "Invalid Request: Only one initialization request is allowed",
+                message: "Invalid Request: Only one initialization request is allowed",
               },
               id: null,
             }),
@@ -729,8 +705,7 @@ export class StreamableHTTPServerTransport implements Transport {
                 jsonrpc: "2.0",
                 error: {
                   code: -32600,
-                  message:
-                    "Invalid Request: Request in batch must have an ID in JSON mode",
+                  message: "Invalid Request: Request in batch must have an ID in JSON mode",
                 },
                 id: null,
               }),
@@ -743,12 +718,10 @@ export class StreamableHTTPServerTransport implements Transport {
           requestIds.push(request.id);
 
           // Create a promise that will be resolved when the response for this request ID arrives via `send`
-          const responsePromise = new Promise<JSONRPCMessage>(
-            (resolve, reject) => {
-              // Store the resolve/reject callbacks keyed by request ID
-              this._pendingJsonResponses.set(request.id, { resolve, reject });
-            }
-          );
+          const responsePromise = new Promise<JSONRPCMessage>((resolve, reject) => {
+            // Store the resolve/reject callbacks keyed by request ID
+            this._pendingJsonResponses.set(request.id, { resolve, reject });
+          });
           responsePromises.push(responsePromise);
 
           // In JSON mode, stream mapping (_requestToStreamMapping) is not strictly needed for sending
@@ -847,8 +820,7 @@ export class StreamableHTTPServerTransport implements Transport {
             // Use Parse error (-32700) for JSON issues, Invalid Request (-32600) for validation/logic issues
             code:
               error instanceof Error &&
-              (error.message.includes("Parse error") ||
-                error.message.includes("Invalid Request"))
+              (error.message.includes("Parse error") || error.message.includes("Invalid Request"))
                 ? error.message.includes("Parse error")
                   ? -32700
                   : -32600
@@ -962,15 +934,11 @@ export class StreamableHTTPServerTransport implements Transport {
         // Calling close() on the controller signals the stream end to the client.
         // The stream's cancel handler will be triggered subsequently to clean up mappings.
         controller.close();
-        this.onerror?.(
-          new Error(`Closing stream [${streamId}] via transport.close()`)
-        ); // Debug log
+        this.onerror?.(new Error(`Closing stream [${streamId}] via transport.close()`)); // Debug log
       } catch (error) {
         // Catch errors if the controller is already closing or errored
         this.onerror?.(
-          new Error(
-            `Error closing stream [${streamId}] via transport.close(): ${error}`
-          )
+          new Error(`Error closing stream [${streamId}] via transport.close(): ${error}`)
         );
       }
     });
@@ -1000,10 +968,7 @@ export class StreamableHTTPServerTransport implements Transport {
    * In SSE mode, enqueues the message to the appropriate stream.
    * In JSON mode, resolves the promise awaiting the response if it's a response/error.
    */
-  async send(
-    message: JSONRPCMessage,
-    options?: { relatedRequestId?: RequestId }
-  ): Promise<void> {
+  async send(message: JSONRPCMessage, options?: { relatedRequestId?: RequestId }): Promise<void> {
     // This method does NOT return a Response. It modifies internal state or pushes data.
 
     let requestId = options?.relatedRequestId;
@@ -1015,10 +980,7 @@ export class StreamableHTTPServerTransport implements Transport {
 
     // --- Handle JSON Response Mode ---
     // If enableJsonResponse is true AND this message is a response/error, resolve the pending promise.
-    if (
-      this._enableJsonResponse &&
-      (isJSONRPCResponse(message) || isJSONRPCError(message))
-    ) {
+    if (this._enableJsonResponse && (isJSONRPCResponse(message) || isJSONRPCError(message))) {
       if (requestId !== undefined && requestId !== null) {
         // Only valid JSON-RPC response IDs (number/string) map to pending requests
         const pending = this._pendingJsonResponses.get(requestId);
@@ -1129,11 +1091,7 @@ export class StreamableHTTPServerTransport implements Transport {
         eventId = await this._eventStore.storeEvent(streamId, message);
         // this.onerror?.(new Error(`Stored event ${eventId} for stream ${streamId}`)); // Debug log
       } catch (storageError) {
-        this.onerror?.(
-          new Error(
-            `Failed to store event for stream ${streamId}: ${storageError}`
-          )
-        );
+        this.onerror?.(new Error(`Failed to store event for stream ${streamId}: ${storageError}`));
         // Log error, but continue trying to send the message (client might still be connected).
       }
     }
@@ -1144,9 +1102,7 @@ export class StreamableHTTPServerTransport implements Transport {
       // Failed to enqueue. The stream might be closed, errored, or buffer is full.
       // This indicates a problem with the stream or client connection.
       this.onerror?.(
-        new Error(
-          `Failed to enqueue SSE event for stream ${streamId}. Stream may be closed.`
-        )
+        new Error(`Failed to enqueue SSE event for stream ${streamId}. Stream may be closed.`)
       );
       // The stream's cancel handler should handle cleanup if it's truly closed.
       // We could proactively call controller.error here, but it might double-error.
@@ -1165,15 +1121,11 @@ export class StreamableHTTPServerTransport implements Transport {
           .map(([id]) => id);
 
         // Check if we have received responses for all requests that initiated this stream
-        const allResponsesReady = relatedIds.every((id) =>
-          this._requestResponseMap.has(id)
-        );
+        const allResponsesReady = relatedIds.every((id) => this._requestResponseMap.has(id));
 
         if (allResponsesReady) {
           this.onerror?.(
-            new Error(
-              `All responses ready for stream [${streamId}]. Closing stream.`
-            )
+            new Error(`All responses ready for stream [${streamId}]. Closing stream.`)
           ); // Debug log
 
           // All responses for this batch/stream are ready, close the SSE stream
@@ -1181,9 +1133,7 @@ export class StreamableHTTPServerTransport implements Transport {
             controller.close(); // Signals end of stream to the client
           } catch (error) {
             this.onerror?.(
-              new Error(
-                `Error calling controller.close on stream [${streamId}]: ${error}`
-              )
+              new Error(`Error calling controller.close on stream [${streamId}]: ${error}`)
             );
           }
 

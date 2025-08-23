@@ -1,19 +1,13 @@
 "use client";
-import { useMemo } from "react";
-import { useTranslation } from "react-i18next";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMemo } from "react";
 import { useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import MagicDownEditor from "@/components/MagicDown/Editor";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import { useKnowledgeStore } from "@/store/knowledge";
 import { cn } from "@/utils/style";
 
@@ -35,9 +29,7 @@ function Content({ id, editClassName, onSubmit, onBack }: Props) {
   const defaultValues = useMemo(() => {
     const { knowledges } = useKnowledgeStore.getState();
     const detail = knowledges.find((item) => item.id === id);
-    return detail
-      ? { title: detail.title, content: detail.content }
-      : { title: "", content: "" };
+    return detail ? { title: detail.title, content: detail.content } : { title: "", content: "" };
   }, [id]);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -66,10 +58,7 @@ function Content({ id, editClassName, onSubmit, onBack }: Props) {
             <FormItem>
               <FormLabel>{t("knowledge.editor.title")}</FormLabel>
               <FormControl>
-                <Input
-                  placeholder={t("knowledge.editor.titlePlaceholder")}
-                  {...field}
-                />
+                <Input placeholder={t("knowledge.editor.titlePlaceholder")} {...field} />
               </FormControl>
             </FormItem>
           )}
@@ -82,7 +71,7 @@ function Content({ id, editClassName, onSubmit, onBack }: Props) {
               <FormLabel>{t("knowledge.editor.content")}</FormLabel>
               <FormControl>
                 <MagicDownEditor
-                  className={editClassName}
+                  {...(editClassName && { className: editClassName })}
                   defaultValue={field.value}
                   hideView={true}
                   onChange={field.onChange}

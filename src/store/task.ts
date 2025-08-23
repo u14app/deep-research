@@ -1,6 +1,6 @@
+import { pick } from "radash";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { pick } from "radash";
 
 export interface TaskStore {
   id: string;
@@ -87,8 +87,7 @@ export const useTaskStore = create(
         return true;
       },
       setQuestion: (question) => set(() => ({ question })),
-      addResource: (resource) =>
-        set((state) => ({ resources: [resource, ...state.resources] })),
+      addResource: (resource) => set((state) => ({ resources: [resource, ...state.resources] })),
       updateResource: (id, resource) => {
         const newResources = get().resources.map((item) => {
           return item.id === id ? { ...item, ...resource } : item;

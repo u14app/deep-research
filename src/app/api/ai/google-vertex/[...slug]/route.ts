@@ -1,18 +1,9 @@
-import { NextResponse, type NextRequest } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 
 export const runtime = "edge";
-export const preferredRegion = [
-  "cle1",
-  "iad1",
-  "pdx1",
-  "sfo1",
-  "sin1",
-  "syd1",
-  "hnd1",
-  "kix1",
-];
+export const preferredRegion = ["cle1", "iad1", "pdx1", "sfo1", "sin1", "syd1", "hnd1", "kix1"];
 
-const API_PROXY_BASE_URL = `https://${process.env.GOOGLE_VERTEX_LOCATION}-aiplatform.googleapis.com/v1/projects/${process.env.GOOGLE_VERTEX_PROJECT}/locations/${process.env.GOOGLE_VERTEX_LOCATION}/publishers/google`;
+const API_PROXY_BASE_URL = `https://${process.env["GOOGLE_VERTEX_LOCATION"]}-aiplatform.googleapis.com/v1/projects/${process.env["GOOGLE_VERTEX_PROJECT"]}/locations/${process.env["GOOGLE_VERTEX_LOCATION"]}/publishers/google`;
 
 async function handler(req: NextRequest) {
   let body;
@@ -38,13 +29,9 @@ async function handler(req: NextRequest) {
     const response = await fetch(url, payload);
     return new NextResponse(response.body, response);
   } catch (error) {
-    if (error instanceof Error) {
-      console.error(error);
-      return NextResponse.json(
-        { code: 500, message: error.message },
-        { status: 500 }
-      );
-    }
+    console.error(error);
+    const message = error instanceof Error ? error.message : "Unknown error";
+    return NextResponse.json({ code: 500, message }, { status: 500 });
   }
 }
 

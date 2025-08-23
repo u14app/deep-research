@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef, useEffect } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 function useAccurateTimer() {
   const [time, setTime] = useState(0);

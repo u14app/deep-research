@@ -1,25 +1,16 @@
-import { NextResponse, type NextRequest } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import DeepResearch from "@/utils/deep-research";
 import { multiApiKeyPolling } from "@/utils/model";
 import {
-  getAIProviderBaseURL,
   getAIProviderApiKey,
-  getSearchProviderBaseURL,
+  getAIProviderBaseURL,
   getSearchProviderApiKey,
+  getSearchProviderBaseURL,
 } from "../../utils";
 
 export const runtime = "edge";
 export const dynamic = "force-dynamic";
-export const preferredRegion = [
-  "cle1",
-  "iad1",
-  "pdx1",
-  "sfo1",
-  "sin1",
-  "syd1",
-  "hnd1",
-  "kix1",
-];
+export const preferredRegion = ["cle1", "iad1", "pdx1", "sfo1", "sin1", "syd1", "hnd1", "kix1"];
 
 export async function GET(req: NextRequest) {
   function getValueFromSearchParams(key: string) {
@@ -32,10 +23,8 @@ export async function GET(req: NextRequest) {
   const searchProvider = getValueFromSearchParams("searchProvider") || "";
   const language = getValueFromSearchParams("language") || "";
   const maxResult = Number(getValueFromSearchParams("maxResult")) || 5;
-  const enableCitationImage =
-    getValueFromSearchParams("enableCitationImage") === "false";
-  const enableReferences =
-    getValueFromSearchParams("enableReferences") === "false";
+  const enableCitationImage = getValueFromSearchParams("enableCitationImage") === "false";
+  const enableReferences = getValueFromSearchParams("enableReferences") === "false";
 
   const encoder = new TextEncoder();
   const readableStream = new ReadableStream({
@@ -46,18 +35,21 @@ export async function GET(req: NextRequest) {
         console.log("Client disconnected");
       });
 
+      const aiApiKey = multiApiKeyPolling(getAIProviderApiKey(provider));
+      const searchApiKey = multiApiKeyPolling(getSearchProviderApiKey(searchProvider));
+
       const deepResearch = new DeepResearch({
-        language,
+        ...(language && { language }),
         AIProvider: {
           baseURL: getAIProviderBaseURL(provider),
-          apiKey: multiApiKeyPolling(getAIProviderApiKey(provider)),
+          ...(aiApiKey && { apiKey: aiApiKey }),
           provider,
           thinkingModel,
           taskModel,
         },
         searchProvider: {
           baseURL: getSearchProviderBaseURL(searchProvider),
-          apiKey: multiApiKeyPolling(getSearchProviderApiKey(searchProvider)),
+          ...(searchApiKey && { apiKey: searchApiKey }),
           provider: searchProvider,
           maxResult,
         },
@@ -65,11 +57,7 @@ export async function GET(req: NextRequest) {
           if (event === "message") {
             controller.enqueue(encoder.encode(data.text));
           } else if (event === "progress") {
-            console.log(
-              `[${data.step}]: ${data.name ? `"${data.name}" ` : ""}${
-                data.status
-              }`
-            );
+            console.log(`[${data.step}]: ${data.name ? `"${data.name}" ` : ""}${data.status}`);
             if (data.step === "final-report" && data.status === "end") {
               controller.close();
             }

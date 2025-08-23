@@ -1,9 +1,6 @@
 const MAX_TEXT_CHUNK_LENGTH = 2000; // 你可以根据需要调整这个值
 
-export function splitText(
-  text: string = "",
-  maxLength: number = MAX_TEXT_CHUNK_LENGTH
-): string[] {
+export function splitText(text: string = "", maxLength: number = MAX_TEXT_CHUNK_LENGTH): string[] {
   const paragraphs = text.split("\n");
   const chunks: string[] = [];
   let currentChunk = "";
@@ -83,7 +80,7 @@ export function containsXmlHtmlTags(text: string): boolean {
   // Use the 'i' flag for case-insensitive matching (HTML tag names and attribute names are usually case-insensitive)
   // Use the 'test()' method, which only needs to find the first match to return true, which is more efficient
   const xmlHtmlTagRegex =
-    /(<!--.*?-->|<!\[CDATA\[.*?]]>|<!DOCTYPE[^>]*?>|<\?.*?\?>|<[!\/]?[a-zA-Z][^>]*?>)/i;
+    /(<!--.*?-->|<!\[CDATA\[.*?]]>|<!DOCTYPE[^>]*?>|<\?.*?\?>|<[!/]?[a-zA-Z][^>]*?>)/i;
 
   return xmlHtmlTagRegex.test(text);
 }
@@ -116,9 +113,7 @@ export class ThinkTagStreamProcessor {
 
     if (startTag) {
       if (endTagIndex !== -1) {
-        const contentAfterThink = this.buffer.substring(
-          endTagIndex + "</think>".length
-        );
+        const contentAfterThink = this.buffer.substring(endTagIndex + "</think>".length);
 
         // Output the content after </think>
         if (contentAfterThink.length > 0) {

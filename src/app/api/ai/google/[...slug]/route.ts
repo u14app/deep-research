@@ -1,21 +1,12 @@
-import { NextResponse, type NextRequest } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { GEMINI_BASE_URL } from "@/constants/urls";
 
 export const runtime = "edge";
-export const preferredRegion = [
-  "cle1",
-  "iad1",
-  "pdx1",
-  "sfo1",
-  "sin1",
-  "syd1",
-  "hnd1",
-  "kix1",
-];
+export const preferredRegion = ["cle1", "iad1", "pdx1", "sfo1", "sin1", "syd1", "hnd1", "kix1"];
 
 const API_PROXY_BASE_URL =
-  process.env.API_PROXY_BASE_URL ||
-  process.env.GOOGLE_GENERATIVE_AI_API_BASE_URL ||
+  process.env["API_PROXY_BASE_URL"] ||
+  process.env["GOOGLE_GENERATIVE_AI_API_BASE_URL"] ||
   GEMINI_BASE_URL;
 
 async function handler(req: NextRequest) {
@@ -35,8 +26,7 @@ async function handler(req: NextRequest) {
       method: req.method,
       headers: {
         "Content-Type": req.headers.get("Content-Type") || "application/json",
-        "x-goog-api-client":
-          req.headers.get("x-goog-api-client") || "genai-js/0.24.0",
+        "x-goog-api-client": req.headers.get("x-goog-api-client") || "genai-js/0.24.0",
         "x-goog-api-key": req.headers.get("x-goog-api-key") || "",
       },
     };
@@ -44,13 +34,9 @@ async function handler(req: NextRequest) {
     const response = await fetch(url, payload);
     return new NextResponse(response.body, response);
   } catch (error) {
-    if (error instanceof Error) {
-      console.error(error);
-      return NextResponse.json(
-        { code: 500, message: error.message },
-        { status: 500 }
-      );
-    }
+    console.error(error);
+    const message = error instanceof Error ? error.message : "Unknown error";
+    return NextResponse.json({ code: 500, message }, { status: 500 });
   }
 }
 

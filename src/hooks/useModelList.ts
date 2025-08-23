@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
-import { useSettingStore } from "@/store/setting";
 import {
-  GEMINI_BASE_URL,
-  OPENROUTER_BASE_URL,
-  OPENAI_BASE_URL,
   ANTHROPIC_BASE_URL,
   DEEPSEEK_BASE_URL,
-  XAI_BASE_URL,
+  GEMINI_BASE_URL,
   MISTRAL_BASE_URL,
-  POLLINATIONS_BASE_URL,
   OLLAMA_BASE_URL,
+  OPENAI_BASE_URL,
+  OPENROUTER_BASE_URL,
+  POLLINATIONS_BASE_URL,
+  XAI_BASE_URL,
 } from "@/constants/urls";
+import { useSettingStore } from "@/store/setting";
 import { multiApiKeyPolling } from "@/utils/model";
 import { generateSignature } from "@/utils/signature";
 import { completePath } from "@/utils/url";
@@ -146,16 +146,14 @@ function useModelList() {
       setModelList(newModelList);
       return newModelList;
     } else if (provider === "openrouter") {
-      const { openRouterApiKey = "", openRouterApiProxy } =
-        useSettingStore.getState();
+      const { openRouterApiKey = "", openRouterApiProxy } = useSettingStore.getState();
       if (mode === "local" && !openRouterApiKey) {
         return [];
       }
       const apiKey = multiApiKeyPolling(openRouterApiKey);
       const response = await fetch(
         mode === "local"
-          ? completePath(openRouterApiProxy || OPENROUTER_BASE_URL, "/api/v1") +
-              "/models"
+          ? completePath(openRouterApiProxy || OPENROUTER_BASE_URL, "/api/v1") + "/models"
           : "/api/ai/openrouter/v1/models",
         {
           headers: {
@@ -198,16 +196,14 @@ function useModelList() {
       setModelList(newModelList);
       return newModelList;
     } else if (provider === "anthropic") {
-      const { anthropicApiKey = "", anthropicApiProxy } =
-        useSettingStore.getState();
+      const { anthropicApiKey = "", anthropicApiProxy } = useSettingStore.getState();
       if (mode === "local" && !anthropicApiKey) {
         return [];
       }
       const apiKey = multiApiKeyPolling(anthropicApiKey);
       const response = await fetch(
         mode === "local"
-          ? completePath(anthropicApiProxy || ANTHROPIC_BASE_URL, "/v1") +
-              "/models"
+          ? completePath(anthropicApiProxy || ANTHROPIC_BASE_URL, "/v1") + "/models"
           : "/api/ai/anthropic/v1/models",
         {
           headers: {
@@ -224,16 +220,14 @@ function useModelList() {
       setModelList(newModelList);
       return newModelList;
     } else if (provider === "deepseek") {
-      const { deepseekApiKey = "", deepseekApiProxy } =
-        useSettingStore.getState();
+      const { deepseekApiKey = "", deepseekApiProxy } = useSettingStore.getState();
       if (mode === "local" && !deepseekApiKey) {
         return [];
       }
       const apiKey = multiApiKeyPolling(deepseekApiKey);
       const response = await fetch(
         mode === "local"
-          ? completePath(deepseekApiProxy || DEEPSEEK_BASE_URL, "/v1") +
-              "/models"
+          ? completePath(deepseekApiProxy || DEEPSEEK_BASE_URL, "/v1") + "/models"
           : "/api/ai/deepseek/v1/models",
         {
           headers: {
@@ -268,8 +262,7 @@ function useModelList() {
       setModelList(newModelList);
       return newModelList;
     } else if (provider === "mistral") {
-      const { mistralApiKey = "", mistralApiProxy } =
-        useSettingStore.getState();
+      const { mistralApiKey = "", mistralApiProxy } = useSettingStore.getState();
       if (mode === "local" && !mistralApiKey) {
         return [];
       }
@@ -291,8 +284,7 @@ function useModelList() {
       setModelList(newModelList);
       return newModelList;
     } else if (provider === "openaicompatible") {
-      const { openAICompatibleApiKey = "", openAICompatibleApiProxy } =
-        useSettingStore.getState();
+      const { openAICompatibleApiKey = "", openAICompatibleApiProxy } = useSettingStore.getState();
       if (mode === "local" && !openAICompatibleApiKey) {
         return [];
       }
@@ -318,8 +310,7 @@ function useModelList() {
       const response = await fetch(
         mode === "proxy"
           ? "/api/ai/pollinations/models"
-          : completePath(pollinationsApiProxy || POLLINATIONS_BASE_URL) +
-              "/models",
+          : completePath(pollinationsApiProxy || POLLINATIONS_BASE_URL) + "/models",
         {
           headers,
         }

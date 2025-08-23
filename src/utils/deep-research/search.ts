@@ -1,13 +1,13 @@
-import {
-  TAVILY_BASE_URL,
-  FIRECRAWL_BASE_URL,
-  EXA_BASE_URL,
-  BOCHA_BASE_URL,
-  SEARXNG_BASE_URL,
-} from "@/constants/urls";
-import { rewritingPrompt } from "@/constants/prompts";
-import { completePath } from "@/utils/url";
 import { pick, sort } from "radash";
+import { rewritingPrompt } from "@/constants/prompts";
+import {
+  BOCHA_BASE_URL,
+  EXA_BASE_URL,
+  FIRECRAWL_BASE_URL,
+  SEARXNG_BASE_URL,
+  TAVILY_BASE_URL,
+} from "@/constants/urls";
+import { completePath } from "@/utils/url";
 
 type TavilySearchResult = {
   title: string;
@@ -136,27 +136,24 @@ export async function createSearchProvider({
   const headers: HeadersInit = {
     "Content-Type": "application/json",
   };
-  if (apiKey) headers.Authorization = `Bearer ${apiKey}`;
+  if (apiKey) headers["Authorization"] = `Bearer ${apiKey}`;
 
   if (provider === "tavily") {
-    const response = await fetch(
-      `${completePath(baseURL || TAVILY_BASE_URL)}/search`,
-      {
-        method: "POST",
-        headers,
-        credentials: "omit",
-        body: JSON.stringify({
-          query: query.replaceAll("\\", "").replaceAll('"', ""),
-          search_depth: "advanced",
-          topic: scope || "general",
-          max_results: Number(maxResult),
-          include_images: true,
-          include_image_descriptions: true,
-          include_answer: false,
-          include_raw_content: "markdown",
-        }),
-      }
-    );
+    const response = await fetch(`${completePath(baseURL || TAVILY_BASE_URL)}/search`, {
+      method: "POST",
+      headers,
+      credentials: "omit",
+      body: JSON.stringify({
+        query: query.replaceAll("\\", "").replaceAll('"', ""),
+        search_depth: "advanced",
+        topic: scope || "general",
+        max_results: Number(maxResult),
+        include_images: true,
+        include_image_descriptions: true,
+        include_answer: false,
+        include_raw_content: "markdown",
+      }),
+    });
     const { results = [], images = [] } = await response.json();
     return {
       sources: (results as TavilySearchResult[])
@@ -171,24 +168,21 @@ export async function createSearchProvider({
       images: images as ImageSource[],
     };
   } else if (provider === "firecrawl") {
-    const response = await fetch(
-      `${completePath(baseURL || FIRECRAWL_BASE_URL, "/v1")}/search`,
-      {
-        method: "POST",
-        headers,
-        credentials: "omit",
-        body: JSON.stringify({
-          query,
-          limit: maxResult,
-          tbs: "qdr:w",
-          origin: "api",
-          scrapeOptions: {
-            formats: ["markdown"],
-          },
-          timeout: 60000,
-        }),
-      }
-    );
+    const response = await fetch(`${completePath(baseURL || FIRECRAWL_BASE_URL, "/v1")}/search`, {
+      method: "POST",
+      headers,
+      credentials: "omit",
+      body: JSON.stringify({
+        query,
+        limit: maxResult,
+        tbs: "qdr:w",
+        origin: "api",
+        scrapeOptions: {
+          formats: ["markdown"],
+        },
+        timeout: 60000,
+      }),
+    });
     const { data = [] } = await response.json();
     return {
       sources: (data as FirecrawlDocument[])
@@ -201,41 +195,35 @@ export async function createSearchProvider({
       images: [],
     };
   } else if (provider === "exa") {
-    const response = await fetch(
-      `${completePath(baseURL || EXA_BASE_URL)}/search`,
-      {
-        method: "POST",
-        headers,
-        credentials: "omit",
-        body: JSON.stringify({
-          query,
-          category: scope || "research paper",
-          contents: {
-            text: true,
-            summary: {
-              query: `Given the following query from the user:\n<query>${query}</query>\n\n${rewritingPrompt}`,
-            },
-            numResults: Number(maxResult) * 5,
-            livecrawl: "auto",
-            extras: {
-              imageLinks: 3,
-            },
+    const response = await fetch(`${completePath(baseURL || EXA_BASE_URL)}/search`, {
+      method: "POST",
+      headers,
+      credentials: "omit",
+      body: JSON.stringify({
+        query,
+        category: scope || "research paper",
+        contents: {
+          text: true,
+          summary: {
+            query: `Given the following query from the user:\n<query>${query}</query>\n\n${rewritingPrompt}`,
           },
-        }),
-      }
-    );
+          numResults: Number(maxResult) * 5,
+          livecrawl: "auto",
+          extras: {
+            imageLinks: 3,
+          },
+        },
+      }),
+    });
     const { results = [] } = await response.json();
     const images: ImageSource[] = [];
     return {
       sources: (results as ExaSearchResult[])
         .filter((item) => (item.summary || item.text) && item.url)
         .map((result) => {
-          if (
-            result.extras?.imageLinks &&
-            result.extras?.imageLinks.length > 0
-          ) {
+          if (result.extras?.imageLinks && result.extras?.imageLinks.length > 0) {
             result.extras.imageLinks.forEach((url) => {
-              images.push({ url, description: result.text });
+              images.push(result.text ? { url, description: result.text } : { url });
             });
           }
           return {
@@ -247,20 +235,17 @@ export async function createSearchProvider({
       images,
     };
   } else if (provider === "bocha") {
-    const response = await fetch(
-      `${completePath(baseURL || BOCHA_BASE_URL, "/v1")}/web-search`,
-      {
-        method: "POST",
-        headers,
-        credentials: "omit",
-        body: JSON.stringify({
-          query,
-          freshness: "noLimit",
-          summary: true,
-          count: maxResult,
-        }),
-      }
-    );
+    const response = await fetch(`${completePath(baseURL || BOCHA_BASE_URL, "/v1")}/web-search`, {
+      method: "POST",
+      headers,
+      credentials: "omit",
+      body: JSON.stringify({
+        query,
+        freshness: "noLimit",
+        summary: true,
+        count: maxResult,
+      }),
+    });
     const { data = {} } = await response.json();
     const results = data.webPages?.value || [];
     const imageResults = data.images?.value || [];
@@ -285,26 +270,11 @@ export async function createSearchProvider({
   } else if (provider === "searxng") {
     const params = {
       q: query,
-      categories:
-        scope === "academic" ? ["science", "images"] : ["general", "images"],
+      categories: scope === "academic" ? ["science", "images"] : ["general", "images"],
       engines:
         scope === "academic"
-          ? [
-              "arxiv",
-              "google scholar",
-              "pubmed",
-              "wikispecies",
-              "google_images",
-            ]
-          : [
-              "google",
-              "bing",
-              "duckduckgo",
-              "brave",
-              "wikipedia",
-              "bing_images",
-              "google_images",
-            ],
+          ? ["arxiv", "google scholar", "pubmed", "wikispecies", "google_images"]
+          : ["google", "bing", "duckduckgo", "brave", "wikipedia", "bing_images", "google_images"],
       lang: "auto",
       format: "json",
       autocomplete: "google",
@@ -315,19 +285,13 @@ export async function createSearchProvider({
     }
     const local = global.location || {};
     const response = await fetch(
-      `${completePath(
-        baseURL || SEARXNG_BASE_URL
-      )}/search?${searchQuery.toString()}`,
+      `${completePath(baseURL || SEARXNG_BASE_URL)}/search?${searchQuery.toString()}`,
       baseURL?.startsWith(local.origin)
         ? { method: "POST", credentials: "omit", headers }
         : { method: "GET", credentials: "omit" }
     );
     const { results = [] } = await response.json();
-    const rearrangedResults = sort(
-      results as SearxngSearchResult[],
-      (item) => item.score,
-      true
-    );
+    const rearrangedResults = sort(results as SearxngSearchResult[], (item) => item.score, true);
     return {
       sources: rearrangedResults
         .filter((item) => item.content && item.url && item.score >= 0.5)

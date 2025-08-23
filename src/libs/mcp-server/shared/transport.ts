@@ -1,4 +1,4 @@
-import { JSONRPCMessage, RequestId } from "../types";
+import type { JSONRPCMessage, RequestId } from "../types";
 
 /**
  * Options for sending a JSON-RPC message.

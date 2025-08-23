@@ -1,21 +1,21 @@
 "use client";
-import dynamic from "next/dynamic";
-import { useState, useMemo, useLayoutEffect } from "react";
-import { useTranslation } from "react-i18next";
-import { TrashIcon, FilePenLine, FilePlus2 } from "lucide-react";
-import Fuse from "fuse.js";
-import { toast } from "sonner";
 import dayjs from "dayjs";
-import ResourceIcon from "./ResourceIcon";
+import Fuse from "fuse.js";
+import { FilePenLine, FilePlus2, TrashIcon } from "lucide-react";
+import dynamic from "next/dynamic";
+import { useLayoutEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 import SearchArea from "@/components/Internal/SearchArea";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
+  DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
-  DialogContent,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Table,
   TableBody,
@@ -25,12 +25,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import useKnowledge from "@/hooks/useKnowledge";
 import { useKnowledgeStore } from "@/store/knowledge";
 import { useTaskStore } from "@/store/task";
-import { getTextByteSize, formatSize } from "@/utils/file";
+import { formatSize, getTextByteSize } from "@/utils/file";
 import { cn } from "@/utils/style";
+import ResourceIcon from "./ResourceIcon";
 
 const Content = dynamic(() => import("./Content"));
 
@@ -94,9 +94,7 @@ function Knowledge({ open, onClose }: KnowledgeProps) {
           status: "completed",
         });
       }
-      toast.message(
-        t("knowledge.addResourceMessage", { title: knowledge.title })
-      );
+      toast.message(t("knowledge.addResourceMessage", { title: knowledge.title }));
     } else {
       toast.error(t("knowledge.resourceNotFound"));
     }
@@ -180,9 +178,7 @@ function Knowledge({ open, onClose }: KnowledgeProps) {
                         <TableHead className="text-center max-sm:hidden">
                           {t("knowledge.date")}
                         </TableHead>
-                        <TableHead className="text-center w-28">
-                          {t("knowledge.action")}
-                        </TableHead>
+                        <TableHead className="text-center w-28">{t("knowledge.action")}</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -194,10 +190,7 @@ function Knowledge({ open, onClose }: KnowledgeProps) {
                               title={item.title}
                               onClick={() => editKnowledge(item.id)}
                             >
-                              <ResourceIcon
-                                className="w-4 h-4 mr-1"
-                                type={item.type}
-                              />{" "}
+                              <ResourceIcon className="w-4 h-4 mr-1" type={item.type} />{" "}
                               <span className="truncate w-80 max-lg:w-52 max-sm:w-40 cursor-pointer hover:text-blue-500">
                                 {item.title}
                               </span>

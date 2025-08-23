@@ -1,98 +1,80 @@
 "use client";
-import {
-  useLayoutEffect,
-  useState,
-  useCallback,
-  useMemo,
-  type ReactNode,
-} from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { CircleHelp, MonitorDown, RefreshCw } from "lucide-react";
+import { capitalize, omit } from "radash";
+import { type ReactNode, useCallback, useLayoutEffect, useMemo, useState } from "react";
+import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { usePWAInstall } from "react-use-pwa-install";
-import { RefreshCw, CircleHelp, MonitorDown } from "lucide-react";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { toast } from "sonner";
+import { z } from "zod";
 import { Password } from "@/components/Internal/PasswordInput";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogHeader,
   DialogFooter,
+  DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectGroup,
   SelectItem,
-  SelectTrigger,
   SelectLabel,
+  SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import useModel from "@/hooks/useModelList";
-import { useSettingStore } from "@/store/setting";
-import {
-  GEMINI_BASE_URL,
-  OPENROUTER_BASE_URL,
-  OPENAI_BASE_URL,
-  ANTHROPIC_BASE_URL,
-  DEEPSEEK_BASE_URL,
-  XAI_BASE_URL,
-  MISTRAL_BASE_URL,
-  POLLINATIONS_BASE_URL,
-  OLLAMA_BASE_URL,
-  TAVILY_BASE_URL,
-  FIRECRAWL_BASE_URL,
-  EXA_BASE_URL,
-  BOCHA_BASE_URL,
-  SEARXNG_BASE_URL,
-} from "@/constants/urls";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import locales from "@/constants/locales";
 import {
-  filterThinkingModelList,
-  filterNetworkingModelList,
-  filterOpenRouterModelList,
+  ANTHROPIC_BASE_URL,
+  BOCHA_BASE_URL,
+  DEEPSEEK_BASE_URL,
+  EXA_BASE_URL,
+  FIRECRAWL_BASE_URL,
+  GEMINI_BASE_URL,
+  MISTRAL_BASE_URL,
+  OLLAMA_BASE_URL,
+  OPENAI_BASE_URL,
+  OPENROUTER_BASE_URL,
+  POLLINATIONS_BASE_URL,
+  SEARXNG_BASE_URL,
+  TAVILY_BASE_URL,
+  XAI_BASE_URL,
+} from "@/constants/urls";
+import useModel from "@/hooks/useModelList";
+import { type SettingStore, useSettingStore } from "@/store/setting";
+import {
   filterDeepSeekModelList,
-  filterOpenAIModelList,
   filterMistralModelList,
+  filterNetworkingModelList,
+  filterOpenAIModelList,
+  filterOpenRouterModelList,
   filterPollinationsModelList,
+  filterThinkingModelList,
   getCustomModelList,
 } from "@/utils/model";
 import { researchStore } from "@/utils/storage";
 import { cn } from "@/utils/style";
-import { omit, capitalize } from "radash";
 
 type SettingProps = {
   open: boolean;
   onClose: () => void;
 };
 
-const BUILD_MODE = process.env.NEXT_PUBLIC_BUILD_MODE;
-const VERSION = process.env.NEXT_PUBLIC_VERSION;
-const DISABLED_AI_PROVIDER = process.env.NEXT_PUBLIC_DISABLED_AI_PROVIDER || "";
-const DISABLED_SEARCH_PROVIDER =
-  process.env.NEXT_PUBLIC_DISABLED_SEARCH_PROVIDER || "";
-const MODEL_LIST = process.env.NEXT_PUBLIC_MODEL_LIST || "";
+const BUILD_MODE = process.env["NEXT_PUBLIC_BUILD_MODE"];
+const VERSION = process.env["NEXT_PUBLIC_VERSION"];
+const DISABLED_AI_PROVIDER = process.env["NEXT_PUBLIC_DISABLED_AI_PROVIDER"] || "";
+const DISABLED_SEARCH_PROVIDER = process.env["NEXT_PUBLIC_DISABLED_SEARCH_PROVIDER"] || "";
+const MODEL_LIST = process.env["NEXT_PUBLIC_MODEL_LIST"] || "";
 
 const formSchema = z.object({
   provider: z.string(),
@@ -267,9 +249,7 @@ function Setting({ open, onClose }: SettingProps) {
   const isDisabledAIProvider = useCallback(
     (provider: string) => {
       const disabledAIProviders =
-        mode === "proxy" && DISABLED_AI_PROVIDER.length > 0
-          ? DISABLED_AI_PROVIDER.split(",")
-          : [];
+        mode === "proxy" && DISABLED_AI_PROVIDER.length > 0 ? DISABLED_AI_PROVIDER.split(",") : [];
       return disabledAIProviders.includes(provider);
     },
     [mode]
@@ -314,7 +294,11 @@ function Setting({ open, onClose }: SettingProps) {
   }
 
   function handleSubmit(values: z.infer<typeof formSchema>) {
-    update(values);
+    // Filter out undefined values to match the exact type requirements
+    const filteredValues = Object.fromEntries(
+      Object.entries(values).filter(([_, value]) => value !== undefined)
+    ) as Partial<SettingStore>;
+    update(filteredValues);
     onClose();
   }
 
@@ -409,13 +393,11 @@ function Setting({ open, onClose }: SettingProps) {
                     render={({ field }) => (
                       <FormItem className="from-item">
                         <FormLabel className="from-label">
-                          <HelpTip tip={t("setting.modeTip")}>
-                            {t("setting.mode")}
-                          </HelpTip>
+                          <HelpTip tip={t("setting.modeTip")}>{t("setting.mode")}</HelpTip>
                         </FormLabel>
                         <FormControl>
                           <Select
-                            value={field.value}
+                            value={field.value || ""}
                             onValueChange={(value) => {
                               field.onChange(value);
                               handleModeChange(value);
@@ -425,12 +407,8 @@ function Setting({ open, onClose }: SettingProps) {
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent className="max-sm:max-h-48">
-                              <SelectItem value="local">
-                                {t("setting.local")}
-                              </SelectItem>
-                              <SelectItem value="proxy">
-                                {t("setting.proxy")}
-                              </SelectItem>
+                              <SelectItem value="local">{t("setting.local")}</SelectItem>
+                              <SelectItem value="proxy">{t("setting.proxy")}</SelectItem>
                             </SelectContent>
                           </Select>
                         </FormControl>
@@ -444,9 +422,7 @@ function Setting({ open, onClose }: SettingProps) {
                   render={({ field }) => (
                     <FormItem className="from-item">
                       <FormLabel className="from-label">
-                        <HelpTip tip={t("setting.providerTip")}>
-                          {t("setting.provider")}
-                        </HelpTip>
+                        <HelpTip tip={t("setting.providerTip")}>{t("setting.provider")}</HelpTip>
                       </FormLabel>
                       <FormControl>
                         <Select
@@ -461,17 +437,13 @@ function Setting({ open, onClose }: SettingProps) {
                           </SelectTrigger>
                           <SelectContent className="max-sm:max-h-72">
                             {!isDisabledAIProvider("google") ? (
-                              <SelectItem value="google">
-                                Google AI Studio
-                              </SelectItem>
+                              <SelectItem value="google">Google AI Studio</SelectItem>
                             ) : null}
                             {!isDisabledAIProvider("openai") ? (
                               <SelectItem value="openai">OpenAI</SelectItem>
                             ) : null}
                             {!isDisabledAIProvider("anthropic") ? (
-                              <SelectItem value="anthropic">
-                                Anthropic
-                              </SelectItem>
+                              <SelectItem value="anthropic">Anthropic</SelectItem>
                             ) : null}
                             {!isDisabledAIProvider("deepseek") ? (
                               <SelectItem value="deepseek">DeepSeek</SelectItem>
@@ -493,19 +465,13 @@ function Setting({ open, onClose }: SettingProps) {
                               </SelectItem>
                             ) : null}
                             {!isDisabledAIProvider("azure") ? (
-                              <SelectItem value="azure">
-                                Azure OpenAI (Beta)
-                              </SelectItem>
+                              <SelectItem value="azure">Azure OpenAI (Beta)</SelectItem>
                             ) : null}
                             {!isDisabledAIProvider("google-vertex") ? (
-                              <SelectItem value="google-vertex">
-                                Google Vertex (Alpha)
-                              </SelectItem>
+                              <SelectItem value="google-vertex">Google Vertex (Alpha)</SelectItem>
                             ) : null}
                             {!isDisabledAIProvider("openrouter") ? (
-                              <SelectItem value="openrouter">
-                                OpenRouter
-                              </SelectItem>
+                              <SelectItem value="openrouter">OpenRouter</SelectItem>
                             ) : null}
                             {!isDisabledAIProvider("ollama") ? (
                               <SelectItem value="ollama">Ollama</SelectItem>
@@ -529,21 +495,14 @@ function Setting({ open, onClose }: SettingProps) {
                         <FormItem className="from-item">
                           <FormLabel className="from-label">
                             {t("setting.apiKeyLabel")}
-                            <span className="ml-1 text-red-500 max-sm:hidden">
-                              *
-                            </span>
+                            <span className="ml-1 text-red-500 max-sm:hidden">*</span>
                           </FormLabel>
                           <FormControl className="form-field">
                             <Password
                               type="text"
                               placeholder={t("setting.apiKeyPlaceholder")}
                               {...field}
-                              onBlur={() =>
-                                updateSetting(
-                                  "apiKey",
-                                  form.getValues("apiKey")
-                                )
-                              }
+                              onBlur={() => updateSetting("apiKey", form.getValues("apiKey"))}
                             />
                           </FormControl>
                         </FormItem>
@@ -554,19 +513,12 @@ function Setting({ open, onClose }: SettingProps) {
                       name="apiProxy"
                       render={({ field }) => (
                         <FormItem className="from-item">
-                          <FormLabel className="from-label">
-                            {t("setting.apiUrlLabel")}
-                          </FormLabel>
+                          <FormLabel className="from-label">{t("setting.apiUrlLabel")}</FormLabel>
                           <FormControl className="form-field">
                             <Input
                               placeholder={GEMINI_BASE_URL}
                               {...field}
-                              onBlur={() =>
-                                updateSetting(
-                                  "apiProxy",
-                                  form.getValues("apiProxy")
-                                )
-                              }
+                              onBlur={() => updateSetting("apiProxy", form.getValues("apiProxy"))}
                             />
                           </FormControl>
                         </FormItem>
@@ -585,9 +537,7 @@ function Setting({ open, onClose }: SettingProps) {
                         <FormItem className="from-item">
                           <FormLabel className="from-label">
                             Project
-                            <span className="ml-1 text-red-500 max-sm:hidden">
-                              *
-                            </span>
+                            <span className="ml-1 text-red-500 max-sm:hidden">*</span>
                           </FormLabel>
                           <FormControl className="form-field">
                             <Input
@@ -611,9 +561,7 @@ function Setting({ open, onClose }: SettingProps) {
                         <FormItem className="from-item">
                           <FormLabel className="from-label">
                             Location
-                            <span className="ml-1 text-red-500 max-sm:hidden">
-                              *
-                            </span>
+                            <span className="ml-1 text-red-500 max-sm:hidden">*</span>
                           </FormLabel>
                           <FormControl className="form-field">
                             <Input
@@ -635,9 +583,7 @@ function Setting({ open, onClose }: SettingProps) {
                       name="googleClientEmail"
                       render={({ field }) => (
                         <FormItem className="from-item">
-                          <FormLabel className="from-label">
-                            Client Email
-                          </FormLabel>
+                          <FormLabel className="from-label">Client Email</FormLabel>
                           <FormControl className="form-field">
                             <Input
                               placeholder="Google account client email"
@@ -658,9 +604,7 @@ function Setting({ open, onClose }: SettingProps) {
                       name="googlePrivateKey"
                       render={({ field }) => (
                         <FormItem className="from-item">
-                          <FormLabel className="from-label">
-                            Private Key
-                          </FormLabel>
+                          <FormLabel className="from-label">Private Key</FormLabel>
                           <FormControl className="form-field">
                             <Password
                               type="text"
@@ -682,9 +626,7 @@ function Setting({ open, onClose }: SettingProps) {
                       name="googlePrivateKeyId"
                       render={({ field }) => (
                         <FormItem className="from-item">
-                          <FormLabel className="from-label">
-                            Private Key ID
-                          </FormLabel>
+                          <FormLabel className="from-label">Private Key ID</FormLabel>
                           <FormControl className="form-field">
                             <Input
                               placeholder="Google account private key ID"
@@ -713,9 +655,7 @@ function Setting({ open, onClose }: SettingProps) {
                         <FormItem className="from-item">
                           <FormLabel className="from-label">
                             {t("setting.apiKeyLabel")}
-                            <span className="ml-1 text-red-500 max-sm:hidden">
-                              *
-                            </span>
+                            <span className="ml-1 text-red-500 max-sm:hidden">*</span>
                           </FormLabel>
                           <FormControl className="form-field">
                             <Password
@@ -738,9 +678,7 @@ function Setting({ open, onClose }: SettingProps) {
                       name="openRouterApiProxy"
                       render={({ field }) => (
                         <FormItem className="from-item">
-                          <FormLabel className="from-label">
-                            {t("setting.apiUrlLabel")}
-                          </FormLabel>
+                          <FormLabel className="from-label">{t("setting.apiUrlLabel")}</FormLabel>
                           <FormControl className="form-field">
                             <Input
                               placeholder={OPENROUTER_BASE_URL}
@@ -769,9 +707,7 @@ function Setting({ open, onClose }: SettingProps) {
                         <FormItem className="from-item">
                           <FormLabel className="from-label">
                             {t("setting.apiKeyLabel")}
-                            <span className="ml-1 text-red-500 max-sm:hidden">
-                              *
-                            </span>
+                            <span className="ml-1 text-red-500 max-sm:hidden">*</span>
                           </FormLabel>
                           <FormControl className="form-field">
                             <Password
@@ -779,10 +715,7 @@ function Setting({ open, onClose }: SettingProps) {
                               placeholder={t("setting.apiKeyPlaceholder")}
                               {...field}
                               onBlur={() =>
-                                updateSetting(
-                                  "openAIApiKey",
-                                  form.getValues("openAIApiKey")
-                                )
+                                updateSetting("openAIApiKey", form.getValues("openAIApiKey"))
                               }
                             />
                           </FormControl>
@@ -794,18 +727,13 @@ function Setting({ open, onClose }: SettingProps) {
                       name="openAIApiProxy"
                       render={({ field }) => (
                         <FormItem className="from-item">
-                          <FormLabel className="from-label">
-                            {t("setting.apiUrlLabel")}
-                          </FormLabel>
+                          <FormLabel className="from-label">{t("setting.apiUrlLabel")}</FormLabel>
                           <FormControl className="form-field">
                             <Input
                               placeholder={OPENAI_BASE_URL}
                               {...field}
                               onBlur={() =>
-                                updateSetting(
-                                  "openAIApiProxy",
-                                  form.getValues("openAIApiProxy")
-                                )
+                                updateSetting("openAIApiProxy", form.getValues("openAIApiProxy"))
                               }
                             />
                           </FormControl>
@@ -825,9 +753,7 @@ function Setting({ open, onClose }: SettingProps) {
                         <FormItem className="from-item">
                           <FormLabel className="from-label">
                             {t("setting.apiKeyLabel")}
-                            <span className="ml-1 text-red-500 max-sm:hidden">
-                              *
-                            </span>
+                            <span className="ml-1 text-red-500 max-sm:hidden">*</span>
                           </FormLabel>
                           <FormControl className="form-field">
                             <Password
@@ -835,10 +761,7 @@ function Setting({ open, onClose }: SettingProps) {
                               placeholder={t("setting.apiKeyPlaceholder")}
                               {...field}
                               onBlur={() =>
-                                updateSetting(
-                                  "anthropicApiKey",
-                                  form.getValues("anthropicApiKey")
-                                )
+                                updateSetting("anthropicApiKey", form.getValues("anthropicApiKey"))
                               }
                             />
                           </FormControl>
@@ -850,9 +773,7 @@ function Setting({ open, onClose }: SettingProps) {
                       name="anthropicApiProxy"
                       render={({ field }) => (
                         <FormItem className="from-item">
-                          <FormLabel className="from-label">
-                            {t("setting.apiUrlLabel")}
-                          </FormLabel>
+                          <FormLabel className="from-label">{t("setting.apiUrlLabel")}</FormLabel>
                           <FormControl className="form-field">
                             <Input
                               placeholder={ANTHROPIC_BASE_URL}
@@ -881,9 +802,7 @@ function Setting({ open, onClose }: SettingProps) {
                         <FormItem className="from-item">
                           <FormLabel className="from-label">
                             {t("setting.apiKeyLabel")}
-                            <span className="ml-1 text-red-500 max-sm:hidden">
-                              *
-                            </span>
+                            <span className="ml-1 text-red-500 max-sm:hidden">*</span>
                           </FormLabel>
                           <FormControl className="form-field">
                             <Password
@@ -891,10 +810,7 @@ function Setting({ open, onClose }: SettingProps) {
                               placeholder={t("setting.apiKeyPlaceholder")}
                               {...field}
                               onBlur={() =>
-                                updateSetting(
-                                  "deepseekApiKey",
-                                  form.getValues("deepseekApiKey")
-                                )
+                                updateSetting("deepseekApiKey", form.getValues("deepseekApiKey"))
                               }
                             />
                           </FormControl>
@@ -906,9 +822,7 @@ function Setting({ open, onClose }: SettingProps) {
                       name="deepseekApiProxy"
                       render={({ field }) => (
                         <FormItem className="from-item">
-                          <FormLabel className="from-label">
-                            {t("setting.apiUrlLabel")}
-                          </FormLabel>
+                          <FormLabel className="from-label">{t("setting.apiUrlLabel")}</FormLabel>
                           <FormControl className="form-field">
                             <Input
                               placeholder={DEEPSEEK_BASE_URL}
@@ -937,21 +851,14 @@ function Setting({ open, onClose }: SettingProps) {
                         <FormItem className="from-item">
                           <FormLabel className="from-label">
                             {t("setting.apiKeyLabel")}
-                            <span className="ml-1 text-red-500 max-sm:hidden">
-                              *
-                            </span>
+                            <span className="ml-1 text-red-500 max-sm:hidden">*</span>
                           </FormLabel>
                           <FormControl className="form-field">
                             <Password
                               type="text"
                               placeholder={t("setting.apiKeyPlaceholder")}
                               {...field}
-                              onBlur={() =>
-                                updateSetting(
-                                  "xAIApiKey",
-                                  form.getValues("xAIApiKey")
-                                )
-                              }
+                              onBlur={() => updateSetting("xAIApiKey", form.getValues("xAIApiKey"))}
                             />
                           </FormControl>
                         </FormItem>
@@ -962,18 +869,13 @@ function Setting({ open, onClose }: SettingProps) {
                       name="xAIApiProxy"
                       render={({ field }) => (
                         <FormItem className="from-item">
-                          <FormLabel className="from-label">
-                            {t("setting.apiUrlLabel")}
-                          </FormLabel>
+                          <FormLabel className="from-label">{t("setting.apiUrlLabel")}</FormLabel>
                           <FormControl className="form-field">
                             <Input
                               placeholder={XAI_BASE_URL}
                               {...field}
                               onBlur={() =>
-                                updateSetting(
-                                  "xAIApiProxy",
-                                  form.getValues("xAIApiProxy")
-                                )
+                                updateSetting("xAIApiProxy", form.getValues("xAIApiProxy"))
                               }
                             />
                           </FormControl>
@@ -993,9 +895,7 @@ function Setting({ open, onClose }: SettingProps) {
                         <FormItem className="from-item">
                           <FormLabel className="from-label">
                             {t("setting.apiKeyLabel")}
-                            <span className="ml-1 text-red-500 max-sm:hidden">
-                              *
-                            </span>
+                            <span className="ml-1 text-red-500 max-sm:hidden">*</span>
                           </FormLabel>
                           <FormControl className="form-field">
                             <Password
@@ -1003,10 +903,7 @@ function Setting({ open, onClose }: SettingProps) {
                               placeholder={t("setting.apiKeyPlaceholder")}
                               {...field}
                               onBlur={() =>
-                                updateSetting(
-                                  "mistralApiKey",
-                                  form.getValues("mistralApiKey")
-                                )
+                                updateSetting("mistralApiKey", form.getValues("mistralApiKey"))
                               }
                             />
                           </FormControl>
@@ -1018,18 +915,13 @@ function Setting({ open, onClose }: SettingProps) {
                       name="mistralApiProxy"
                       render={({ field }) => (
                         <FormItem className="from-item">
-                          <FormLabel className="from-label">
-                            {t("setting.apiUrlLabel")}
-                          </FormLabel>
+                          <FormLabel className="from-label">{t("setting.apiUrlLabel")}</FormLabel>
                           <FormControl className="form-field">
                             <Input
                               placeholder={MISTRAL_BASE_URL}
                               {...field}
                               onBlur={() =>
-                                updateSetting(
-                                  "mistralApiProxy",
-                                  form.getValues("mistralApiProxy")
-                                )
+                                updateSetting("mistralApiProxy", form.getValues("mistralApiProxy"))
                               }
                             />
                           </FormControl>
@@ -1049,9 +941,7 @@ function Setting({ open, onClose }: SettingProps) {
                         <FormItem className="from-item">
                           <FormLabel className="from-label">
                             {t("setting.apiKeyLabel")}
-                            <span className="ml-1 text-red-500 max-sm:hidden">
-                              *
-                            </span>
+                            <span className="ml-1 text-red-500 max-sm:hidden">*</span>
                           </FormLabel>
                           <FormControl className="form-field">
                             <Password
@@ -1059,10 +949,7 @@ function Setting({ open, onClose }: SettingProps) {
                               placeholder={t("setting.apiKeyPlaceholder")}
                               {...field}
                               onBlur={() =>
-                                updateSetting(
-                                  "azureApiKey",
-                                  form.getValues("azureApiKey")
-                                )
+                                updateSetting("azureApiKey", form.getValues("azureApiKey"))
                               }
                             />
                           </FormControl>
@@ -1076,9 +963,7 @@ function Setting({ open, onClose }: SettingProps) {
                         <FormItem className="from-item">
                           <FormLabel className="from-label">
                             {t("setting.resourceNameLabel")}
-                            <span className="ml-1 text-red-500 max-sm:hidden">
-                              *
-                            </span>
+                            <span className="ml-1 text-red-500 max-sm:hidden">*</span>
                           </FormLabel>
                           <FormControl className="form-field">
                             <Input
@@ -1108,10 +993,7 @@ function Setting({ open, onClose }: SettingProps) {
                               placeholder={t("setting.apiVersionPlaceholder")}
                               {...field}
                               onBlur={() =>
-                                updateSetting(
-                                  "azureApiVersion",
-                                  form.getValues("azureApiVersion")
-                                )
+                                updateSetting("azureApiVersion", form.getValues("azureApiVersion"))
                               }
                             />
                           </FormControl>
@@ -1131,9 +1013,7 @@ function Setting({ open, onClose }: SettingProps) {
                         <FormItem className="from-item">
                           <FormLabel className="from-label">
                             {t("setting.apiKeyLabel")}
-                            <span className="ml-1 text-red-500 max-sm:hidden">
-                              *
-                            </span>
+                            <span className="ml-1 text-red-500 max-sm:hidden">*</span>
                           </FormLabel>
                           <FormControl className="form-field">
                             <Password
@@ -1156,9 +1036,7 @@ function Setting({ open, onClose }: SettingProps) {
                       name="openAICompatibleApiProxy"
                       render={({ field }) => (
                         <FormItem className="from-item">
-                          <FormLabel className="from-label">
-                            {t("setting.apiUrlLabel")}
-                          </FormLabel>
+                          <FormLabel className="from-label">{t("setting.apiUrlLabel")}</FormLabel>
                           <FormControl className="form-field">
                             <Input
                               placeholder={t("setting.apiUrlPlaceholder")}
@@ -1185,9 +1063,7 @@ function Setting({ open, onClose }: SettingProps) {
                       name="pollinationsApiProxy"
                       render={({ field }) => (
                         <FormItem className="from-item">
-                          <FormLabel className="from-label">
-                            {t("setting.apiUrlLabel")}
-                          </FormLabel>
+                          <FormLabel className="from-label">{t("setting.apiUrlLabel")}</FormLabel>
                           <FormControl className="form-field">
                             <Input
                               placeholder={POLLINATIONS_BASE_URL}
@@ -1214,18 +1090,13 @@ function Setting({ open, onClose }: SettingProps) {
                       name="ollamaApiProxy"
                       render={({ field }) => (
                         <FormItem className="from-item">
-                          <FormLabel className="from-label">
-                            {t("setting.apiUrlLabel")}
-                          </FormLabel>
+                          <FormLabel className="from-label">{t("setting.apiUrlLabel")}</FormLabel>
                           <FormControl className="form-field">
                             <Input
                               placeholder={OLLAMA_BASE_URL}
                               {...field}
                               onBlur={() =>
-                                updateSetting(
-                                  "ollamaApiProxy",
-                                  form.getValues("ollamaApiProxy")
-                                )
+                                updateSetting("ollamaApiProxy", form.getValues("ollamaApiProxy"))
                               }
                             />
                           </FormControl>
@@ -1247,9 +1118,7 @@ function Setting({ open, onClose }: SettingProps) {
                         <FormLabel className="from-label">
                           <HelpTip tip={t("setting.accessPasswordTip")}>
                             {t("setting.accessPassword")}
-                            <span className="ml-1 text-red-500 max-sm:hidden">
-                              *
-                            </span>
+                            <span className="ml-1 text-red-500 max-sm:hidden">*</span>
                           </HelpTip>
                         </FormLabel>
                         <FormControl className="form-field">
@@ -1258,10 +1127,7 @@ function Setting({ open, onClose }: SettingProps) {
                             placeholder={t("setting.accessPasswordPlaceholder")}
                             {...field}
                             onBlur={() =>
-                              updateSetting(
-                                "accessPassword",
-                                form.getValues("accessPassword")
-                              )
+                              updateSetting("accessPassword", form.getValues("accessPassword"))
                             }
                           />
                         </FormControl>
@@ -1282,35 +1148,26 @@ function Setting({ open, onClose }: SettingProps) {
                         <FormLabel className="from-label">
                           <HelpTip tip={t("setting.thinkingModelTip")}>
                             {t("setting.thinkingModel")}
-                            <span className="ml-1 text-red-500 max-sm:hidden">
-                              *
-                            </span>
+                            <span className="ml-1 text-red-500 max-sm:hidden">*</span>
                           </HelpTip>
                         </FormLabel>
                         <FormControl>
                           <div className="form-field w-full">
-                            <Select
-                              value={field.value}
-                              onValueChange={field.onChange}
-                            >
+                            <Select value={field.value || ""} onValueChange={field.onChange}>
                               <SelectTrigger
                                 className={cn({
                                   hidden: modelList.length === 0,
                                 })}
                               >
                                 <SelectValue
-                                  placeholder={t(
-                                    "setting.modelListLoadingPlaceholder"
-                                  )}
+                                  placeholder={t("setting.modelListLoadingPlaceholder")}
                                 />
                               </SelectTrigger>
                               <SelectContent className="max-sm:max-h-72">
-                                {thinkingModelList[0].length > 0 ? (
+                                {(thinkingModelList[0]?.length ?? 0) > 0 ? (
                                   <SelectGroup>
-                                    <SelectLabel>
-                                      {t("setting.recommendedModels")}
-                                    </SelectLabel>
-                                    {thinkingModelList[0].map((name) => {
+                                    <SelectLabel>{t("setting.recommendedModels")}</SelectLabel>
+                                    {thinkingModelList[0]?.map((name) => {
                                       return !isDisabledAIModel(name) ? (
                                         <SelectItem key={name} value={name}>
                                           {convertModelName(name)}
@@ -1320,10 +1177,8 @@ function Setting({ open, onClose }: SettingProps) {
                                   </SelectGroup>
                                 ) : null}
                                 <SelectGroup>
-                                  <SelectLabel>
-                                    {t("setting.basicModels")}
-                                  </SelectLabel>
-                                  {thinkingModelList[1].map((name) => {
+                                  <SelectLabel>{t("setting.basicModels")}</SelectLabel>
+                                  {thinkingModelList[1]?.map((name) => {
                                     return !isDisabledAIModel(name) ? (
                                       <SelectItem key={name} value={name}>
                                         {convertModelName(name)}
@@ -1366,34 +1221,25 @@ function Setting({ open, onClose }: SettingProps) {
                         <FormLabel className="from-label">
                           <HelpTip tip={t("setting.networkingModelTip")}>
                             {t("setting.networkingModel")}
-                            <span className="ml-1 text-red-500 max-sm:hidden">
-                              *
-                            </span>
+                            <span className="ml-1 text-red-500 max-sm:hidden">*</span>
                           </HelpTip>
                         </FormLabel>
                         <FormControl>
                           <div className="form-field w-full">
-                            <Select
-                              value={field.value}
-                              onValueChange={field.onChange}
-                            >
+                            <Select value={field.value || ""} onValueChange={field.onChange}>
                               <SelectTrigger
                                 className={cn({
                                   hidden: modelList.length === 0,
                                 })}
                               >
                                 <SelectValue
-                                  placeholder={t(
-                                    "setting.modelListLoadingPlaceholder"
-                                  )}
+                                  placeholder={t("setting.modelListLoadingPlaceholder")}
                                 />
                               </SelectTrigger>
                               <SelectContent className="max-sm:max-h-72">
                                 {networkingModelList[0].length > 0 ? (
                                   <SelectGroup>
-                                    <SelectLabel>
-                                      {t("setting.recommendedModels")}
-                                    </SelectLabel>
+                                    <SelectLabel>{t("setting.recommendedModels")}</SelectLabel>
                                     {networkingModelList[0].map((name) => {
                                       return !isDisabledAIModel(name) ? (
                                         <SelectItem key={name} value={name}>
@@ -1404,9 +1250,7 @@ function Setting({ open, onClose }: SettingProps) {
                                   </SelectGroup>
                                 ) : null}
                                 <SelectGroup>
-                                  <SelectLabel>
-                                    {t("setting.basicModels")}
-                                  </SelectLabel>
+                                  <SelectLabel>{t("setting.basicModels")}</SelectLabel>
                                   {networkingModelList[1].map((name) => {
                                     return !isDisabledAIModel(name) ? (
                                       <SelectItem key={name} value={name}>
@@ -1456,35 +1300,26 @@ function Setting({ open, onClose }: SettingProps) {
                         <FormLabel className="from-label">
                           <HelpTip tip={t("setting.thinkingModelTip")}>
                             {t("setting.thinkingModel")}
-                            <span className="ml-1 text-red-500 max-sm:hidden">
-                              *
-                            </span>
+                            <span className="ml-1 text-red-500 max-sm:hidden">*</span>
                           </HelpTip>
                         </FormLabel>
                         <FormControl>
                           <div className="form-field w-full">
-                            <Select
-                              value={field.value}
-                              onValueChange={field.onChange}
-                            >
+                            <Select value={field.value || ""} onValueChange={field.onChange}>
                               <SelectTrigger
                                 className={cn({
                                   hidden: modelList.length === 0,
                                 })}
                               >
                                 <SelectValue
-                                  placeholder={t(
-                                    "setting.modelListLoadingPlaceholder"
-                                  )}
+                                  placeholder={t("setting.modelListLoadingPlaceholder")}
                                 />
                               </SelectTrigger>
                               <SelectContent className="max-sm:max-h-72">
-                                {thinkingModelList[0].length > 0 ? (
+                                {(thinkingModelList[0]?.length ?? 0) > 0 ? (
                                   <SelectGroup>
-                                    <SelectLabel>
-                                      {t("setting.recommendedModels")}
-                                    </SelectLabel>
-                                    {thinkingModelList[0].map((name) => {
+                                    <SelectLabel>{t("setting.recommendedModels")}</SelectLabel>
+                                    {thinkingModelList[0]?.map((name) => {
                                       return !isDisabledAIModel(name) ? (
                                         <SelectItem key={name} value={name}>
                                           {convertModelName(name)}
@@ -1494,10 +1329,8 @@ function Setting({ open, onClose }: SettingProps) {
                                   </SelectGroup>
                                 ) : null}
                                 <SelectGroup>
-                                  <SelectLabel>
-                                    {t("setting.basicModels")}
-                                  </SelectLabel>
-                                  {thinkingModelList[1].map((name) => {
+                                  <SelectLabel>{t("setting.basicModels")}</SelectLabel>
+                                  {thinkingModelList[1]?.map((name) => {
                                     return !isDisabledAIModel(name) ? (
                                       <SelectItem key={name} value={name}>
                                         {convertModelName(name)}
@@ -1540,34 +1373,25 @@ function Setting({ open, onClose }: SettingProps) {
                         <FormLabel className="from-label">
                           <HelpTip tip={t("setting.networkingModelTip")}>
                             {t("setting.networkingModel")}
-                            <span className="ml-1 text-red-500 max-sm:hidden">
-                              *
-                            </span>
+                            <span className="ml-1 text-red-500 max-sm:hidden">*</span>
                           </HelpTip>
                         </FormLabel>
                         <FormControl>
                           <div className="form-field w-full">
-                            <Select
-                              value={field.value}
-                              onValueChange={field.onChange}
-                            >
+                            <Select value={field.value || ""} onValueChange={field.onChange}>
                               <SelectTrigger
                                 className={cn({
                                   hidden: modelList.length === 0,
                                 })}
                               >
                                 <SelectValue
-                                  placeholder={t(
-                                    "setting.modelListLoadingPlaceholder"
-                                  )}
+                                  placeholder={t("setting.modelListLoadingPlaceholder")}
                                 />
                               </SelectTrigger>
                               <SelectContent className="max-sm:max-h-72">
                                 {networkingModelList[0].length > 0 ? (
                                   <SelectGroup>
-                                    <SelectLabel>
-                                      {t("setting.recommendedModels")}
-                                    </SelectLabel>
+                                    <SelectLabel>{t("setting.recommendedModels")}</SelectLabel>
                                     {networkingModelList[0].map((name) => {
                                       return !isDisabledAIModel(name) ? (
                                         <SelectItem key={name} value={name}>
@@ -1578,9 +1402,7 @@ function Setting({ open, onClose }: SettingProps) {
                                   </SelectGroup>
                                 ) : null}
                                 <SelectGroup>
-                                  <SelectLabel>
-                                    {t("setting.basicModels")}
-                                  </SelectLabel>
+                                  <SelectLabel>{t("setting.basicModels")}</SelectLabel>
                                   {networkingModelList[1].map((name) => {
                                     return !isDisabledAIModel(name) ? (
                                       <SelectItem key={name} value={name}>
@@ -1630,9 +1452,7 @@ function Setting({ open, onClose }: SettingProps) {
                         <FormLabel className="from-label">
                           <HelpTip tip={t("setting.thinkingModelTip")}>
                             {t("setting.thinkingModel")}
-                            <span className="ml-1 text-red-500 max-sm:hidden">
-                              *
-                            </span>
+                            <span className="ml-1 text-red-500 max-sm:hidden">*</span>
                           </HelpTip>
                         </FormLabel>
                         <FormControl>
@@ -1655,9 +1475,7 @@ function Setting({ open, onClose }: SettingProps) {
                         <FormLabel className="from-label">
                           <HelpTip tip={t("setting.networkingModelTip")}>
                             {t("setting.networkingModel")}
-                            <span className="ml-1 text-red-500 max-sm:hidden">
-                              *
-                            </span>
+                            <span className="ml-1 text-red-500 max-sm:hidden">*</span>
                           </HelpTip>
                         </FormLabel>
                         <FormControl>
@@ -1686,35 +1504,26 @@ function Setting({ open, onClose }: SettingProps) {
                         <FormLabel className="from-label">
                           <HelpTip tip={t("setting.thinkingModelTip")}>
                             {t("setting.thinkingModel")}
-                            <span className="ml-1 text-red-500 max-sm:hidden">
-                              *
-                            </span>
+                            <span className="ml-1 text-red-500 max-sm:hidden">*</span>
                           </HelpTip>
                         </FormLabel>
                         <FormControl>
                           <div className="form-field w-full">
-                            <Select
-                              value={field.value}
-                              onValueChange={field.onChange}
-                            >
+                            <Select value={field.value || ""} onValueChange={field.onChange}>
                               <SelectTrigger
                                 className={cn({
                                   hidden: modelList.length === 0,
                                 })}
                               >
                                 <SelectValue
-                                  placeholder={t(
-                                    "setting.modelListLoadingPlaceholder"
-                                  )}
+                                  placeholder={t("setting.modelListLoadingPlaceholder")}
                                 />
                               </SelectTrigger>
                               <SelectContent className="max-sm:max-h-72">
-                                {thinkingModelList[0].length > 0 ? (
+                                {(thinkingModelList[0]?.length ?? 0) > 0 ? (
                                   <SelectGroup>
-                                    <SelectLabel>
-                                      {t("setting.recommendedModels")}
-                                    </SelectLabel>
-                                    {thinkingModelList[0].map((name) => {
+                                    <SelectLabel>{t("setting.recommendedModels")}</SelectLabel>
+                                    {thinkingModelList[0]?.map((name) => {
                                       return !isDisabledAIModel(name) ? (
                                         <SelectItem key={name} value={name}>
                                           {convertModelName(name)}
@@ -1724,10 +1533,8 @@ function Setting({ open, onClose }: SettingProps) {
                                   </SelectGroup>
                                 ) : null}
                                 <SelectGroup>
-                                  <SelectLabel>
-                                    {t("setting.basicModels")}
-                                  </SelectLabel>
-                                  {thinkingModelList[1].map((name) => {
+                                  <SelectLabel>{t("setting.basicModels")}</SelectLabel>
+                                  {thinkingModelList[1]?.map((name) => {
                                     return !isDisabledAIModel(name) ? (
                                       <SelectItem key={name} value={name}>
                                         {convertModelName(name)}
@@ -1770,34 +1577,25 @@ function Setting({ open, onClose }: SettingProps) {
                         <FormLabel className="from-label">
                           <HelpTip tip={t("setting.networkingModelTip")}>
                             {t("setting.networkingModel")}
-                            <span className="ml-1 text-red-500 max-sm:hidden">
-                              *
-                            </span>
+                            <span className="ml-1 text-red-500 max-sm:hidden">*</span>
                           </HelpTip>
                         </FormLabel>
                         <FormControl>
                           <div className="form-field w-full">
-                            <Select
-                              value={field.value}
-                              onValueChange={field.onChange}
-                            >
+                            <Select value={field.value || ""} onValueChange={field.onChange}>
                               <SelectTrigger
                                 className={cn({
                                   hidden: modelList.length === 0,
                                 })}
                               >
                                 <SelectValue
-                                  placeholder={t(
-                                    "setting.modelListLoadingPlaceholder"
-                                  )}
+                                  placeholder={t("setting.modelListLoadingPlaceholder")}
                                 />
                               </SelectTrigger>
                               <SelectContent className="max-sm:max-h-72">
                                 {networkingModelList[0].length > 0 ? (
                                   <SelectGroup>
-                                    <SelectLabel>
-                                      {t("setting.recommendedModels")}
-                                    </SelectLabel>
+                                    <SelectLabel>{t("setting.recommendedModels")}</SelectLabel>
                                     {networkingModelList[0].map((name) => {
                                       return !isDisabledAIModel(name) ? (
                                         <SelectItem key={name} value={name}>
@@ -1808,9 +1606,7 @@ function Setting({ open, onClose }: SettingProps) {
                                   </SelectGroup>
                                 ) : null}
                                 <SelectGroup>
-                                  <SelectLabel>
-                                    {t("setting.basicModels")}
-                                  </SelectLabel>
+                                  <SelectLabel>{t("setting.basicModels")}</SelectLabel>
                                   {networkingModelList[1].map((name) => {
                                     return !isDisabledAIModel(name) ? (
                                       <SelectItem key={name} value={name}>
@@ -1860,26 +1656,19 @@ function Setting({ open, onClose }: SettingProps) {
                         <FormLabel className="from-label">
                           <HelpTip tip={t("setting.thinkingModelTip")}>
                             {t("setting.thinkingModel")}
-                            <span className="ml-1 text-red-500 max-sm:hidden">
-                              *
-                            </span>
+                            <span className="ml-1 text-red-500 max-sm:hidden">*</span>
                           </HelpTip>
                         </FormLabel>
                         <FormControl>
                           <div className="form-field w-full">
-                            <Select
-                              value={field.value}
-                              onValueChange={field.onChange}
-                            >
+                            <Select value={field.value || ""} onValueChange={field.onChange}>
                               <SelectTrigger
                                 className={cn({
                                   hidden: modelList.length === 0,
                                 })}
                               >
                                 <SelectValue
-                                  placeholder={t(
-                                    "setting.modelListLoadingPlaceholder"
-                                  )}
+                                  placeholder={t("setting.modelListLoadingPlaceholder")}
                                 />
                               </SelectTrigger>
                               <SelectContent className="max-sm:max-h-72">
@@ -1925,26 +1714,19 @@ function Setting({ open, onClose }: SettingProps) {
                         <FormLabel className="from-label">
                           <HelpTip tip={t("setting.networkingModelTip")}>
                             {t("setting.networkingModel")}
-                            <span className="ml-1 text-red-500 max-sm:hidden">
-                              *
-                            </span>
+                            <span className="ml-1 text-red-500 max-sm:hidden">*</span>
                           </HelpTip>
                         </FormLabel>
                         <FormControl>
                           <div className="form-field w-full">
-                            <Select
-                              value={field.value}
-                              onValueChange={field.onChange}
-                            >
+                            <Select value={field.value || ""} onValueChange={field.onChange}>
                               <SelectTrigger
                                 className={cn({
                                   hidden: modelList.length === 0,
                                 })}
                               >
                                 <SelectValue
-                                  placeholder={t(
-                                    "setting.modelListLoadingPlaceholder"
-                                  )}
+                                  placeholder={t("setting.modelListLoadingPlaceholder")}
                                 />
                               </SelectTrigger>
                               <SelectContent className="max-sm:max-h-72">
@@ -1996,35 +1778,26 @@ function Setting({ open, onClose }: SettingProps) {
                         <FormLabel className="from-label">
                           <HelpTip tip={t("setting.thinkingModelTip")}>
                             {t("setting.thinkingModel")}
-                            <span className="ml-1 text-red-500 max-sm:hidden">
-                              *
-                            </span>
+                            <span className="ml-1 text-red-500 max-sm:hidden">*</span>
                           </HelpTip>
                         </FormLabel>
                         <FormControl>
                           <div className="form-field w-full">
-                            <Select
-                              value={field.value}
-                              onValueChange={field.onChange}
-                            >
+                            <Select value={field.value || ""} onValueChange={field.onChange}>
                               <SelectTrigger
                                 className={cn({
                                   hidden: modelList.length === 0,
                                 })}
                               >
                                 <SelectValue
-                                  placeholder={t(
-                                    "setting.modelListLoadingPlaceholder"
-                                  )}
+                                  placeholder={t("setting.modelListLoadingPlaceholder")}
                                 />
                               </SelectTrigger>
                               <SelectContent className="max-sm:max-h-72">
-                                {thinkingModelList[0].length > 0 ? (
+                                {(thinkingModelList[0]?.length ?? 0) > 0 ? (
                                   <SelectGroup>
-                                    <SelectLabel>
-                                      {t("setting.recommendedModels")}
-                                    </SelectLabel>
-                                    {thinkingModelList[0].map((name) => {
+                                    <SelectLabel>{t("setting.recommendedModels")}</SelectLabel>
+                                    {thinkingModelList[0]?.map((name) => {
                                       return !isDisabledAIModel(name) ? (
                                         <SelectItem key={name} value={name}>
                                           {convertModelName(name)}
@@ -2034,10 +1807,8 @@ function Setting({ open, onClose }: SettingProps) {
                                   </SelectGroup>
                                 ) : null}
                                 <SelectGroup>
-                                  <SelectLabel>
-                                    {t("setting.basicModels")}
-                                  </SelectLabel>
-                                  {thinkingModelList[1].map((name) => {
+                                  <SelectLabel>{t("setting.basicModels")}</SelectLabel>
+                                  {thinkingModelList[1]?.map((name) => {
                                     return !isDisabledAIModel(name) ? (
                                       <SelectItem key={name} value={name}>
                                         {convertModelName(name)}
@@ -2080,34 +1851,25 @@ function Setting({ open, onClose }: SettingProps) {
                         <FormLabel className="from-label">
                           <HelpTip tip={t("setting.networkingModelTip")}>
                             {t("setting.networkingModel")}
-                            <span className="ml-1 text-red-500 max-sm:hidden">
-                              *
-                            </span>
+                            <span className="ml-1 text-red-500 max-sm:hidden">*</span>
                           </HelpTip>
                         </FormLabel>
                         <FormControl>
                           <div className="form-field w-full">
-                            <Select
-                              value={field.value}
-                              onValueChange={field.onChange}
-                            >
+                            <Select value={field.value || ""} onValueChange={field.onChange}>
                               <SelectTrigger
                                 className={cn({
                                   hidden: modelList.length === 0,
                                 })}
                               >
                                 <SelectValue
-                                  placeholder={t(
-                                    "setting.modelListLoadingPlaceholder"
-                                  )}
+                                  placeholder={t("setting.modelListLoadingPlaceholder")}
                                 />
                               </SelectTrigger>
                               <SelectContent className="max-sm:max-h-72">
                                 {networkingModelList[0].length > 0 ? (
                                   <SelectGroup>
-                                    <SelectLabel>
-                                      {t("setting.recommendedModels")}
-                                    </SelectLabel>
+                                    <SelectLabel>{t("setting.recommendedModels")}</SelectLabel>
                                     {networkingModelList[0].map((name) => {
                                       return !isDisabledAIModel(name) ? (
                                         <SelectItem key={name} value={name}>
@@ -2118,9 +1880,7 @@ function Setting({ open, onClose }: SettingProps) {
                                   </SelectGroup>
                                 ) : null}
                                 <SelectGroup>
-                                  <SelectLabel>
-                                    {t("setting.basicModels")}
-                                  </SelectLabel>
+                                  <SelectLabel>{t("setting.basicModels")}</SelectLabel>
                                   {networkingModelList[1].map((name) => {
                                     return !isDisabledAIModel(name) ? (
                                       <SelectItem key={name} value={name}>
@@ -2170,26 +1930,19 @@ function Setting({ open, onClose }: SettingProps) {
                         <FormLabel className="from-label">
                           <HelpTip tip={t("setting.thinkingModelTip")}>
                             {t("setting.thinkingModel")}
-                            <span className="ml-1 text-red-500 max-sm:hidden">
-                              *
-                            </span>
+                            <span className="ml-1 text-red-500 max-sm:hidden">*</span>
                           </HelpTip>
                         </FormLabel>
                         <FormControl>
                           <div className="form-field w-full">
-                            <Select
-                              value={field.value}
-                              onValueChange={field.onChange}
-                            >
+                            <Select value={field.value || ""} onValueChange={field.onChange}>
                               <SelectTrigger
                                 className={cn({
                                   hidden: modelList.length === 0,
                                 })}
                               >
                                 <SelectValue
-                                  placeholder={t(
-                                    "setting.modelListLoadingPlaceholder"
-                                  )}
+                                  placeholder={t("setting.modelListLoadingPlaceholder")}
                                 />
                               </SelectTrigger>
                               <SelectContent className="max-sm:max-h-72">
@@ -2235,26 +1988,19 @@ function Setting({ open, onClose }: SettingProps) {
                         <FormLabel className="from-label">
                           <HelpTip tip={t("setting.networkingModelTip")}>
                             {t("setting.networkingModel")}
-                            <span className="ml-1 text-red-500 max-sm:hidden">
-                              *
-                            </span>
+                            <span className="ml-1 text-red-500 max-sm:hidden">*</span>
                           </HelpTip>
                         </FormLabel>
                         <FormControl>
                           <div className="form-field w-full">
-                            <Select
-                              value={field.value}
-                              onValueChange={field.onChange}
-                            >
+                            <Select value={field.value || ""} onValueChange={field.onChange}>
                               <SelectTrigger
                                 className={cn({
                                   hidden: modelList.length === 0,
                                 })}
                               >
                                 <SelectValue
-                                  placeholder={t(
-                                    "setting.modelListLoadingPlaceholder"
-                                  )}
+                                  placeholder={t("setting.modelListLoadingPlaceholder")}
                                 />
                               </SelectTrigger>
                               <SelectContent className="max-sm:max-h-72">
@@ -2306,35 +2052,26 @@ function Setting({ open, onClose }: SettingProps) {
                         <FormLabel className="from-label">
                           <HelpTip tip={t("setting.thinkingModelTip")}>
                             {t("setting.thinkingModel")}
-                            <span className="ml-1 text-red-500 max-sm:hidden">
-                              *
-                            </span>
+                            <span className="ml-1 text-red-500 max-sm:hidden">*</span>
                           </HelpTip>
                         </FormLabel>
                         <FormControl>
                           <div className="form-field w-full">
-                            <Select
-                              value={field.value}
-                              onValueChange={field.onChange}
-                            >
+                            <Select value={field.value || ""} onValueChange={field.onChange}>
                               <SelectTrigger
                                 className={cn({
                                   hidden: modelList.length === 0,
                                 })}
                               >
                                 <SelectValue
-                                  placeholder={t(
-                                    "setting.modelListLoadingPlaceholder"
-                                  )}
+                                  placeholder={t("setting.modelListLoadingPlaceholder")}
                                 />
                               </SelectTrigger>
                               <SelectContent className="max-sm:max-h-72">
-                                {thinkingModelList[0].length > 0 ? (
+                                {(thinkingModelList[0]?.length ?? 0) > 0 ? (
                                   <SelectGroup>
-                                    <SelectLabel>
-                                      {t("setting.recommendedModels")}
-                                    </SelectLabel>
-                                    {thinkingModelList[0].map((name) => {
+                                    <SelectLabel>{t("setting.recommendedModels")}</SelectLabel>
+                                    {thinkingModelList[0]?.map((name) => {
                                       return !isDisabledAIModel(name) ? (
                                         <SelectItem key={name} value={name}>
                                           {convertModelName(name)}
@@ -2344,10 +2081,8 @@ function Setting({ open, onClose }: SettingProps) {
                                   </SelectGroup>
                                 ) : null}
                                 <SelectGroup>
-                                  <SelectLabel>
-                                    {t("setting.basicModels")}
-                                  </SelectLabel>
-                                  {thinkingModelList[1].map((name) => {
+                                  <SelectLabel>{t("setting.basicModels")}</SelectLabel>
+                                  {thinkingModelList[1]?.map((name) => {
                                     return !isDisabledAIModel(name) ? (
                                       <SelectItem key={name} value={name}>
                                         {convertModelName(name)}
@@ -2390,34 +2125,25 @@ function Setting({ open, onClose }: SettingProps) {
                         <FormLabel className="from-label">
                           <HelpTip tip={t("setting.networkingModelTip")}>
                             {t("setting.networkingModel")}
-                            <span className="ml-1 text-red-500 max-sm:hidden">
-                              *
-                            </span>
+                            <span className="ml-1 text-red-500 max-sm:hidden">*</span>
                           </HelpTip>
                         </FormLabel>
                         <FormControl>
                           <div className="form-field w-full">
-                            <Select
-                              value={field.value}
-                              onValueChange={field.onChange}
-                            >
+                            <Select value={field.value || ""} onValueChange={field.onChange}>
                               <SelectTrigger
                                 className={cn({
                                   hidden: modelList.length === 0,
                                 })}
                               >
                                 <SelectValue
-                                  placeholder={t(
-                                    "setting.modelListLoadingPlaceholder"
-                                  )}
+                                  placeholder={t("setting.modelListLoadingPlaceholder")}
                                 />
                               </SelectTrigger>
                               <SelectContent className="max-sm:max-h-72">
                                 {networkingModelList[0].length > 0 ? (
                                   <SelectGroup>
-                                    <SelectLabel>
-                                      {t("setting.recommendedModels")}
-                                    </SelectLabel>
+                                    <SelectLabel>{t("setting.recommendedModels")}</SelectLabel>
                                     {networkingModelList[0].map((name) => {
                                       return !isDisabledAIModel(name) ? (
                                         <SelectItem key={name} value={name}>
@@ -2428,9 +2154,7 @@ function Setting({ open, onClose }: SettingProps) {
                                   </SelectGroup>
                                 ) : null}
                                 <SelectGroup>
-                                  <SelectLabel>
-                                    {t("setting.basicModels")}
-                                  </SelectLabel>
+                                  <SelectLabel>{t("setting.basicModels")}</SelectLabel>
                                   {networkingModelList[1].map((name) => {
                                     return !isDisabledAIModel(name) ? (
                                       <SelectItem key={name} value={name}>
@@ -2480,17 +2204,12 @@ function Setting({ open, onClose }: SettingProps) {
                         <FormLabel className="from-label">
                           <HelpTip tip={t("setting.thinkingModelTip")}>
                             {t("setting.thinkingModel")}
-                            <span className="ml-1 text-red-500 max-sm:hidden">
-                              *
-                            </span>
+                            <span className="ml-1 text-red-500 max-sm:hidden">*</span>
                           </HelpTip>
                         </FormLabel>
                         <FormControl>
                           <div className="form-field w-full">
-                            <Input
-                              placeholder={t("setting.modelListPlaceholder")}
-                              {...field}
-                            />
+                            <Input placeholder={t("setting.modelListPlaceholder")} {...field} />
                           </div>
                         </FormControl>
                       </FormItem>
@@ -2504,17 +2223,12 @@ function Setting({ open, onClose }: SettingProps) {
                         <FormLabel className="from-label">
                           <HelpTip tip={t("setting.networkingModelTip")}>
                             {t("setting.networkingModel")}
-                            <span className="ml-1 text-red-500 max-sm:hidden">
-                              *
-                            </span>
+                            <span className="ml-1 text-red-500 max-sm:hidden">*</span>
                           </HelpTip>
                         </FormLabel>
                         <FormControl>
                           <div className="form-field w-full">
-                            <Input
-                              placeholder={t("setting.modelListPlaceholder")}
-                              {...field}
-                            />
+                            <Input placeholder={t("setting.modelListPlaceholder")} {...field} />
                           </div>
                         </FormControl>
                       </FormItem>
@@ -2534,9 +2248,7 @@ function Setting({ open, onClose }: SettingProps) {
                         <FormLabel className="from-label">
                           <HelpTip tip={t("setting.thinkingModelTip")}>
                             {t("setting.thinkingModel")}
-                            <span className="ml-1 text-red-500 max-sm:hidden">
-                              *
-                            </span>
+                            <span className="ml-1 text-red-500 max-sm:hidden">*</span>
                           </HelpTip>
                         </FormLabel>
                         <FormControl>
@@ -2553,15 +2265,10 @@ function Setting({ open, onClose }: SettingProps) {
                                 hidden: modelList.length === 0,
                               })}
                             >
-                              <Select
-                                defaultValue={field.value}
-                                onValueChange={field.onChange}
-                              >
+                              <Select defaultValue={field.value} onValueChange={field.onChange}>
                                 <SelectTrigger>
                                   <SelectValue
-                                    placeholder={t(
-                                      "setting.modelListLoadingPlaceholder"
-                                    )}
+                                    placeholder={t("setting.modelListLoadingPlaceholder")}
                                   />
                                 </SelectTrigger>
                                 <SelectContent className="max-sm:max-h-72">
@@ -2582,9 +2289,7 @@ function Setting({ open, onClose }: SettingProps) {
                               disabled={isRefreshing}
                               onClick={() => fetchModelList()}
                             >
-                              <RefreshCw
-                                className={isRefreshing ? "animate-spin" : ""}
-                              />
+                              <RefreshCw className={isRefreshing ? "animate-spin" : ""} />
                             </Button>
                           </div>
                         </FormControl>
@@ -2599,9 +2304,7 @@ function Setting({ open, onClose }: SettingProps) {
                         <FormLabel className="from-label">
                           <HelpTip tip={t("setting.networkingModelTip")}>
                             {t("setting.networkingModel")}
-                            <span className="ml-1 text-red-500 max-sm:hidden">
-                              *
-                            </span>
+                            <span className="ml-1 text-red-500 max-sm:hidden">*</span>
                           </HelpTip>
                         </FormLabel>
                         <FormControl>
@@ -2618,15 +2321,10 @@ function Setting({ open, onClose }: SettingProps) {
                                 hidden: modelList.length === 0,
                               })}
                             >
-                              <Select
-                                defaultValue={field.value}
-                                onValueChange={field.onChange}
-                              >
+                              <Select defaultValue={field.value} onValueChange={field.onChange}>
                                 <SelectTrigger>
                                   <SelectValue
-                                    placeholder={t(
-                                      "setting.modelListLoadingPlaceholder"
-                                    )}
+                                    placeholder={t("setting.modelListLoadingPlaceholder")}
                                   />
                                 </SelectTrigger>
                                 <SelectContent className="max-sm:max-h-72">
@@ -2647,9 +2345,7 @@ function Setting({ open, onClose }: SettingProps) {
                               disabled={isRefreshing}
                               onClick={() => fetchModelList()}
                             >
-                              <RefreshCw
-                                className={isRefreshing ? "animate-spin" : ""}
-                              />
+                              <RefreshCw className={isRefreshing ? "animate-spin" : ""} />
                             </Button>
                           </div>
                         </FormControl>
@@ -2670,35 +2366,26 @@ function Setting({ open, onClose }: SettingProps) {
                         <FormLabel className="from-label">
                           <HelpTip tip={t("setting.thinkingModelTip")}>
                             {t("setting.thinkingModel")}
-                            <span className="ml-1 text-red-500 max-sm:hidden">
-                              *
-                            </span>
+                            <span className="ml-1 text-red-500 max-sm:hidden">*</span>
                           </HelpTip>
                         </FormLabel>
                         <FormControl>
                           <div className="form-field w-full">
-                            <Select
-                              value={field.value}
-                              onValueChange={field.onChange}
-                            >
+                            <Select value={field.value || ""} onValueChange={field.onChange}>
                               <SelectTrigger
                                 className={cn({
                                   hidden: modelList.length === 0,
                                 })}
                               >
                                 <SelectValue
-                                  placeholder={t(
-                                    "setting.modelListLoadingPlaceholder"
-                                  )}
+                                  placeholder={t("setting.modelListLoadingPlaceholder")}
                                 />
                               </SelectTrigger>
                               <SelectContent className="max-sm:max-h-72">
-                                {thinkingModelList[0].length > 0 ? (
+                                {(thinkingModelList[0]?.length ?? 0) > 0 ? (
                                   <SelectGroup>
-                                    <SelectLabel>
-                                      {t("setting.recommendedModels")}
-                                    </SelectLabel>
-                                    {thinkingModelList[0].map((name) => {
+                                    <SelectLabel>{t("setting.recommendedModels")}</SelectLabel>
+                                    {thinkingModelList[0]?.map((name) => {
                                       return !isDisabledAIModel(name) ? (
                                         <SelectItem key={name} value={name}>
                                           {convertModelName(name)}
@@ -2708,10 +2395,8 @@ function Setting({ open, onClose }: SettingProps) {
                                   </SelectGroup>
                                 ) : null}
                                 <SelectGroup>
-                                  <SelectLabel>
-                                    {t("setting.basicModels")}
-                                  </SelectLabel>
-                                  {thinkingModelList[1].map((name) => {
+                                  <SelectLabel>{t("setting.basicModels")}</SelectLabel>
+                                  {thinkingModelList[1]?.map((name) => {
                                     return !isDisabledAIModel(name) ? (
                                       <SelectItem key={name} value={name}>
                                         {convertModelName(name)}
@@ -2754,34 +2439,25 @@ function Setting({ open, onClose }: SettingProps) {
                         <FormLabel className="from-label">
                           <HelpTip tip={t("setting.networkingModelTip")}>
                             {t("setting.networkingModel")}
-                            <span className="ml-1 text-red-500 max-sm:hidden">
-                              *
-                            </span>
+                            <span className="ml-1 text-red-500 max-sm:hidden">*</span>
                           </HelpTip>
                         </FormLabel>
                         <FormControl>
                           <div className="form-field w-full">
-                            <Select
-                              value={field.value}
-                              onValueChange={field.onChange}
-                            >
+                            <Select value={field.value || ""} onValueChange={field.onChange}>
                               <SelectTrigger
                                 className={cn({
                                   hidden: modelList.length === 0,
                                 })}
                               >
                                 <SelectValue
-                                  placeholder={t(
-                                    "setting.modelListLoadingPlaceholder"
-                                  )}
+                                  placeholder={t("setting.modelListLoadingPlaceholder")}
                                 />
                               </SelectTrigger>
                               <SelectContent className="max-sm:max-h-72">
                                 {networkingModelList[0].length > 0 ? (
                                   <SelectGroup>
-                                    <SelectLabel>
-                                      {t("setting.recommendedModels")}
-                                    </SelectLabel>
+                                    <SelectLabel>{t("setting.recommendedModels")}</SelectLabel>
                                     {networkingModelList[0].map((name) => {
                                       return !isDisabledAIModel(name) ? (
                                         <SelectItem key={name} value={name}>
@@ -2792,9 +2468,7 @@ function Setting({ open, onClose }: SettingProps) {
                                   </SelectGroup>
                                 ) : null}
                                 <SelectGroup>
-                                  <SelectLabel>
-                                    {t("setting.basicModels")}
-                                  </SelectLabel>
+                                  <SelectLabel>{t("setting.basicModels")}</SelectLabel>
                                   {networkingModelList[1].map((name) => {
                                     return !isDisabledAIModel(name) ? (
                                       <SelectItem key={name} value={name}>
@@ -2844,9 +2518,7 @@ function Setting({ open, onClose }: SettingProps) {
                         <FormLabel className="from-label">
                           <HelpTip tip={t("setting.thinkingModelTip")}>
                             {t("setting.thinkingModel")}
-                            <span className="ml-1 text-red-500 max-sm:hidden">
-                              *
-                            </span>
+                            <span className="ml-1 text-red-500 max-sm:hidden">*</span>
                           </HelpTip>
                         </FormLabel>
                         <FormControl>
@@ -2863,15 +2535,10 @@ function Setting({ open, onClose }: SettingProps) {
                                 hidden: modelList.length === 0,
                               })}
                             >
-                              <Select
-                                defaultValue={field.value}
-                                onValueChange={field.onChange}
-                              >
+                              <Select defaultValue={field.value} onValueChange={field.onChange}>
                                 <SelectTrigger>
                                   <SelectValue
-                                    placeholder={t(
-                                      "setting.modelListLoadingPlaceholder"
-                                    )}
+                                    placeholder={t("setting.modelListLoadingPlaceholder")}
                                   />
                                 </SelectTrigger>
                                 <SelectContent className="max-sm:max-h-72">
@@ -2892,9 +2559,7 @@ function Setting({ open, onClose }: SettingProps) {
                               disabled={isRefreshing}
                               onClick={() => fetchModelList()}
                             >
-                              <RefreshCw
-                                className={isRefreshing ? "animate-spin" : ""}
-                              />
+                              <RefreshCw className={isRefreshing ? "animate-spin" : ""} />
                             </Button>
                           </div>
                         </FormControl>
@@ -2909,9 +2574,7 @@ function Setting({ open, onClose }: SettingProps) {
                         <FormLabel className="from-label">
                           <HelpTip tip={t("setting.networkingModelTip")}>
                             {t("setting.networkingModel")}
-                            <span className="ml-1 text-red-500 max-sm:hidden">
-                              *
-                            </span>
+                            <span className="ml-1 text-red-500 max-sm:hidden">*</span>
                           </HelpTip>
                         </FormLabel>
                         <FormControl>
@@ -2928,15 +2591,10 @@ function Setting({ open, onClose }: SettingProps) {
                                 hidden: modelList.length === 0,
                               })}
                             >
-                              <Select
-                                defaultValue={field.value}
-                                onValueChange={field.onChange}
-                              >
+                              <Select defaultValue={field.value} onValueChange={field.onChange}>
                                 <SelectTrigger>
                                   <SelectValue
-                                    placeholder={t(
-                                      "setting.modelListLoadingPlaceholder"
-                                    )}
+                                    placeholder={t("setting.modelListLoadingPlaceholder")}
                                   />
                                 </SelectTrigger>
                                 <SelectContent className="max-sm:max-h-72">
@@ -2957,9 +2615,7 @@ function Setting({ open, onClose }: SettingProps) {
                               disabled={isRefreshing}
                               onClick={() => fetchModelList()}
                             >
-                              <RefreshCw
-                                className={isRefreshing ? "animate-spin" : ""}
-                              />
+                              <RefreshCw className={isRefreshing ? "animate-spin" : ""} />
                             </Button>
                           </div>
                         </FormControl>
@@ -2975,25 +2631,16 @@ function Setting({ open, onClose }: SettingProps) {
                   render={({ field }) => (
                     <FormItem className="from-item">
                       <FormLabel className="from-label">
-                        <HelpTip tip={t("setting.webSearchTip")}>
-                          {t("setting.webSearch")}
-                        </HelpTip>
+                        <HelpTip tip={t("setting.webSearchTip")}>{t("setting.webSearch")}</HelpTip>
                       </FormLabel>
                       <FormControl>
-                        <Select
-                          value={field.value}
-                          onValueChange={field.onChange}
-                        >
+                        <Select value={field.value} onValueChange={field.onChange}>
                           <SelectTrigger className="form-field">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="1">
-                              {t("setting.enable")}
-                            </SelectItem>
-                            <SelectItem value="0">
-                              {t("setting.disable")}
-                            </SelectItem>
+                            <SelectItem value="1">{t("setting.enable")}</SelectItem>
+                            <SelectItem value="0">{t("setting.disable")}</SelectItem>
                           </SelectContent>
                         </Select>
                       </FormControl>
@@ -3023,25 +2670,18 @@ function Setting({ open, onClose }: SettingProps) {
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="model">
-                              {t("setting.modelBuiltin")}
-                            </SelectItem>
+                            <SelectItem value="model">{t("setting.modelBuiltin")}</SelectItem>
                             {!isDisabledSearchProvider("tavily") ? (
                               <SelectItem value="tavily">Tavily</SelectItem>
                             ) : null}
                             {!isDisabledSearchProvider("firecrawl") ? (
-                              <SelectItem value="firecrawl">
-                                Firecrawl
-                              </SelectItem>
+                              <SelectItem value="firecrawl">Firecrawl</SelectItem>
                             ) : null}
-                            {!isDisabledSearchProvider("exa") &&
-                            mode === "proxy" ? (
+                            {!isDisabledSearchProvider("exa") && mode === "proxy" ? (
                               <SelectItem value="exa">Exa</SelectItem>
                             ) : null}
                             {!isDisabledSearchProvider("bocha") ? (
-                              <SelectItem value="bocha">
-                                {t("setting.bocha")}
-                              </SelectItem>
+                              <SelectItem value="bocha">{t("setting.bocha")}</SelectItem>
                             ) : null}
                             {!isDisabledSearchProvider("searxng") ? (
                               <SelectItem value="searxng">SearXNG</SelectItem>
@@ -3065,9 +2705,7 @@ function Setting({ open, onClose }: SettingProps) {
                         <FormItem className="from-item">
                           <FormLabel className="from-label">
                             {t("setting.apiKeyLabel")}
-                            <span className="ml-1 text-red-500 max-sm:hidden">
-                              *
-                            </span>
+                            <span className="ml-1 text-red-500 max-sm:hidden">*</span>
                           </FormLabel>
                           <FormControl className="form-field">
                             <Password
@@ -3085,9 +2723,7 @@ function Setting({ open, onClose }: SettingProps) {
                       name="tavilyApiProxy"
                       render={({ field }) => (
                         <FormItem className="from-item">
-                          <FormLabel className="from-label">
-                            {t("setting.apiUrlLabel")}
-                          </FormLabel>
+                          <FormLabel className="from-label">{t("setting.apiUrlLabel")}</FormLabel>
                           <FormControl className="form-field">
                             <Input
                               placeholder={TAVILY_BASE_URL}
@@ -3103,14 +2739,9 @@ function Setting({ open, onClose }: SettingProps) {
                       name="tavilyScope"
                       render={({ field }) => (
                         <FormItem className="from-item">
-                          <FormLabel className="from-label">
-                            {t("setting.searchScope")}
-                          </FormLabel>
+                          <FormLabel className="from-label">{t("setting.searchScope")}</FormLabel>
                           <FormControl className="form-field">
-                            <Select
-                              value={field.value}
-                              onValueChange={field.onChange}
-                            >
+                            <Select value={field.value || ""} onValueChange={field.onChange}>
                               <SelectTrigger className="form-field">
                                 <SelectValue />
                               </SelectTrigger>
@@ -3118,9 +2749,7 @@ function Setting({ open, onClose }: SettingProps) {
                                 <SelectItem value="general">
                                   {t("setting.scopeValue.general")}
                                 </SelectItem>
-                                <SelectItem value="news">
-                                  {t("setting.scopeValue.news")}
-                                </SelectItem>
+                                <SelectItem value="news">{t("setting.scopeValue.news")}</SelectItem>
                               </SelectContent>
                             </Select>
                           </FormControl>
@@ -3140,9 +2769,7 @@ function Setting({ open, onClose }: SettingProps) {
                         <FormItem className="from-item">
                           <FormLabel className="from-label">
                             {t("setting.apiKeyLabel")}
-                            <span className="ml-1 text-red-500 max-sm:hidden">
-                              *
-                            </span>
+                            <span className="ml-1 text-red-500 max-sm:hidden">*</span>
                           </FormLabel>
                           <FormControl className="form-field">
                             <Password
@@ -3160,9 +2787,7 @@ function Setting({ open, onClose }: SettingProps) {
                       name="firecrawlApiProxy"
                       render={({ field }) => (
                         <FormItem className="from-item">
-                          <FormLabel className="from-label">
-                            {t("setting.apiUrlLabel")}
-                          </FormLabel>
+                          <FormLabel className="from-label">{t("setting.apiUrlLabel")}</FormLabel>
                           <FormControl className="form-field">
                             <Input
                               placeholder={FIRECRAWL_BASE_URL}
@@ -3186,9 +2811,7 @@ function Setting({ open, onClose }: SettingProps) {
                         <FormItem className="from-item">
                           <FormLabel className="from-label">
                             {t("setting.apiKeyLabel")}
-                            <span className="ml-1 text-red-500 max-sm:hidden">
-                              *
-                            </span>
+                            <span className="ml-1 text-red-500 max-sm:hidden">*</span>
                           </FormLabel>
                           <FormControl className="form-field">
                             <Password
@@ -3206,9 +2829,7 @@ function Setting({ open, onClose }: SettingProps) {
                       name="exaApiProxy"
                       render={({ field }) => (
                         <FormItem className="from-item">
-                          <FormLabel className="from-label">
-                            {t("setting.apiUrlLabel")}
-                          </FormLabel>
+                          <FormLabel className="from-label">{t("setting.apiUrlLabel")}</FormLabel>
                           <FormControl className="form-field">
                             <Input
                               placeholder={EXA_BASE_URL}
@@ -3224,14 +2845,9 @@ function Setting({ open, onClose }: SettingProps) {
                       name="exaScope"
                       render={({ field }) => (
                         <FormItem className="from-item">
-                          <FormLabel className="from-label">
-                            {t("setting.searchScope")}
-                          </FormLabel>
+                          <FormLabel className="from-label">{t("setting.searchScope")}</FormLabel>
                           <FormControl className="form-field">
-                            <Select
-                              value={field.value}
-                              onValueChange={field.onChange}
-                            >
+                            <Select value={field.value || ""} onValueChange={field.onChange}>
                               <SelectTrigger className="form-field">
                                 <SelectValue />
                               </SelectTrigger>
@@ -3242,9 +2858,7 @@ function Setting({ open, onClose }: SettingProps) {
                                 <SelectItem value="financial">
                                   {t("setting.scopeValue.financial")}
                                 </SelectItem>
-                                <SelectItem value="news">
-                                  {t("setting.scopeValue.news")}
-                                </SelectItem>
+                                <SelectItem value="news">{t("setting.scopeValue.news")}</SelectItem>
                                 <SelectItem value="company">
                                   {t("setting.scopeValue.company")}
                                 </SelectItem>
@@ -3257,9 +2871,7 @@ function Setting({ open, onClose }: SettingProps) {
                                 <SelectItem value="linkedin">
                                   {t("setting.scopeValue.linkedin")}
                                 </SelectItem>
-                                <SelectItem value="pdf">
-                                  {t("setting.scopeValue.pdf")}
-                                </SelectItem>
+                                <SelectItem value="pdf">{t("setting.scopeValue.pdf")}</SelectItem>
                               </SelectContent>
                             </Select>
                           </FormControl>
@@ -3279,9 +2891,7 @@ function Setting({ open, onClose }: SettingProps) {
                         <FormItem className="from-item">
                           <FormLabel className="from-label">
                             {t("setting.apiKeyLabel")}
-                            <span className="ml-1 text-red-500 max-sm:hidden">
-                              *
-                            </span>
+                            <span className="ml-1 text-red-500 max-sm:hidden">*</span>
                           </FormLabel>
                           <FormControl className="form-field">
                             <Password
@@ -3299,9 +2909,7 @@ function Setting({ open, onClose }: SettingProps) {
                       name="bochaApiProxy"
                       render={({ field }) => (
                         <FormItem className="from-item">
-                          <FormLabel className="from-label">
-                            {t("setting.apiUrlLabel")}
-                          </FormLabel>
+                          <FormLabel className="from-label">{t("setting.apiUrlLabel")}</FormLabel>
                           <FormControl className="form-field">
                             <Input
                               placeholder={BOCHA_BASE_URL}
@@ -3323,9 +2931,7 @@ function Setting({ open, onClose }: SettingProps) {
                       name="searxngApiProxy"
                       render={({ field }) => (
                         <FormItem className="from-item">
-                          <FormLabel className="from-label">
-                            {t("setting.apiUrlLabel")}
-                          </FormLabel>
+                          <FormLabel className="from-label">{t("setting.apiUrlLabel")}</FormLabel>
                           <FormControl className="form-field">
                             <Input
                               placeholder={SEARXNG_BASE_URL}
@@ -3341,21 +2947,14 @@ function Setting({ open, onClose }: SettingProps) {
                       name="searxngScope"
                       render={({ field }) => (
                         <FormItem className="from-item">
-                          <FormLabel className="from-label">
-                            {t("setting.searchScope")}
-                          </FormLabel>
+                          <FormLabel className="from-label">{t("setting.searchScope")}</FormLabel>
                           <FormControl className="form-field">
-                            <Select
-                              value={field.value}
-                              onValueChange={field.onChange}
-                            >
+                            <Select value={field.value || ""} onValueChange={field.onChange}>
                               <SelectTrigger className="form-field">
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="all">
-                                  {t("setting.scopeValue.all")}
-                                </SelectItem>
+                                <SelectItem value="all">{t("setting.scopeValue.all")}</SelectItem>
                                 <SelectItem value="academic">
                                   {t("setting.scopeValue.academic")}
                                 </SelectItem>
@@ -3386,9 +2985,7 @@ function Setting({ open, onClose }: SettingProps) {
                             min={1}
                             step={1}
                             disabled={form.getValues("enableSearch") === "0"}
-                            onValueChange={(values) =>
-                              field.onChange(values[0])
-                            }
+                            onValueChange={(values) => field.onChange(values[0])}
                           />
                           <span className="w-[14%] text-center text-sm leading-10">
                             {field.value}
@@ -3417,9 +3014,7 @@ function Setting({ open, onClose }: SettingProps) {
                             min={1}
                             step={1}
                             disabled={form.getValues("enableSearch") === "0"}
-                            onValueChange={(values) =>
-                              field.onChange(values[0])
-                            }
+                            onValueChange={(values) => field.onChange(values[0])}
                           />
                           <span className="w-[14%] text-center text-sm leading-10">
                             {field.value}
@@ -3437,15 +3032,10 @@ function Setting({ open, onClose }: SettingProps) {
                   render={({ field }) => (
                     <FormItem className="from-item">
                       <FormLabel className="from-label">
-                        <HelpTip tip={t("setting.languageTip")}>
-                          {t("setting.language")}
-                        </HelpTip>
+                        <HelpTip tip={t("setting.languageTip")}>{t("setting.language")}</HelpTip>
                       </FormLabel>
                       <FormControl>
-                        <Select
-                          value={field.value}
-                          onValueChange={field.onChange}
-                        >
+                        <Select value={field.value} onValueChange={field.onChange}>
                           <SelectTrigger className="form-field">
                             <SelectValue />
                           </SelectTrigger>
@@ -3470,23 +3060,14 @@ function Setting({ open, onClose }: SettingProps) {
                     <FormItem className="from-item">
                       <FormLabel className="from-label">{t("theme")}</FormLabel>
                       <FormControl>
-                        <Select
-                          value={field.value}
-                          onValueChange={field.onChange}
-                        >
+                        <Select value={field.value} onValueChange={field.onChange}>
                           <SelectTrigger className="form-field">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="system">
-                              {t("setting.system")}
-                            </SelectItem>
-                            <SelectItem value="light">
-                              {t("setting.light")}
-                            </SelectItem>
-                            <SelectItem value="dark">
-                              {t("setting.dark")}
-                            </SelectItem>
+                            <SelectItem value="system">{t("setting.system")}</SelectItem>
+                            <SelectItem value="light">{t("setting.light")}</SelectItem>
+                            <SelectItem value="dark">{t("setting.dark")}</SelectItem>
                           </SelectContent>
                         </Select>
                       </FormControl>
@@ -3499,9 +3080,7 @@ function Setting({ open, onClose }: SettingProps) {
                   render={({ field }) => (
                     <FormItem className="from-item">
                       <FormLabel className="from-label">
-                        <HelpTip tip={t("setting.debugTip")}>
-                          {t("setting.debug")}
-                        </HelpTip>
+                        <HelpTip tip={t("setting.debugTip")}>{t("setting.debug")}</HelpTip>
                       </FormLabel>
                       <FormControl>
                         <Select {...field} onValueChange={field.onChange}>
@@ -3509,12 +3088,8 @@ function Setting({ open, onClose }: SettingProps) {
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="enable">
-                              {t("setting.enable")}
-                            </SelectItem>
-                            <SelectItem value="disable">
-                              {t("setting.disable")}
-                            </SelectItem>
+                            <SelectItem value="enable">{t("setting.enable")}</SelectItem>
+                            <SelectItem value="disable">{t("setting.disable")}</SelectItem>
                           </SelectContent>
                         </Select>
                       </FormControl>
@@ -3524,9 +3099,7 @@ function Setting({ open, onClose }: SettingProps) {
                 {pwaInstall ? (
                   <div className="from-item">
                     <Label className="from-label">
-                      <HelpTip tip={t("setting.PWATip")}>
-                        {t("setting.PWA")}
-                      </HelpTip>
+                      <HelpTip tip={t("setting.PWATip")}>{t("setting.PWA")}</HelpTip>
                     </Label>
                     <Button
                       className="form-field"
@@ -3549,6 +3122,7 @@ function Setting({ open, onClose }: SettingProps) {
                         className="hover:underline hover:underline-offset-4 hover:text-blue-500"
                         href="https://github.com/u14app/deep-research"
                         target="_blank"
+                        rel="noopener"
                       >
                         {t("setting.checkForUpdate")}
                       </a>
@@ -3557,9 +3131,7 @@ function Setting({ open, onClose }: SettingProps) {
                   </div>
                 </div>
                 <div className="from-item">
-                  <Label className="from-label">
-                    {t("setting.resetSetting")}
-                  </Label>
+                  <Label className="from-label">{t("setting.resetSetting")}</Label>
                   <Button
                     className="form-field hover:text-red-500"
                     type="button"
@@ -3570,10 +3142,7 @@ function Setting({ open, onClose }: SettingProps) {
                   </Button>
                 </div>
               </TabsContent>
-              <TabsContent
-                className="space-y-4 min-h-[250px]"
-                value="experimental"
-              >
+              <TabsContent className="space-y-4 min-h-[250px]" value="experimental">
                 <FormField
                   control={form.control}
                   name="references"
@@ -3590,12 +3159,8 @@ function Setting({ open, onClose }: SettingProps) {
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="enable">
-                              {t("setting.enable")}
-                            </SelectItem>
-                            <SelectItem value="disable">
-                              {t("setting.disable")}
-                            </SelectItem>
+                            <SelectItem value="enable">{t("setting.enable")}</SelectItem>
+                            <SelectItem value="disable">{t("setting.disable")}</SelectItem>
                           </SelectContent>
                         </Select>
                       </FormControl>
@@ -3618,12 +3183,8 @@ function Setting({ open, onClose }: SettingProps) {
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="enable">
-                              {t("setting.enable")}
-                            </SelectItem>
-                            <SelectItem value="disable">
-                              {t("setting.disable")}
-                            </SelectItem>
+                            <SelectItem value="enable">{t("setting.enable")}</SelectItem>
+                            <SelectItem value="disable">{t("setting.disable")}</SelectItem>
                           </SelectContent>
                         </Select>
                       </FormControl>
@@ -3646,15 +3207,9 @@ function Setting({ open, onClose }: SettingProps) {
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="character">
-                              {t("setting.character")}
-                            </SelectItem>
-                            <SelectItem value="word">
-                              {t("setting.word")}
-                            </SelectItem>
-                            <SelectItem value="line">
-                              {t("setting.line")}
-                            </SelectItem>
+                            <SelectItem value="character">{t("setting.character")}</SelectItem>
+                            <SelectItem value="word">{t("setting.word")}</SelectItem>
+                            <SelectItem value="line">{t("setting.line")}</SelectItem>
                           </SelectContent>
                         </Select>
                       </FormControl>
@@ -3677,12 +3232,8 @@ function Setting({ open, onClose }: SettingProps) {
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="enable">
-                              {t("setting.enable")}
-                            </SelectItem>
-                            <SelectItem value="disable">
-                              {t("setting.disable")}
-                            </SelectItem>
+                            <SelectItem value="enable">{t("setting.enable")}</SelectItem>
+                            <SelectItem value="disable">{t("setting.disable")}</SelectItem>
                           </SelectContent>
                         </Select>
                       </FormControl>
@@ -3697,10 +3248,7 @@ function Setting({ open, onClose }: SettingProps) {
           <Button className="flex-1" variant="outline" onClick={onClose}>
             {t("setting.cancel")}
           </Button>
-          <Button
-            className="flex-1"
-            onClick={() => handleSubmit(form.getValues())}
-          >
+          <Button className="flex-1" onClick={() => handleSubmit(form.getValues())}>
             {t("setting.save")}
           </Button>
         </DialogFooter>

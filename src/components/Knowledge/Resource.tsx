@@ -1,8 +1,7 @@
 "use client";
+import dayjs from "dayjs";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import dayjs from "dayjs";
-import Content from "./Content";
 import {
   Dialog,
   DialogContent,
@@ -11,6 +10,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useKnowledgeStore } from "@/store/knowledge";
+import Content from "./Content";
 
 type Props = {
   id: string;

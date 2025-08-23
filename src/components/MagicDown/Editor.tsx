@@ -1,14 +1,10 @@
-import { useState, useLayoutEffect, useEffect, useRef, memo } from "react";
-import { useTranslation } from "react-i18next";
 import { MagicdownEditor } from "@xiangfa/mdeditor";
-import View from "./View";
-import {
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from "@/components/ui/resizable";
+import { memo, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import { useMobile } from "@/hooks/useMobile";
 import { cn } from "@/utils/style";
+import View from "./View";
 
 import "./style.css";
 
@@ -19,12 +15,7 @@ type EditorProps = {
   onChange: (value: string) => void;
 };
 
-function Editor({
-  className,
-  defaultValue,
-  onChange,
-  hideView = false,
-}: EditorProps) {
+function Editor({ className, defaultValue, onChange, hideView = false }: EditorProps) {
   const { t } = useTranslation();
   const isMobile = useMobile(750);
   const markdownEditorRef = useRef<HTMLDivElement>(null);
@@ -149,16 +140,10 @@ function Editor({
   }, [t]);
 
   return (
-    <ResizablePanelGroup
-      className="flex rounded-md border"
-      direction="horizontal"
-    >
+    <ResizablePanelGroup className="flex rounded-md border" direction="horizontal">
       <ResizablePanel>
         <div
-          className={cn(
-            "relative flex-1 text-base whitespace-break-spaces p-1.5",
-            className
-          )}
+          className={cn("relative flex-1 text-base whitespace-break-spaces p-1.5", className)}
           ref={markdownEditorRef}
           onBlur={() => onChange(content)}
         ></div>

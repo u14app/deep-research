@@ -1,9 +1,9 @@
-import { create } from "zustand";
-import { persist, type StorageValue } from "zustand/middleware";
-import type { TaskStore } from "./task";
-import { researchStore } from "@/utils/storage";
 import { customAlphabet } from "nanoid";
 import { clone, pick } from "radash";
+import { create } from "zustand";
+import { persist, type StorageValue } from "zustand/middleware";
+import { researchStore } from "@/utils/storage";
+import type { TaskStore } from "./task";
 
 export interface ResearchHistory extends TaskStore {
   createdAt: number;
@@ -44,6 +44,7 @@ export const useHistoryStore = create(
       load: (id) => {
         const current = get().history.find((item) => item.id === id);
         if (current) return clone(current);
+        return undefined;
       },
       update: (id, taskStore) => {
         const newHistory = get().history.map((item) => {
@@ -71,14 +72,9 @@ export const useHistoryStore = create(
       version: 1,
       storage: {
         getItem: async (key: string) => {
-          return await researchStore.getItem<
-            StorageValue<HistoryStore & HistoryActions>
-          >(key);
+          return await researchStore.getItem<StorageValue<HistoryStore & HistoryActions>>(key);
         },
-        setItem: async (
-          key: string,
-          store: StorageValue<HistoryStore & HistoryActions>
-        ) => {
+        setItem: async (key: string, store: StorageValue<HistoryStore & HistoryActions>) => {
           return await researchStore.setItem(key, {
             state: pick(store.state, ["history"]),
             version: store.version,

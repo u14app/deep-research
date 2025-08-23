@@ -1,21 +1,21 @@
 "use client";
-import { useTranslation } from "react-i18next";
 import {
-  BookOpen,
-  GraduationCap,
-  School,
-  PersonStanding,
   Baby,
-  Swords,
-  Languages,
-  SlidersVertical,
-  ChevronsUp,
-  ChevronUp,
+  BookOpen,
   ChevronDown,
   ChevronsDown,
+  ChevronsUp,
+  ChevronUp,
+  GraduationCap,
+  Languages,
   LoaderCircle,
+  PersonStanding,
+  School,
   ScrollText,
+  SlidersVertical,
+  Swords,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/Internal/Button";
 import {
   DropdownMenu,
@@ -48,13 +48,10 @@ function Artifact(props: Props) {
     tooltipSideOffset = 0,
   } = props;
   const { t } = useTranslation();
-  const {
-    loadingAction,
-    translate,
-    changeReadingLevel,
-    adjustLength,
-    continuation,
-  } = useArtifact({ value, onChange });
+  const { loadingAction, translate, changeReadingLevel, adjustLength, continuation } = useArtifact({
+    value,
+    onChange,
+  });
 
   return (
     <>
@@ -77,43 +74,30 @@ function Artifact(props: Props) {
             )}
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent
-          side={dropdownMenuSide}
-          sideOffset={dropdownMenuSideOffset}
-        >
-          <DropdownMenuItem
-            onClick={() => changeReadingLevel("PhD student", systemInstruction)}
-          >
+        <DropdownMenuContent side={dropdownMenuSide} sideOffset={dropdownMenuSideOffset}>
+          <DropdownMenuItem onClick={() => changeReadingLevel("PhD student", systemInstruction)}>
             <GraduationCap />
             <span>{t("artifact.PhD")}</span>
           </DropdownMenuItem>
           <DropdownMenuItem
-            onClick={() =>
-              changeReadingLevel("college student", systemInstruction)
-            }
+            onClick={() => changeReadingLevel("college student", systemInstruction)}
           >
             <School />
             <span>{t("artifact.college")}</span>
           </DropdownMenuItem>
           <DropdownMenuItem
-            onClick={() =>
-              changeReadingLevel("high school student", systemInstruction)
-            }
+            onClick={() => changeReadingLevel("high school student", systemInstruction)}
           >
             <PersonStanding />
             <span>{t("artifact.teenager")}</span>
           </DropdownMenuItem>
           <DropdownMenuItem
-            onClick={() =>
-              changeReadingLevel("elementary school student", systemInstruction)
-            }
+            onClick={() => changeReadingLevel("elementary school student", systemInstruction)}
           >
             <Baby />
             <span>{t("artifact.child")}</span>
           </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => changeReadingLevel("pirate", systemInstruction)}
-          >
+          <DropdownMenuItem onClick={() => changeReadingLevel("pirate", systemInstruction)}>
             <Swords />
             <span>{t("artifact.pirate")}</span>
           </DropdownMenuItem>
@@ -138,50 +122,27 @@ function Artifact(props: Props) {
             )}
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent
-          side={dropdownMenuSide}
-          sideOffset={dropdownMenuSideOffset}
-        >
+        <DropdownMenuContent side={dropdownMenuSide} sideOffset={dropdownMenuSideOffset}>
           <DropdownMenuItem
-            onClick={() =>
-              adjustLength(
-                "much longer than it currently is",
-                systemInstruction
-              )
-            }
+            onClick={() => adjustLength("much longer than it currently is", systemInstruction)}
           >
             <ChevronsUp />
             <span>{t("artifact.longest")}</span>
           </DropdownMenuItem>
           <DropdownMenuItem
-            onClick={() =>
-              adjustLength(
-                "slightly longer than it currently is",
-                systemInstruction
-              )
-            }
+            onClick={() => adjustLength("slightly longer than it currently is", systemInstruction)}
           >
             <ChevronUp />
             <span>{t("artifact.long")}</span>
           </DropdownMenuItem>
           <DropdownMenuItem
-            onClick={() =>
-              adjustLength(
-                "slightly shorter than it currently is",
-                systemInstruction
-              )
-            }
+            onClick={() => adjustLength("slightly shorter than it currently is", systemInstruction)}
           >
             <ChevronDown />
             <span>{t("artifact.shorter")}</span>
           </DropdownMenuItem>
           <DropdownMenuItem
-            onClick={() =>
-              adjustLength(
-                "much shorter than it currently is",
-                systemInstruction
-              )
-            }
+            onClick={() => adjustLength("much shorter than it currently is", systemInstruction)}
           >
             <ChevronsDown />
             <span>{t("artifact.shortest")}</span>
@@ -207,79 +168,52 @@ function Artifact(props: Props) {
             )}
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent
-          side={dropdownMenuSide}
-          sideOffset={dropdownMenuSideOffset}
-        >
-          <DropdownMenuItem
-            onClick={() => translate("English", systemInstruction)}
-          >
+        <DropdownMenuContent side={dropdownMenuSide} sideOffset={dropdownMenuSideOffset}>
+          <DropdownMenuItem onClick={() => translate("English", systemInstruction)}>
             <span>🇬🇧</span>
             <span>English</span>
           </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => translate("Simplified Chinese", systemInstruction)}
-          >
+          <DropdownMenuItem onClick={() => translate("Simplified Chinese", systemInstruction)}>
             <span>🇨🇳</span>
             <span>简体中文</span>
           </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => translate("Traditional Chinese", systemInstruction)}
-          >
+          <DropdownMenuItem onClick={() => translate("Traditional Chinese", systemInstruction)}>
             <span>🇭🇰</span>
             <span>繁体中文</span>
           </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => translate("Japanese", systemInstruction)}
-          >
+          <DropdownMenuItem onClick={() => translate("Japanese", systemInstruction)}>
             <span>🇯🇵</span>
             <span>日本語</span>
           </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => translate("Korean", systemInstruction)}
-          >
+          <DropdownMenuItem onClick={() => translate("Korean", systemInstruction)}>
             <span>🇰🇷</span>
             <span>한국어</span>
           </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => translate("Spanish", systemInstruction)}
-          >
+          <DropdownMenuItem onClick={() => translate("Spanish", systemInstruction)}>
             <span>🇪🇸</span>
             <span>Español</span>
           </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => translate("German", systemInstruction)}
-          >
+          <DropdownMenuItem onClick={() => translate("German", systemInstruction)}>
             <span>🇩🇪</span>
             <span>Deutsch</span>
           </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => translate("French", systemInstruction)}
-          >
+          <DropdownMenuItem onClick={() => translate("French", systemInstruction)}>
             <span>🇫🇷</span>
             <span>Français</span>
           </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => translate("Portuguese", systemInstruction)}
-          >
+          <DropdownMenuItem onClick={() => translate("Portuguese", systemInstruction)}>
             <span>🇧🇷</span>
             <span>Português</span>
           </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => translate("Russian", systemInstruction)}
-          >
+          <DropdownMenuItem onClick={() => translate("Russian", systemInstruction)}>
             <span>🇷🇺</span>
             <span>Русский</span>
           </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => translate("Hindi", systemInstruction)}
-          >
+          <DropdownMenuItem onClick={() => translate("Hindi", systemInstruction)}>
             <span>🇮🇳</span>
             <span>हिन्दी</span>
           </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => translate("Arabic", systemInstruction)}
-          >
+          <DropdownMenuItem onClick={() => translate("Arabic", systemInstruction)}>
             <span>🇸🇦</span>
             <span>العربية</span>
           </DropdownMenuItem>

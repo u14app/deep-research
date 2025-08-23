@@ -47,11 +47,7 @@ interface SearchTask {
 
 interface PartialJson {
   value: JSONValue | undefined;
-  state:
-    | "undefined-input"
-    | "successful-parse"
-    | "repaired-parse"
-    | "failed-parse";
+  state: "undefined-input" | "successful-parse" | "repaired-parse" | "failed-parse";
 }
 
 interface WebSearchResult {

@@ -1,15 +1,11 @@
 import { useSettingStore } from "@/store/setting";
-import {
-  createSearchProvider,
-  type SearchProviderOptions,
-} from "@/utils/deep-research/search";
+import { createSearchProvider, type SearchProviderOptions } from "@/utils/deep-research/search";
 import { multiApiKeyPolling } from "@/utils/model";
 import { generateSignature } from "@/utils/signature";
 
 function useWebSearch() {
   async function search(query: string) {
-    const { mode, searchProvider, searchMaxResult, accessPassword } =
-      useSettingStore.getState();
+    const { mode, searchProvider, searchMaxResult, accessPassword } = useSettingStore.getState();
     const options: SearchProviderOptions = {
       provider: searchProvider,
       maxResult: searchMaxResult,
@@ -17,9 +13,8 @@ function useWebSearch() {
     };
 
     switch (searchProvider) {
-      case "tavily":
-        const { tavilyApiKey, tavilyApiProxy, tavilyScope } =
-          useSettingStore.getState();
+      case "tavily": {
+        const { tavilyApiKey, tavilyApiProxy, tavilyScope } = useSettingStore.getState();
         if (mode === "local") {
           options.baseURL = tavilyApiProxy;
           options.apiKey = multiApiKeyPolling(tavilyApiKey);
@@ -28,9 +23,9 @@ function useWebSearch() {
         }
         options.scope = tavilyScope;
         break;
-      case "firecrawl":
-        const { firecrawlApiKey, firecrawlApiProxy } =
-          useSettingStore.getState();
+      }
+      case "firecrawl": {
+        const { firecrawlApiKey, firecrawlApiProxy } = useSettingStore.getState();
         if (mode === "local") {
           options.baseURL = firecrawlApiProxy;
           options.apiKey = multiApiKeyPolling(firecrawlApiKey);
@@ -38,7 +33,8 @@ function useWebSearch() {
           options.baseURL = location.origin + "/api/search/firecrawl";
         }
         break;
-      case "exa":
+      }
+      case "exa": {
         const { exaApiKey, exaApiProxy, exaScope } = useSettingStore.getState();
         if (mode === "local") {
           options.baseURL = exaApiProxy;
@@ -48,7 +44,8 @@ function useWebSearch() {
         }
         options.scope = exaScope;
         break;
-      case "bocha":
+      }
+      case "bocha": {
         const { bochaApiKey, bochaApiProxy } = useSettingStore.getState();
         if (mode === "local") {
           options.baseURL = bochaApiProxy;
@@ -57,7 +54,8 @@ function useWebSearch() {
           options.baseURL = location.origin + "/api/search/bocha";
         }
         break;
-      case "searxng":
+      }
+      case "searxng": {
         const { searxngApiProxy, searxngScope } = useSettingStore.getState();
         if (mode === "local") {
           options.baseURL = searxngApiProxy;
@@ -66,6 +64,7 @@ function useWebSearch() {
         }
         options.scope = searxngScope;
         break;
+      }
       default:
         break;
     }

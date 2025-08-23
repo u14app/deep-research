@@ -1,11 +1,11 @@
 "use client";
-import { useState } from "react";
 import { Loader2, X } from "lucide-react";
+import { isFunction } from "radash";
+import { useState } from "react";
 import Resource from "@/components/Knowledge/Resource";
-import ResourceIcon from "./ResourceIcon";
 import { formatSize } from "@/utils/file";
 import { cn } from "@/utils/style";
-import { isFunction } from "radash";
+import ResourceIcon from "./ResourceIcon";
 
 type Props = {
   className?: string;

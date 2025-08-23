@@ -1,5 +1,5 @@
-import { type APICallError } from "ai";
-import { isString, isObject } from "radash";
+import type { APICallError } from "ai";
+import { isObject, isString } from "radash";
 
 interface GeminiError {
   error: {

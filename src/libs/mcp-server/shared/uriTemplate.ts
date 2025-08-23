@@ -19,27 +19,18 @@ export class UriTemplate {
     return /\{[^}\s]+\}/.test(str);
   }
 
-  private static validateLength(
-    str: string,
-    max: number,
-    context: string
-  ): void {
+  private static validateLength(str: string, max: number, context: string): void {
     if (str.length > max) {
-      throw new Error(
-        `${context} exceeds maximum length of ${max} characters (got ${str.length})`
-      );
+      throw new Error(`${context} exceeds maximum length of ${max} characters (got ${str.length})`);
     }
   }
   private readonly template: string;
   private readonly parts: Array<
-    | string
-    | { name: string; operator: string; names: string[]; exploded: boolean }
+    string | { name: string; operator: string; names: string[]; exploded: boolean }
   >;
 
   get variableNames(): string[] {
-    return this.parts.flatMap((part) =>
-      typeof part === "string" ? [] : part.names
-    );
+    return this.parts.flatMap((part) => (typeof part === "string" ? [] : part.names));
   }
 
   constructor(template: string) {
@@ -54,13 +45,9 @@ export class UriTemplate {
 
   private parse(
     template: string
-  ): Array<
-    | string
-    | { name: string; operator: string; names: string[]; exploded: boolean }
-  > {
+  ): Array<string | { name: string; operator: string; names: string[]; exploded: boolean }> {
     const parts: Array<
-      | string
-      | { name: string; operator: string; names: string[]; exploded: boolean }
+      string | { name: string; operator: string; names: string[]; exploded: boolean }
     > = [];
     let currentText = "";
     let i = 0;
@@ -90,11 +77,7 @@ export class UriTemplate {
 
         // Validate variable name length
         for (const name of names) {
-          UriTemplate.validateLength(
-            name,
-            MAX_VARIABLE_LENGTH,
-            "Variable name"
-          );
+          UriTemplate.validateLength(name, MAX_VARIABLE_LENGTH, "Variable name");
         }
 
         parts.push({ name, operator, names, exploded });
@@ -161,9 +144,7 @@ export class UriTemplate {
     }
 
     if (part.names.length > 1) {
-      const values = part.names
-        .map((name) => variables[name])
-        .filter((v) => v !== undefined);
+      const values = part.names.map((name) => variables[name]).filter((v) => v !== undefined);
       if (values.length === 0) return "";
       return values.map((v) => (Array.isArray(v) ? v[0] : v)).join(",");
     }
@@ -290,11 +271,7 @@ export class UriTemplate {
     }
 
     pattern += "$";
-    UriTemplate.validateLength(
-      pattern,
-      MAX_REGEX_LENGTH,
-      "Generated regex pattern"
-    );
+    UriTemplate.validateLength(pattern, MAX_REGEX_LENGTH, "Generated regex pattern");
     const regex = new RegExp(pattern);
     const match = uri.match(regex);
 

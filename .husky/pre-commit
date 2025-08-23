@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Run lint-staged for changed files
+npx lint-staged
+
+# Run TypeScript check (fast with incremental compilation)
+pnpm run typecheck

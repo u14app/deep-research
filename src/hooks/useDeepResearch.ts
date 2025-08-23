@@ -1,34 +1,34 @@
-import { useState } from "react";
-import { streamText, smoothStream, type JSONValue, type Tool } from "ai";
-import { parsePartialJson } from "@ai-sdk/ui-utils";
+import type { GoogleGenerativeAIProviderMetadata } from "@ai-sdk/google";
 import { openai } from "@ai-sdk/openai";
-import { type GoogleGenerativeAIProviderMetadata } from "@ai-sdk/google";
-import { useTranslation } from "react-i18next";
+import { parsePartialJson } from "@ai-sdk/ui-utils";
+import { type JSONValue, smoothStream, streamText, type Tool } from "ai";
 import Plimit from "p-limit";
+import { flat, pick, unique } from "radash";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
+import { outputGuidelinesPrompt } from "@/constants/prompts";
 import useModelProvider from "@/hooks/useAiProvider";
 import useWebSearch from "@/hooks/useWebSearch";
-import { useTaskStore } from "@/store/task";
 import { useHistoryStore } from "@/store/history";
-import { useSettingStore } from "@/store/setting";
 import { useKnowledgeStore } from "@/store/knowledge";
-import { outputGuidelinesPrompt } from "@/constants/prompts";
+import { useSettingStore } from "@/store/setting";
+import { useTaskStore } from "@/store/task";
 import {
-  getSystemPrompt,
   generateQuestionsPrompt,
-  writeReportPlanPrompt,
   generateSerpQueriesPrompt,
+  getSERPQuerySchema,
+  getSystemPrompt,
   processResultPrompt,
-  processSearchResultPrompt,
   processSearchKnowledgeResultPrompt,
+  processSearchResultPrompt,
   reviewSerpQueriesPrompt,
   writeFinalReportPrompt,
-  getSERPQuerySchema,
+  writeReportPlanPrompt,
 } from "@/utils/deep-research/prompts";
-import { isNetworkingModel } from "@/utils/model";
-import { ThinkTagStreamProcessor, removeJsonMarkdown } from "@/utils/text";
 import { parseError } from "@/utils/error";
-import { pick, flat, unique } from "radash";
+import { isNetworkingModel } from "@/utils/model";
+import { removeJsonMarkdown, ThinkTagStreamProcessor } from "@/utils/text";
 
 type ProviderOptions = Record<string, Record<string, JSONValue>>;
 type Tools = Record<string, Tool>;
@@ -59,16 +59,12 @@ function useDeepResearch() {
   const [status, setStatus] = useState<string>("");
 
   async function generateSearchSettings(searchModel: string) {
-    const { provider, enableSearch, searchProvider, searchMaxResult } =
-      useSettingStore.getState();
+    const { provider, enableSearch, searchProvider, searchMaxResult } = useSettingStore.getState();
 
     if (enableSearch && searchProvider === "model") {
       const createModel = (model: string) => {
         // Enable Gemini's built-in search tool
-        if (
-          ["google", "google-vertex"].includes(provider) &&
-          isNetworkingModel(model)
-        ) {
+        if (["google", "google-vertex"].includes(provider) && isNetworkingModel(model)) {
           return createModelProvider(model, { useSearchGrounding: true });
         } else {
           return createModelProvider(model);
@@ -87,6 +83,7 @@ function useDeepResearch() {
             }),
           } as Tools;
         }
+        return undefined;
       };
       const getProviderOptions = (model: string) => {
         // Enable OpenRouter's built-in search tool
@@ -101,11 +98,7 @@ function useDeepResearch() {
               ],
             },
           } as ProviderOptions;
-        } else if (
-          provider === "xai" &&
-          model.startsWith("grok-3") &&
-          !model.includes("mini")
-        ) {
+        } else if (provider === "xai" && model.startsWith("grok-3") && !model.includes("mini")) {
           return {
             xai: {
               search_parameters: {
@@ -115,6 +108,7 @@ function useDeepResearch() {
             },
           } as ProviderOptions;
         }
+        return undefined;
       };
 
       return {
@@ -138,10 +132,7 @@ function useDeepResearch() {
     const result = streamText({
       ...searchSettings,
       system: getSystemPrompt(),
-      prompt: [
-        generateQuestionsPrompt(question),
-        getResponseLanguagePrompt(),
-      ].join("\n\n"),
+      prompt: [generateQuestionsPrompt(question), getResponseLanguagePrompt()].join("\n\n"),
       experimental_transform: smoothTextStream(smoothTextStreamType),
       onError: handleError,
     });
@@ -176,9 +167,7 @@ function useDeepResearch() {
     const result = streamText({
       ...searchSettings,
       system: getSystemPrompt(),
-      prompt: [writeReportPlanPrompt(query), getResponseLanguagePrompt()].join(
-        "\n\n"
-      ),
+      prompt: [writeReportPlanPrompt(query), getResponseLanguagePrompt()].join("\n\n"),
       experimental_transform: smoothTextStream(smoothTextStreamType),
       onError: handleError,
     });
@@ -253,13 +242,8 @@ function useDeepResearch() {
   }
 
   async function runSearchTask(queries: SearchTask[]) {
-    const {
-      enableSearch,
-      searchProvider,
-      parallelSearch,
-      references,
-      onlyUseLocalResource,
-    } = useSettingStore.getState();
+    const { enableSearch, searchProvider, parallelSearch, references, onlyUseLocalResource } =
+      useSettingStore.getState();
     const { resources } = useTaskStore.getState();
     const { networkingModel } = getModel();
     setStatus(t("research.common.research"));
@@ -276,10 +260,7 @@ function useDeepResearch() {
           taskStore.updateTask(item.query, { state: "processing" });
 
           if (resources.length > 0) {
-            const knowledges = await searchLocalKnowledges(
-              item.query,
-              item.researchGoal
-            );
+            const knowledges = await searchLocalKnowledges(item.query, item.researchGoal);
             content += [
               knowledges,
               `### ${t("research.searchResult.references")}`,
@@ -312,14 +293,11 @@ function useDeepResearch() {
               } catch (err) {
                 console.error(err);
                 handleError(
-                  `[${searchProvider}]: ${
-                    err instanceof Error ? err.message : "Search Failed"
-                  }`
+                  `[${searchProvider}]: ${err instanceof Error ? err.message : "Search Failed"}`
                 );
                 return plimit.clearQueue();
               }
-              const enableReferences =
-                sources.length > 0 && references === "enable";
+              const enableReferences = sources.length > 0 && references === "enable";
               searchResult = streamText({
                 model: await createModelProvider(networkingModel),
                 system: getSystemPrompt(),
@@ -336,9 +314,7 @@ function useDeepResearch() {
                 onError: handleError,
               });
             } else {
-              const searchSettings = await generateSearchSettings(
-                networkingModel
-              );
+              const searchSettings = await generateSearchSettings(networkingModel);
               searchResult = streamText({
                 ...searchSettings,
                 system: getSystemPrompt(),
@@ -390,9 +366,7 @@ function useDeepResearch() {
                   googleGroundingMetadata.groundingSupports.forEach(
                     ({ segment, groundingChunkIndices }) => {
                       if (segment.text && groundingChunkIndices) {
-                        const index = groundingChunkIndices.map(
-                          (idx: number) => `[${idx + 1}]`
-                        );
+                        const index = groundingChunkIndices.map((idx: number) => `[${idx + 1}]`);
                         content = content.replaceAll(
                           segment.text,
                           `${segment.text}${index.join("")}`
@@ -470,21 +444,14 @@ function useDeepResearch() {
         textPart,
         (text) => {
           content += text;
-          const data: PartialJson = parsePartialJson(
-            removeJsonMarkdown(content)
-          );
-          if (
-            querySchema.safeParse(data.value) &&
-            data.state === "successful-parse"
-          ) {
+          const data: PartialJson = parsePartialJson(removeJsonMarkdown(content));
+          if (querySchema.safeParse(data.value) && data.state === "successful-parse") {
             if (data.value) {
-              queries = data.value.map(
-                (item: { query: string; researchGoal: string }) => ({
-                  state: "unprocessed",
-                  learning: "",
-                  ...pick(item, ["query", "researchGoal"]),
-                })
-              );
+              queries = data.value.map((item: { query: string; researchGoal: string }) => ({
+                state: "unprocessed",
+                learning: "",
+                ...pick(item, ["query", "researchGoal"]),
+              }));
             }
           }
         },
@@ -502,15 +469,8 @@ function useDeepResearch() {
 
   async function writeFinalReport() {
     const { citationImage, references } = useSettingStore.getState();
-    const {
-      reportPlan,
-      tasks,
-      setId,
-      setTitle,
-      setSources,
-      requirement,
-      updateFinalReport,
-    } = useTaskStore.getState();
+    const { reportPlan, tasks, setId, setTitle, setSources, requirement, updateFinalReport } =
+      useTaskStore.getState();
     const { save } = useHistoryStore.getState();
     const { thinkingModel } = getModel();
     setStatus(t("research.common.writing"));
@@ -536,9 +496,7 @@ function useDeepResearch() {
         writeFinalReportPrompt(
           reportPlan,
           learnings,
-          enableReferences
-            ? sources.map((item) => pick(item, ["title", "url"]))
-            : [],
+          enableReferences ? sources.map((item) => pick(item, ["title", "url"])) : [],
           enableCitationImage ? images : [],
           requirement,
           enableCitationImage,
@@ -583,11 +541,7 @@ function useDeepResearch() {
       updateFinalReport(content);
     }
     if (content.length > 0) {
-      const title = (content || "")
-        .split("\n")[0]
-        .replaceAll("#", "")
-        .replaceAll("*", "")
-        .trim();
+      const title = (content || "").split("\n")[0].replaceAll("#", "").replaceAll("*", "").trim();
       setTitle(title);
       setSources(sources);
       const id = save(taskStore.backup());
@@ -607,10 +561,7 @@ function useDeepResearch() {
       const result = streamText({
         model: await createModelProvider(thinkingModel),
         system: getSystemPrompt(),
-        prompt: [
-          generateSerpQueriesPrompt(reportPlan),
-          getResponseLanguagePrompt(),
-        ].join("\n\n"),
+        prompt: [generateSerpQueriesPrompt(reportPlan), getResponseLanguagePrompt()].join("\n\n"),
         experimental_transform: smoothTextStream(smoothTextStreamType),
         onError: handleError,
       });
@@ -624,22 +575,15 @@ function useDeepResearch() {
           textPart,
           (text) => {
             content += text;
-            const data: PartialJson = parsePartialJson(
-              removeJsonMarkdown(content)
-            );
+            const data: PartialJson = parsePartialJson(removeJsonMarkdown(content));
             if (querySchema.safeParse(data.value)) {
-              if (
-                data.state === "repaired-parse" ||
-                data.state === "successful-parse"
-              ) {
+              if (data.state === "repaired-parse" || data.state === "successful-parse") {
                 if (data.value) {
-                  queries = data.value.map(
-                    (item: { query: string; researchGoal: string }) => ({
-                      state: "unprocessed",
-                      learning: "",
-                      ...pick(item, ["query", "researchGoal"]),
-                    })
-                  );
+                  queries = data.value.map((item: { query: string; researchGoal: string }) => ({
+                    state: "unprocessed",
+                    learning: "",
+                    ...pick(item, ["query", "researchGoal"]),
+                  }));
                   taskStore.update(queries);
                 }
               }

@@ -1,20 +1,21 @@
 "use client";
-import { useState, useMemo, useLayoutEffect, useRef } from "react";
-import { useTranslation } from "react-i18next";
-import { TrashIcon, FileOutput, Download } from "lucide-react";
-import { z } from "zod";
-import { toast } from "sonner";
-import Fuse from "fuse.js";
 import dayjs from "dayjs";
+import Fuse from "fuse.js";
+import { Download, FileOutput, TrashIcon } from "lucide-react";
+import { useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
+import { z } from "zod";
 import SearchArea from "@/components/Internal/SearchArea";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Table,
   TableBody,
@@ -23,9 +24,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { useTaskStore, type TaskStore } from "@/store/task";
-import { useHistoryStore, type ResearchHistory } from "@/store/history";
+import { type ResearchHistory, useHistoryStore } from "@/store/history";
+import { type TaskStore, useTaskStore } from "@/store/task";
 import { downloadFile } from "@/utils/file";
 import { fileParser } from "@/utils/parser";
 
@@ -186,21 +186,15 @@ function History({ open, onClose }: HistoryProps) {
         </div>
         <ScrollArea className="max-h-[65vh]">
           {historyList.length === 0 ? (
-            <div className="text-center py-6 text-muted-foreground">
-              {t("history.noHistory")}
-            </div>
+            <div className="text-center py-6 text-muted-foreground">{t("history.noHistory")}</div>
           ) : (
             <>
               <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>{t("history.name")}</TableHead>
-                    <TableHead className="text-center max-sm:hidden">
-                      {t("history.date")}
-                    </TableHead>
-                    <TableHead className="text-center w-32">
-                      {t("history.actions")}
-                    </TableHead>
+                    <TableHead className="text-center max-sm:hidden">{t("history.date")}</TableHead>
+                    <TableHead className="text-center w-32">{t("history.actions")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>

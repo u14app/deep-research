@@ -1,8 +1,8 @@
 "use client";
 import dynamic from "next/dynamic";
+import { useTheme } from "next-themes";
 import { useLayoutEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { useTheme } from "next-themes";
 import { useGlobalStore } from "@/store/global";
 import { useSettingStore } from "@/store/setting";
 
@@ -10,9 +10,7 @@ const Header = dynamic(() => import("@/components/Internal/Header"));
 const Setting = dynamic(() => import("@/components/Setting"));
 const Topic = dynamic(() => import("@/components/Research/Topic"));
 const Feedback = dynamic(() => import("@/components/Research/Feedback"));
-const SearchResult = dynamic(
-  () => import("@/components/Research/SearchResult")
-);
+const SearchResult = dynamic(() => import("@/components/Research/SearchResult"));
 const FinalReport = dynamic(() => import("@/components/Research/FinalReport"));
 const History = dynamic(() => import("@/components/History"));
 const Knowledge = dynamic(() => import("@/components/Knowledge"));
@@ -45,7 +43,7 @@ function Home() {
         <FinalReport />
       </main>
       <footer className="my-4 text-center text-sm text-gray-600 print:hidden">
-        <a href="https://github.com/u14app/" target="_blank">
+        <a href="https://github.com/u14app/" target="_blank" rel="noopener">
           {t("copyright", {
             name: "U14App",
           })}
@@ -54,10 +52,7 @@ function Home() {
       <aside className="print:hidden">
         <Setting open={openSetting} onClose={() => setOpenSetting(false)} />
         <History open={openHistory} onClose={() => setOpenHistory(false)} />
-        <Knowledge
-          open={openKnowledge}
-          onClose={() => setOpenKnowledge(false)}
-        />
+        <Knowledge open={openKnowledge} onClose={() => setOpenKnowledge(false)} />
       </aside>
     </div>
   );

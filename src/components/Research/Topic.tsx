@@ -1,42 +1,29 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
-import { useTranslation } from "react-i18next";
-import {
-  LoaderCircle,
-  SquarePlus,
-  FilePlus,
-  BookText,
-  Paperclip,
-  Link,
-} from "lucide-react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import ResourceList from "@/components/Knowledge/ResourceList";
-import Crawler from "@/components/Knowledge/Crawler";
+import { BookText, FilePlus, Link, LoaderCircle, Paperclip, SquarePlus } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
+import { z } from "zod";
 import { Button } from "@/components/Internal/Button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-} from "@/components/ui/form";
-import { Textarea } from "@/components/ui/textarea";
+import Crawler from "@/components/Knowledge/Crawler";
+import ResourceList from "@/components/Knowledge/ResourceList";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import useDeepResearch from "@/hooks/useDeepResearch";
-import useAiProvider from "@/hooks/useAiProvider";
-import useKnowledge from "@/hooks/useKnowledge";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
+import { Textarea } from "@/components/ui/textarea";
 import useAccurateTimer from "@/hooks/useAccurateTimer";
+import useAiProvider from "@/hooks/useAiProvider";
+import useDeepResearch from "@/hooks/useDeepResearch";
+import useKnowledge from "@/hooks/useKnowledge";
 import { useGlobalStore } from "@/store/global";
+import { useHistoryStore } from "@/store/history";
 import { useSettingStore } from "@/store/setting";
 import { useTaskStore } from "@/store/task";
-import { useHistoryStore } from "@/store/history";
 
 const formSchema = z.object({
   topic: z.string().min(2),
@@ -49,11 +36,7 @@ function Topic() {
   const { askQuestions } = useDeepResearch();
   const { hasApiKey } = useAiProvider();
   const { getKnowledgeFromFile } = useKnowledge();
-  const {
-    formattedTime,
-    start: accurateTimerStart,
-    stop: accurateTimerStop,
-  } = useAccurateTimer();
+  const { formattedTime, start: accurateTimerStart, stop: accurateTimerStop } = useAccurateTimer();
   const [isThinking, setIsThinking] = useState<boolean>(false);
   const [openCrawler, setOpenCrawler] = useState<boolean>(false);
 
@@ -126,9 +109,7 @@ function Topic() {
   return (
     <section className="p-4 border rounded-md mt-4 print:hidden">
       <div className="flex justify-between items-center border-b mb-2">
-        <h3 className="font-semibold text-lg leading-10">
-          {t("research.topic.title")}
-        </h3>
+        <h3 className="font-semibold text-lg leading-10">{t("research.topic.title")}</h3>
         <div className="flex gap-1">
           <Button
             variant="ghost"
@@ -186,16 +167,12 @@ function Topic() {
                       <span>{t("knowledge.knowledge")}</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem
-                      onClick={() =>
-                        handleCheck() && fileInputRef.current?.click()
-                      }
+                      onClick={() => handleCheck() && fileInputRef.current?.click()}
                     >
                       <Paperclip />
                       <span>{t("knowledge.localFile")}</span>
                     </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => handleCheck() && setOpenCrawler(true)}
-                    >
+                    <DropdownMenuItem onClick={() => handleCheck() && setOpenCrawler(true)}>
                       <Link />
                       <span>{t("knowledge.webPage")}</span>
                     </DropdownMenuItem>
@@ -226,10 +203,7 @@ function Topic() {
         hidden
         onChange={(ev) => handleFileUpload(ev.target.files)}
       />
-      <Crawler
-        open={openCrawler}
-        onClose={() => setOpenCrawler(false)}
-      ></Crawler>
+      <Crawler open={openCrawler} onClose={() => setOpenCrawler(false)}></Crawler>
     </section>
   );
 }

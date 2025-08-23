@@ -1,21 +1,17 @@
-import { streamText, smoothStream } from "ai";
-import { Md5 } from "ts-md5";
+import { smoothStream, streamText } from "ai";
+import { omit } from "radash";
 import { toast } from "sonner";
+import { Md5 } from "ts-md5";
+import { rewritingPrompt } from "@/constants/prompts";
 import useModelProvider from "@/hooks/useAiProvider";
 import { useKnowledgeStore } from "@/store/knowledge";
-import { useTaskStore } from "@/store/task";
 import { useSettingStore } from "@/store/setting";
-import { rewritingPrompt } from "@/constants/prompts";
+import { useTaskStore } from "@/store/task";
 import { jinaReader, localCrawler } from "@/utils/crawler";
-import { fileParser } from "@/utils/parser";
-import { getTextByteSize } from "@/utils/file";
-import {
-  splitText,
-  containsXmlHtmlTags,
-  ThinkTagStreamProcessor,
-} from "@/utils/text";
 import { parseError } from "@/utils/error";
-import { omit } from "radash";
+import { getTextByteSize } from "@/utils/file";
+import { fileParser } from "@/utils/parser";
+import { containsXmlHtmlTags, splitText, ThinkTagStreamProcessor } from "@/utils/text";
 
 const MAX_CHUNK_LENGTH = 10000;
 
@@ -48,9 +44,7 @@ function useKnowledge() {
       const meta = `${fileMeta.name}::${fileMeta.size}::${fileMeta.type}::${fileMeta.lastModified}`;
       return Md5.hashStr(meta);
     } else if (type === "url" && options && options.url) {
-      return Md5.hashStr(
-        `${options.url}::${Date.now().toString().substring(0, 8)}`
-      );
+      return Md5.hashStr(`${options.url}::${Date.now().toString().substring(0, 8)}`);
     } else if (type === "knowledge") {
       return Md5.hashStr(`KNOWLEDGE::${Date.now()}`);
     } else {

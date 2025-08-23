@@ -1,9 +1,9 @@
-import { useRef, useState, type ReactNode } from "react";
-import { useTranslation } from "react-i18next";
-import { Copy, CopyCheck } from "lucide-react";
 import copy from "copy-to-clipboard";
-import { Button } from "@/components/Internal/Button";
+import { Copy, CopyCheck } from "lucide-react";
 import { capitalize, get } from "radash";
+import { type ReactNode, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { Button } from "@/components/Internal/Button";
 
 import "./highlight.css";
 import "./style.css";
@@ -137,10 +137,7 @@ function Code({ children, lang }: Props) {
           </Button>
         </div>
       </div>
-      <div
-        ref={codeWrapperRef}
-        className="overflow-auto rounded-b bg-slate-50 dark:bg-slate-800"
-      >
+      <div ref={codeWrapperRef} className="overflow-auto rounded-b bg-slate-50 dark:bg-slate-800">
         {children}
       </div>
     </>

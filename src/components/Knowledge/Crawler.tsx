@@ -1,9 +1,10 @@
 "use client";
-import { useTranslation } from "react-i18next";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
+import { z } from "zod";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -13,6 +14,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -20,8 +22,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import useKnowledge from "@/hooks/useKnowledge";
 import { useSettingStore } from "@/store/setting";
 
@@ -30,7 +30,7 @@ type Props = {
   onClose: () => void;
 };
 
-const BUILD_MODE = process.env.NEXT_PUBLIC_BUILD_MODE;
+const BUILD_MODE = process.env["NEXT_PUBLIC_BUILD_MODE"];
 const URLRegExp = /^https?:\/\/.+/;
 
 const formSchema = z.object({

@@ -1,18 +1,17 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
-import ThemeProvider from "@/components/Provider/Theme";
-import I18Provider from "@/components/Provider/I18n";
 import Debugger from "@/components/Internal/Debugger";
+import I18Provider from "@/components/Provider/I18n";
+import ThemeProvider from "@/components/Provider/Theme";
 import { Toaster } from "@/components/ui/sonner";
 
 import "./globals.css";
 
-const HEAD_SCRIPTS = process.env.HEAD_SCRIPTS as string;
+const HEAD_SCRIPTS = process.env["HEAD_SCRIPTS"] as string;
 const APP_NAME = "Deep Research";
 const APP_DEFAULT_TITLE = "Deep Research";
 const APP_TITLE_TEMPLATE = "%s - PWA App";
-const APP_DESCRIPTION =
-  "Use any LLMs (Large Language Models) for Deep Research.";
+const APP_DESCRIPTION = "Use any LLMs (Large Language Models) for Deep Research.";
 
 export const metadata: Metadata = {
   applicationName: APP_NAME,

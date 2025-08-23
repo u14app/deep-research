@@ -1,22 +1,16 @@
 "use client";
-import dynamic from "next/dynamic";
-import { useState, useEffect } from "react";
-import { useTranslation } from "react-i18next";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoaderCircle } from "lucide-react";
+import dynamic from "next/dynamic";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
+import { z } from "zod";
 import { Button } from "@/components/Internal/Button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
-import useDeepResearch from "@/hooks/useDeepResearch";
 import useAccurateTimer from "@/hooks/useAccurateTimer";
+import useDeepResearch from "@/hooks/useDeepResearch";
 import { useTaskStore } from "@/store/task";
 
 const MagicDown = dynamic(() => import("@/components/MagicDown"));
@@ -29,11 +23,7 @@ function Feedback() {
   const { t } = useTranslation();
   const taskStore = useTaskStore();
   const { status, deepResearch, writeReportPlan } = useDeepResearch();
-  const {
-    formattedTime,
-    start: accurateTimerStart,
-    stop: accurateTimerStop,
-  } = useAccurateTimer();
+  const { formattedTime, start: accurateTimerStart, stop: accurateTimerStop } = useAccurateTimer();
   const [isThinking, setIsThinking] = useState<boolean>(false);
   const [isResearch, setIsResaerch] = useState<boolean>(false);
 
@@ -87,9 +77,7 @@ function Feedback() {
         <div>{t("research.feedback.emptyTip")}</div>
       ) : (
         <div>
-          <h4 className="mt-4 text-base font-semibold">
-            {t("research.feedback.questions")}
-          </h4>
+          <h4 className="mt-4 text-base font-semibold">{t("research.feedback.questions")}</h4>
           <MagicDown
             className="mt-2 min-h-20"
             value={taskStore.questions}
@@ -116,11 +104,7 @@ function Feedback() {
                   </FormItem>
                 )}
               />
-              <Button
-                className="mt-4 w-full"
-                type="submit"
-                disabled={isThinking}
-              >
+              <Button className="mt-4 w-full" type="submit" disabled={isThinking}>
                 {isThinking ? (
                   <>
                     <LoaderCircle className="animate-spin" />
@@ -139,9 +123,7 @@ function Feedback() {
       )}
       {taskStore.reportPlan !== "" ? (
         <div className="mt-6">
-          <h4 className="text-base font-semibold">
-            {t("research.feedback.reportPlan")}
-          </h4>
+          <h4 className="text-base font-semibold">{t("research.feedback.reportPlan")}</h4>
           <MagicDown
             className="mt-2 min-h-20"
             value={taskStore.reportPlan}

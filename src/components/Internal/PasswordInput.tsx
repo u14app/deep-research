@@ -1,11 +1,6 @@
 "use client";
-import {
-  useState,
-  forwardRef,
-  type ForwardedRef,
-  type ComponentProps,
-} from "react";
 import { Eye, EyeOff } from "lucide-react";
+import { type ComponentProps, type ForwardedRef, forwardRef, useState } from "react";
 import { Input as OriginalInput } from "@/components/ui/input";
 import { cn } from "@/utils/style";
 
@@ -27,15 +22,9 @@ function PasswordInput(
       />
       <div className="absolute top-0.5 right-1 w-8 h-8 text-gray-500 cursor-pointer flex justify-center items-center">
         {showPassword ? (
-          <EyeOff
-            className="w-5 h-5 scale-90"
-            onClick={() => setShowPassword(false)}
-          />
+          <EyeOff className="w-5 h-5 scale-90" onClick={() => setShowPassword(false)} />
         ) : (
-          <Eye
-            className="w-5 h-5 scale-90"
-            onClick={() => setShowPassword(true)}
-          />
+          <Eye className="w-5 h-5 scale-90" onClick={() => setShowPassword(true)} />
         )}
       </div>
     </div>

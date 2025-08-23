@@ -1,41 +1,35 @@
 "use client";
-import dynamic from "next/dynamic";
-import { useState, useEffect, useMemo } from "react";
-import { useTranslation } from "react-i18next";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "sonner";
 import {
-  LoaderCircle,
   CircleCheck,
-  TextSearch,
   Download,
-  Trash,
-  RotateCcw,
+  LoaderCircle,
   NotebookText,
+  RotateCcw,
+  TextSearch,
+  Trash,
 } from "lucide-react";
+import dynamic from "next/dynamic";
+import { useEffect, useMemo, useState } from "react";
+import { useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
+import { z } from "zod";
 import { Button } from "@/components/Internal/Button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-} from "@/components/ui/form";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Textarea } from "@/components/ui/textarea";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Separator } from "@/components/ui/separator";
+import { Textarea } from "@/components/ui/textarea";
 import useAccurateTimer from "@/hooks/useAccurateTimer";
 import useDeepResearch from "@/hooks/useDeepResearch";
 import useKnowledge from "@/hooks/useKnowledge";
-import { useTaskStore } from "@/store/task";
 import { useKnowledgeStore } from "@/store/knowledge";
+import { useTaskStore } from "@/store/task";
 import { downloadFile } from "@/utils/file";
 
 const MagicDown = dynamic(() => import("@/components/MagicDown"));
@@ -68,11 +62,7 @@ function SearchResult() {
   const taskStore = useTaskStore();
   const { status, runSearchTask, reviewSearchResult } = useDeepResearch();
   const { generateId } = useKnowledge();
-  const {
-    formattedTime,
-    start: accurateTimerStart,
-    stop: accurateTimerStop,
-  } = useAccurateTimer();
+  const { formattedTime, start: accurateTimerStart, stop: accurateTimerStop } = useAccurateTimer();
   const [isThinking, setIsThinking] = useState<boolean>(false);
   const unfinishedTasks = useMemo(() => {
     return taskStore.tasks.filter((item) => item.state !== "completed");
@@ -96,18 +86,12 @@ function SearchResult() {
       item.learning,
       item.images?.length > 0
         ? `#### ${t("research.searchResult.relatedImages")}\n\n${item.images
-            .map(
-              (source) =>
-                `![${source.description || source.url}](${source.url})`
-            )
+            .map((source) => `![${source.description || source.url}](${source.url})`)
             .join("\n")}`
         : "",
       item.sources?.length > 0
         ? `#### ${t("research.common.sources")}\n\n${item.sources
-            .map(
-              (source, idx) =>
-                `${idx + 1}. [${source.title || source.url}][${idx + 1}]`
-            )
+            .map((source, idx) => `${idx + 1}. [${source.title || source.url}][${idx + 1}]`)
             .join("\n")}`
         : "",
     ].join("\n\n");
@@ -189,15 +173,11 @@ function SearchResult() {
                     </div>
                   </AccordionTrigger>
                   <AccordionContent className="prose prose-slate dark:prose-invert max-w-full min-h-20">
-                    <MagicDownView>
-                      {addQuoteBeforeAllLine(item.researchGoal)}
-                    </MagicDownView>
+                    <MagicDownView>{addQuoteBeforeAllLine(item.researchGoal)}</MagicDownView>
                     <Separator className="mb-4" />
                     <MagicDown
                       value={item.learning}
-                      onChange={(value) =>
-                        taskStore.updateTask(item.query, { learning: value })
-                      }
+                      onChange={(value) => taskStore.updateTask(item.query, { learning: value })}
                       tools={
                         <>
                           <div className="px-1">
@@ -211,9 +191,7 @@ function SearchResult() {
                             title={t("research.common.restudy")}
                             side="left"
                             sideoffset={8}
-                            onClick={() =>
-                              handleRetry(item.query, item.researchGoal)
-                            }
+                            onClick={() => handleRetry(item.query, item.researchGoal)}
                           >
                             <RotateCcw />
                           </Button>
@@ -307,9 +285,7 @@ function SearchResult() {
                     <FormControl>
                       <Textarea
                         rows={3}
-                        placeholder={t(
-                          "research.searchResult.suggestionPlaceholder"
-                        )}
+                        placeholder={t("research.searchResult.suggestionPlaceholder")}
                         disabled={isThinking}
                         {...field}
                       />
@@ -317,12 +293,7 @@ function SearchResult() {
                   </FormItem>
                 )}
               />
-              <Button
-                className="w-full mt-4"
-                type="submit"
-                variant="default"
-                disabled={isThinking}
-              >
+              <Button className="w-full mt-4" type="submit" variant="default" disabled={isThinking}>
                 {isThinking ? (
                   <>
                     <LoaderCircle className="animate-spin" />

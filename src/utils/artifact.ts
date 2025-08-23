@@ -1,8 +1,4 @@
-export function AIWritePrompt(
-  content: string,
-  prompt: string,
-  systemInstruction: string = ""
-) {
+export function AIWritePrompt(content: string, prompt: string, systemInstruction: string = "") {
   return `Your task is to modify the following artifacts as required in feature.
 Try not to change the meaning or story behind the artifact as much as possible.
 
@@ -117,10 +113,7 @@ Rules and guidelines:
 </rules-guidelines>`;
 }
 
-export function addEmojisPrompt(
-  content: string,
-  systemInstruction: string = ""
-) {
+export function addEmojisPrompt(content: string, systemInstruction: string = "") {
   return `You are tasked with revising the following artifact by adding emojis to it.
 Ensure you do not change the meaning or story behind the artifact, simply include emojis throughout the text where appropriate.
 
@@ -143,10 +136,7 @@ Rules and guidelines:
 </rules-guidelines>`;
 }
 
-export function continuationPrompt(
-  content: string,
-  systemInstruction: string = ""
-) {
+export function continuationPrompt(content: string, systemInstruction: string = "") {
   return `Your task is to continue writing the following artifact.
 Maintain the following artifact writing style, including but not limited to typesetting, punctuation, etc.
 Only the continued artifact needs to be returned, without including the current artifact.

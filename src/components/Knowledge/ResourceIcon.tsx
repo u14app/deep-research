@@ -1,5 +1,5 @@
 "use client";
-import { File, BookText, Link } from "lucide-react";
+import { BookText, File, Link } from "lucide-react";
 import { cn } from "@/utils/style";
 
 type Props = {

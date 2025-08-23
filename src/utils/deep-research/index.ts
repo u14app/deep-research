@@ -1,20 +1,20 @@
-import { streamText, generateText } from "ai";
-import { type GoogleGenerativeAIProviderMetadata } from "@ai-sdk/google";
-import { createAIProvider } from "./provider";
-import { createSearchProvider } from "./search";
+import type { GoogleGenerativeAIProviderMetadata } from "@ai-sdk/google";
+import { generateText, streamText } from "ai";
+import { flat, isFunction, pick, unique } from "radash";
+import { outputGuidelinesPrompt } from "@/constants/prompts";
+import { isNetworkingModel } from "@/utils/model";
+import { removeJsonMarkdown, ThinkTagStreamProcessor } from "@/utils/text";
 import {
-  getSystemPrompt,
-  writeReportPlanPrompt,
   generateSerpQueriesPrompt,
+  getSERPQuerySchema,
+  getSystemPrompt,
   processResultPrompt,
   processSearchResultPrompt,
   writeFinalReportPrompt,
-  getSERPQuerySchema,
+  writeReportPlanPrompt,
 } from "./prompts";
-import { outputGuidelinesPrompt } from "@/constants/prompts";
-import { isNetworkingModel } from "@/utils/model";
-import { ThinkTagStreamProcessor, removeJsonMarkdown } from "@/utils/text";
-import { pick, unique, flat, isFunction } from "radash";
+import { createAIProvider } from "./provider";
+import { createSearchProvider } from "./search";
 
 export interface DeepResearchOptions {
   AIProvider: {
@@ -115,10 +115,7 @@ class DeepResearch {
     const result = streamText({
       model: await this.getThinkingModel(),
       system: getSystemPrompt(),
-      prompt: [
-        writeReportPlanPrompt(query),
-        this.getResponseLanguagePrompt(),
-      ].join("\n\n"),
+      prompt: [writeReportPlanPrompt(query), this.getResponseLanguagePrompt()].join("\n\n"),
     });
     let content = "";
     this.onMessage("message", { type: "text", text: "<report-plan>\n" });
@@ -147,18 +144,15 @@ class DeepResearch {
     return content;
   }
 
-  async generateSERPQuery(
-    reportPlan: string
-  ): Promise<DeepResearchSearchTask[]> {
+  async generateSERPQuery(reportPlan: string): Promise<DeepResearchSearchTask[]> {
     this.onMessage("progress", { step: "serp-query", status: "start" });
     const thinkTagStreamProcessor = new ThinkTagStreamProcessor();
     const { text } = await generateText({
       model: await this.getThinkingModel(),
       system: getSystemPrompt(),
-      prompt: [
-        generateSerpQueriesPrompt(reportPlan),
-        this.getResponseLanguagePrompt(),
-      ].join("\n\n"),
+      prompt: [generateSerpQueriesPrompt(reportPlan), this.getResponseLanguagePrompt()].join(
+        "\n\n"
+      ),
     });
     const querySchema = getSERPQuerySchema();
     let content = "";
@@ -242,6 +236,9 @@ class DeepResearch {
           }
         };
 
+        const tools = await getTools();
+        const providerOptions = getProviderOptions();
+
         searchResult = streamText({
           model: await this.getTaskModel(),
           system: getSystemPrompt(),
@@ -249,8 +246,8 @@ class DeepResearch {
             processResultPrompt(item.query, item.researchGoal),
             this.getResponseLanguagePrompt(),
           ].join("\n\n"),
-          tools: await getTools(),
-          providerOptions: getProviderOptions(),
+          ...(tools && { tools }),
+          ...(providerOptions && { providerOptions }),
         });
       } else {
         try {
@@ -306,25 +303,20 @@ class DeepResearch {
           sources.push(part.source);
         } else if (part.type === "finish") {
           if (part.providerMetadata?.google) {
-            const { groundingMetadata } = part.providerMetadata.google;
+            const { groundingMetadata } = part.providerMetadata["google"];
             const googleGroundingMetadata =
               groundingMetadata as GoogleGenerativeAIProviderMetadata["groundingMetadata"];
             if (googleGroundingMetadata?.groundingSupports) {
               googleGroundingMetadata.groundingSupports.forEach(
                 ({ segment, groundingChunkIndices }) => {
                   if (segment.text && groundingChunkIndices) {
-                    const index = groundingChunkIndices.map(
-                      (idx: number) => `[${idx + 1}]`
-                    );
-                    content = content.replaceAll(
-                      segment.text,
-                      `${segment.text}${index.join("")}`
-                    );
+                    const index = groundingChunkIndices.map((idx: number) => `[${idx + 1}]`);
+                    content = content.replaceAll(segment.text, `${segment.text}${index.join("")}`);
                   }
                 }
               );
             }
-          } else if (part.providerMetadata?.openai) {
+          } else if (part.providerMetadata?.["openai"]) {
             // Fixed the problem that OpenAI cannot generate markdown reference link syntax properly in Chinese context
             content = content.replaceAll("【", "[").replaceAll("】", "]");
           }
@@ -336,10 +328,7 @@ class DeepResearch {
         const imageContent =
           "\n\n---\n\n" +
           images
-            .map(
-              (source) =>
-                `![${source.description || source.url}](${source.url})`
-            )
+            .map((source) => `![${source.description || source.url}](${source.url})`)
             .join("\n");
         content += imageContent;
         this.onMessage("message", { type: "text", text: imageContent });
@@ -451,11 +440,7 @@ class DeepResearch {
     this.onMessage("message", { type: "text", text: "\n</final-report>\n\n" });
     thinkTagStreamProcessor.end();
 
-    const title = content
-      .split("\n")[0]
-      .replaceAll("#", "")
-      .replaceAll("*", "")
-      .trim();
+    const title = (content || "").split("\n")[0].replaceAll("#", "").replaceAll("*", "").trim();
 
     const finalReportResult: FinalReportResult = {
       title,
@@ -472,11 +457,7 @@ class DeepResearch {
     return finalReportResult;
   }
 
-  async start(
-    query: string,
-    enableCitationImage = true,
-    enableReferences = true
-  ) {
+  async start(query: string, enableCitationImage = true, enableReferences = true) {
     try {
       const reportPlan = await this.writeReportPlan(query);
       const tasks = await this.generateSERPQuery(reportPlan);

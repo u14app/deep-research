@@ -1,74 +1,74 @@
-import { zodToJsonSchema } from "zod-to-json-schema";
 import {
+  type AnyZodObject,
+  type ZodObject,
+  type ZodOptional,
+  type ZodRawShape,
+  type ZodString,
+  type ZodType,
+  type ZodTypeAny,
+  type ZodTypeDef,
   z,
-  ZodRawShape,
-  ZodObject,
-  ZodString,
-  AnyZodObject,
-  ZodTypeAny,
-  ZodType,
-  ZodTypeDef,
-  ZodOptional,
 } from "zod";
-import {
-  Implementation,
-  Tool,
-  ListToolsResult,
-  CallToolResult,
-  McpError,
-  ErrorCode,
-  CompleteRequest,
-  CompleteResult,
-  PromptReference,
-  ResourceReference,
-  Resource,
-  ListResourcesResult,
-  ListResourceTemplatesRequestSchema,
-  ReadResourceRequestSchema,
-  ListToolsRequestSchema,
-  CallToolRequestSchema,
-  ListResourcesRequestSchema,
-  ListPromptsRequestSchema,
-  GetPromptRequestSchema,
-  CompleteRequestSchema,
-  ListPromptsResult,
-  Prompt,
-  PromptArgument,
-  GetPromptResult,
-  ReadResourceResult,
-  ServerRequest,
-  ServerCapabilities,
-  ServerNotification,
-  ToolAnnotations,
-  ClientCapabilities,
-  CreateMessageRequest,
-  CreateMessageResultSchema,
-  EmptyResultSchema,
-  InitializedNotificationSchema,
-  InitializeRequest,
-  InitializeRequestSchema,
-  InitializeResult,
-  LATEST_PROTOCOL_VERSION,
-  ListRootsRequest,
-  ListRootsResultSchema,
-  LoggingMessageNotification,
-  Notification,
-  Request,
-  ResourceUpdatedNotification,
-  Result,
-  ServerResult,
-  SUPPORTED_PROTOCOL_VERSIONS,
-} from "./types";
-import { Completable, CompletableDef } from "./completable";
-import { UriTemplate, Variables } from "./shared/uriTemplate";
+import { zodToJsonSchema } from "zod-to-json-schema";
+import { Completable, type CompletableDef } from "./completable";
 import {
   mergeCapabilities,
-  RequestHandlerExtra,
   Protocol,
-  ProtocolOptions,
-  RequestOptions,
+  type ProtocolOptions,
+  type RequestHandlerExtra,
+  type RequestOptions,
 } from "./shared/protocol";
-import { Transport } from "./shared/transport";
+import type { Transport } from "./shared/transport";
+import { UriTemplate, type Variables } from "./shared/uriTemplate";
+import {
+  CallToolRequestSchema,
+  type CallToolResult,
+  type ClientCapabilities,
+  type CompleteRequest,
+  CompleteRequestSchema,
+  type CompleteResult,
+  type CreateMessageRequest,
+  CreateMessageResultSchema,
+  EmptyResultSchema,
+  ErrorCode,
+  GetPromptRequestSchema,
+  type GetPromptResult,
+  type Implementation,
+  InitializedNotificationSchema,
+  type InitializeRequest,
+  InitializeRequestSchema,
+  type InitializeResult,
+  LATEST_PROTOCOL_VERSION,
+  ListPromptsRequestSchema,
+  type ListPromptsResult,
+  ListResourcesRequestSchema,
+  type ListResourcesResult,
+  ListResourceTemplatesRequestSchema,
+  type ListRootsRequest,
+  ListRootsResultSchema,
+  ListToolsRequestSchema,
+  type ListToolsResult,
+  type LoggingMessageNotification,
+  McpError,
+  type Notification,
+  type Prompt,
+  type PromptArgument,
+  type PromptReference,
+  ReadResourceRequestSchema,
+  type ReadResourceResult,
+  type Request,
+  type Resource,
+  type ResourceReference,
+  type ResourceUpdatedNotification,
+  type Result,
+  type ServerCapabilities,
+  type ServerNotification,
+  type ServerRequest,
+  type ServerResult,
+  SUPPORTED_PROTOCOL_VERSIONS,
+  type Tool,
+  type ToolAnnotations,
+} from "./types";
 
 export type ServerOptions = ProtocolOptions & {
   /**
@@ -110,7 +110,7 @@ export type ServerOptions = ProtocolOptions & {
 export class Server<
   RequestT extends Request = Request,
   NotificationT extends Notification = Notification,
-  ResultT extends Result = Result
+  ResultT extends Result = Result,
 > extends Protocol<
   ServerRequest | RequestT,
   ServerNotification | NotificationT,
@@ -129,17 +129,16 @@ export class Server<
   /**
    * Initializes this server with the given name and version information.
    */
-  constructor(private _serverInfo: Implementation, options?: ServerOptions) {
+  constructor(
+    private _serverInfo: Implementation,
+    options?: ServerOptions
+  ) {
     super(options);
     this._capabilities = options?.capabilities ?? {};
     this._instructions = options?.instructions;
 
-    this.setRequestHandler(InitializeRequestSchema, (request) =>
-      this._oninitialize(request)
-    );
-    this.setNotificationHandler(InitializedNotificationSchema, () =>
-      this.oninitialized?.()
-    );
+    this.setRequestHandler(InitializeRequestSchema, (request) => this._oninitialize(request));
+    this.setNotificationHandler(InitializedNotificationSchema, () => this.oninitialized?.());
   }
 
   /**
@@ -149,9 +148,7 @@ export class Server<
    */
   public registerCapabilities(capabilities: ServerCapabilities): void {
     if (this.transport) {
-      throw new Error(
-        "Cannot register capabilities after connecting to transport"
-      );
+      throw new Error("Cannot register capabilities after connecting to transport");
     }
 
     this._capabilities = mergeCapabilities(this._capabilities, capabilities);
@@ -161,17 +158,13 @@ export class Server<
     switch (method as ServerRequest["method"]) {
       case "sampling/createMessage":
         if (!this._clientCapabilities?.sampling) {
-          throw new Error(
-            `Client does not support sampling (required for ${method})`
-          );
+          throw new Error(`Client does not support sampling (required for ${method})`);
         }
         break;
 
       case "roots/list":
         if (!this._clientCapabilities?.roots) {
-          throw new Error(
-            `Client does not support listing roots (required for ${method})`
-          );
+          throw new Error(`Client does not support listing roots (required for ${method})`);
         }
         break;
 
@@ -187,9 +180,7 @@ export class Server<
     switch (method as ServerNotification["method"]) {
       case "notifications/message":
         if (!this._capabilities.logging) {
-          throw new Error(
-            `Server does not support logging (required for ${method})`
-          );
+          throw new Error(`Server does not support logging (required for ${method})`);
         }
         break;
 
@@ -232,26 +223,20 @@ export class Server<
     switch (method) {
       case "sampling/createMessage":
         if (!this._capabilities.sampling) {
-          throw new Error(
-            `Server does not support sampling (required for ${method})`
-          );
+          throw new Error(`Server does not support sampling (required for ${method})`);
         }
         break;
 
       case "logging/setLevel":
         if (!this._capabilities.logging) {
-          throw new Error(
-            `Server does not support logging (required for ${method})`
-          );
+          throw new Error(`Server does not support logging (required for ${method})`);
         }
         break;
 
       case "prompts/get":
       case "prompts/list":
         if (!this._capabilities.prompts) {
-          throw new Error(
-            `Server does not support prompts (required for ${method})`
-          );
+          throw new Error(`Server does not support prompts (required for ${method})`);
         }
         break;
 
@@ -259,18 +244,14 @@ export class Server<
       case "resources/templates/list":
       case "resources/read":
         if (!this._capabilities.resources) {
-          throw new Error(
-            `Server does not support resources (required for ${method})`
-          );
+          throw new Error(`Server does not support resources (required for ${method})`);
         }
         break;
 
       case "tools/call":
       case "tools/list":
         if (!this._capabilities.tools) {
-          throw new Error(
-            `Server does not support tools (required for ${method})`
-          );
+          throw new Error(`Server does not support tools (required for ${method})`);
         }
         break;
 
@@ -281,9 +262,7 @@ export class Server<
     }
   }
 
-  private async _oninitialize(
-    request: InitializeRequest
-  ): Promise<InitializeResult> {
+  private async _oninitialize(request: InitializeRequest): Promise<InitializeResult> {
     const requestedVersion = request.params.protocolVersion;
 
     this._clientCapabilities = request.params.capabilities;
@@ -321,10 +300,7 @@ export class Server<
     return this.request({ method: "ping" }, EmptyResultSchema);
   }
 
-  async createMessage(
-    params: CreateMessageRequest["params"],
-    options?: RequestOptions
-  ) {
+  async createMessage(params: CreateMessageRequest["params"], options?: RequestOptions) {
     return this.request(
       { method: "sampling/createMessage", params },
       CreateMessageResultSchema,
@@ -332,15 +308,8 @@ export class Server<
     );
   }
 
-  async listRoots(
-    params?: ListRootsRequest["params"],
-    options?: RequestOptions
-  ) {
-    return this.request(
-      { method: "roots/list", params },
-      ListRootsResultSchema,
-      options
-    );
+  async listRoots(params?: ListRootsRequest["params"], options?: RequestOptions) {
+    return this.request({ method: "roots/list", params }, ListRootsResultSchema, options);
   }
 
   async sendLoggingMessage(params: LoggingMessageNotification["params"]) {
@@ -414,12 +383,8 @@ export class McpServer {
       return;
     }
 
-    this.server.assertCanSetRequestHandler(
-      ListToolsRequestSchema.shape.method.value
-    );
-    this.server.assertCanSetRequestHandler(
-      CallToolRequestSchema.shape.method.value
-    );
+    this.server.assertCanSetRequestHandler(ListToolsRequestSchema.shape.method.value);
+    this.server.assertCanSetRequestHandler(CallToolRequestSchema.shape.method.value);
 
     this.server.registerCapabilities({
       tools: {
@@ -460,25 +425,17 @@ export class McpServer {
       async (request, extra): Promise<CallToolResult> => {
         const tool = this._registeredTools[request.params.name];
         if (!tool) {
-          throw new McpError(
-            ErrorCode.InvalidParams,
-            `Tool ${request.params.name} not found`
-          );
+          throw new McpError(ErrorCode.InvalidParams, `Tool ${request.params.name} not found`);
         }
 
         if (!tool.enabled) {
-          throw new McpError(
-            ErrorCode.InvalidParams,
-            `Tool ${request.params.name} disabled`
-          );
+          throw new McpError(ErrorCode.InvalidParams, `Tool ${request.params.name} disabled`);
         }
 
         let result: CallToolResult;
 
         if (tool.inputSchema) {
-          const parseResult = await tool.inputSchema.safeParseAsync(
-            request.params.arguments
-          );
+          const parseResult = await tool.inputSchema.safeParseAsync(request.params.arguments);
           if (!parseResult.success) {
             throw new McpError(
               ErrorCode.InvalidParams,
@@ -570,9 +527,7 @@ export class McpServer {
       return;
     }
 
-    this.server.assertCanSetRequestHandler(
-      CompleteRequestSchema.shape.method.value
-    );
+    this.server.assertCanSetRequestHandler(CompleteRequestSchema.shape.method.value);
 
     this.server.setRequestHandler(
       CompleteRequestSchema,
@@ -602,17 +557,11 @@ export class McpServer {
   ): Promise<CompleteResult> {
     const prompt = this._registeredPrompts[ref.name];
     if (!prompt) {
-      throw new McpError(
-        ErrorCode.InvalidParams,
-        `Prompt ${ref.name} not found`
-      );
+      throw new McpError(ErrorCode.InvalidParams, `Prompt ${ref.name} not found`);
     }
 
     if (!prompt.enabled) {
-      throw new McpError(
-        ErrorCode.InvalidParams,
-        `Prompt ${ref.name} disabled`
-      );
+      throw new McpError(ErrorCode.InvalidParams, `Prompt ${ref.name} disabled`);
     }
 
     if (!prompt.argsSchema) {
@@ -649,9 +598,7 @@ export class McpServer {
       );
     }
 
-    const completer = template.resourceTemplate.completeCallback(
-      request.params.argument.name
-    );
+    const completer = template.resourceTemplate.completeCallback(request.params.argument.name);
     if (!completer) {
       return EMPTY_COMPLETION_RESULT;
     }
@@ -667,15 +614,9 @@ export class McpServer {
       return;
     }
 
-    this.server.assertCanSetRequestHandler(
-      ListResourcesRequestSchema.shape.method.value
-    );
-    this.server.assertCanSetRequestHandler(
-      ListResourceTemplatesRequestSchema.shape.method.value
-    );
-    this.server.assertCanSetRequestHandler(
-      ReadResourceRequestSchema.shape.method.value
-    );
+    this.server.assertCanSetRequestHandler(ListResourcesRequestSchema.shape.method.value);
+    this.server.assertCanSetRequestHandler(ListResourceTemplatesRequestSchema.shape.method.value);
+    this.server.assertCanSetRequestHandler(ReadResourceRequestSchema.shape.method.value);
 
     this.server.registerCapabilities({
       resources: {
@@ -683,88 +624,67 @@ export class McpServer {
       },
     });
 
-    this.server.setRequestHandler(
-      ListResourcesRequestSchema,
-      async (_, extra) => {
-        const resources = Object.entries(this._registeredResources)
-          .filter(([, resource]) => resource.enabled)
-          .map(([uri, resource]) => ({
-            uri,
-            name: resource.name,
-            ...resource.metadata,
-          }));
+    this.server.setRequestHandler(ListResourcesRequestSchema, async (_, extra) => {
+      const resources = Object.entries(this._registeredResources)
+        .filter(([, resource]) => resource.enabled)
+        .map(([uri, resource]) => ({
+          uri,
+          name: resource.name,
+          ...resource.metadata,
+        }));
 
-        const templateResources: Resource[] = [];
-        for (const template of Object.values(
-          this._registeredResourceTemplates
-        )) {
-          if (!template.resourceTemplate.listCallback) {
-            continue;
-          }
-
-          const result = await template.resourceTemplate.listCallback(extra);
-          for (const resource of result.resources) {
-            templateResources.push({
-              ...resource,
-              ...template.metadata,
-            });
-          }
+      const templateResources: Resource[] = [];
+      for (const template of Object.values(this._registeredResourceTemplates)) {
+        if (!template.resourceTemplate.listCallback) {
+          continue;
         }
 
-        return { resources: [...resources, ...templateResources] };
+        const result = await template.resourceTemplate.listCallback(extra);
+        for (const resource of result.resources) {
+          templateResources.push({
+            ...resource,
+            ...template.metadata,
+          });
+        }
       }
-    );
 
-    this.server.setRequestHandler(
-      ListResourceTemplatesRequestSchema,
-      async () => {
-        const resourceTemplates = Object.entries(
-          this._registeredResourceTemplates
-        ).map(([name, template]) => ({
+      return { resources: [...resources, ...templateResources] };
+    });
+
+    this.server.setRequestHandler(ListResourceTemplatesRequestSchema, async () => {
+      const resourceTemplates = Object.entries(this._registeredResourceTemplates).map(
+        ([name, template]) => ({
           name,
           uriTemplate: template.resourceTemplate.uriTemplate.toString(),
           ...template.metadata,
-        }));
+        })
+      );
 
-        return { resourceTemplates };
-      }
-    );
+      return { resourceTemplates };
+    });
 
-    this.server.setRequestHandler(
-      ReadResourceRequestSchema,
-      async (request, extra) => {
-        const uri = new URL(request.params.uri);
+    this.server.setRequestHandler(ReadResourceRequestSchema, async (request, extra) => {
+      const uri = new URL(request.params.uri);
 
-        // First check for exact resource match
-        const resource = this._registeredResources[uri.toString()];
-        if (resource) {
-          if (!resource.enabled) {
-            throw new McpError(
-              ErrorCode.InvalidParams,
-              `Resource ${uri} disabled`
-            );
-          }
-          return resource.readCallback(uri, extra);
+      // First check for exact resource match
+      const resource = this._registeredResources[uri.toString()];
+      if (resource) {
+        if (!resource.enabled) {
+          throw new McpError(ErrorCode.InvalidParams, `Resource ${uri} disabled`);
         }
-
-        // Then check templates
-        for (const template of Object.values(
-          this._registeredResourceTemplates
-        )) {
-          const variables = template.resourceTemplate.uriTemplate.match(
-            uri.toString()
-          );
-          if (variables) {
-            return template.readCallback(uri, variables, extra);
-          }
-        }
-
-        throw new McpError(
-          ErrorCode.InvalidParams,
-          `Resource ${uri} not found`
-        );
+        return resource.readCallback(uri, extra);
       }
-    );
+
+      // Then check templates
+      for (const template of Object.values(this._registeredResourceTemplates)) {
+        const variables = template.resourceTemplate.uriTemplate.match(uri.toString());
+        if (variables) {
+          return template.readCallback(uri, variables, extra);
+        }
+      }
+
+      throw new McpError(ErrorCode.InvalidParams, `Resource ${uri} not found`);
+    });
 
     this.setCompletionRequestHandler();
 
@@ -778,12 +698,8 @@ export class McpServer {
       return;
     }
 
-    this.server.assertCanSetRequestHandler(
-      ListPromptsRequestSchema.shape.method.value
-    );
-    this.server.assertCanSetRequestHandler(
-      GetPromptRequestSchema.shape.method.value
-    );
+    this.server.assertCanSetRequestHandler(ListPromptsRequestSchema.shape.method.value);
+    this.server.assertCanSetRequestHandler(GetPromptRequestSchema.shape.method.value);
 
     this.server.registerCapabilities({
       prompts: {
@@ -813,23 +729,15 @@ export class McpServer {
       async (request, extra): Promise<GetPromptResult> => {
         const prompt = this._registeredPrompts[request.params.name];
         if (!prompt) {
-          throw new McpError(
-            ErrorCode.InvalidParams,
-            `Prompt ${request.params.name} not found`
-          );
+          throw new McpError(ErrorCode.InvalidParams, `Prompt ${request.params.name} not found`);
         }
 
         if (!prompt.enabled) {
-          throw new McpError(
-            ErrorCode.InvalidParams,
-            `Prompt ${request.params.name} disabled`
-          );
+          throw new McpError(ErrorCode.InvalidParams, `Prompt ${request.params.name} disabled`);
         }
 
         if (prompt.argsSchema) {
-          const parseResult = await prompt.argsSchema.safeParseAsync(
-            request.params.arguments
-          );
+          const parseResult = await prompt.argsSchema.safeParseAsync(request.params.arguments);
           if (!parseResult.success) {
             throw new McpError(
               ErrorCode.InvalidParams,
@@ -855,11 +763,7 @@ export class McpServer {
   /**
    * Registers a resource `name` at a fixed URI, which will use the given callback to respond to read requests.
    */
-  resource(
-    name: string,
-    uri: string,
-    readCallback: ReadResourceCallback
-  ): RegisteredResource;
+  resource(name: string, uri: string, readCallback: ReadResourceCallback): RegisteredResource;
 
   /**
    * Registers a resource `name` at a fixed URI with metadata, which will use the given callback to respond to read requests.
@@ -900,9 +804,7 @@ export class McpServer {
       metadata = rest.shift() as ResourceMetadata;
     }
 
-    const readCallback = rest[0] as
-      | ReadResourceCallback
-      | ReadResourceTemplateCallback;
+    const readCallback = rest[0] as ReadResourceCallback | ReadResourceTemplateCallback;
 
     if (typeof uriOrTemplate === "string") {
       if (this._registeredResources[uriOrTemplate]) {
@@ -918,22 +820,16 @@ export class McpServer {
         enable: () => registeredResource.update({ enabled: true }),
         remove: () => registeredResource.update({ uri: null }),
         update: (updates) => {
-          if (
-            typeof updates.uri !== "undefined" &&
-            updates.uri !== uriOrTemplate
-          ) {
+          if (typeof updates.uri !== "undefined" && updates.uri !== uriOrTemplate) {
             delete this._registeredResources[uriOrTemplate];
-            if (updates.uri)
-              this._registeredResources[updates.uri] = registeredResource;
+            if (updates.uri) this._registeredResources[updates.uri] = registeredResource;
           }
-          if (typeof updates.name !== "undefined")
-            registeredResource.name = updates.name;
+          if (typeof updates.name !== "undefined") registeredResource.name = updates.name;
           if (typeof updates.metadata !== "undefined")
             registeredResource.metadata = updates.metadata;
           if (typeof updates.callback !== "undefined")
             registeredResource.readCallback = updates.callback;
-          if (typeof updates.enabled !== "undefined")
-            registeredResource.enabled = updates.enabled;
+          if (typeof updates.enabled !== "undefined") registeredResource.enabled = updates.enabled;
           this.sendResourceListChanged();
         },
       };
@@ -959,8 +855,7 @@ export class McpServer {
           if (typeof updates.name !== "undefined" && updates.name !== name) {
             delete this._registeredResourceTemplates[name];
             if (updates.name)
-              this._registeredResourceTemplates[updates.name] =
-                registeredResourceTemplate;
+              this._registeredResourceTemplates[updates.name] = registeredResourceTemplate;
           }
           if (typeof updates.template !== "undefined")
             registeredResourceTemplate.resourceTemplate = updates.template;
@@ -991,10 +886,8 @@ export class McpServer {
   ): RegisteredTool {
     const registeredTool: RegisteredTool = {
       description,
-      inputSchema:
-        inputSchema === undefined ? undefined : z.object(inputSchema),
-      outputSchema:
-        outputSchema === undefined ? undefined : z.object(outputSchema),
+      inputSchema: inputSchema === undefined ? undefined : z.object(inputSchema),
+      outputSchema: outputSchema === undefined ? undefined : z.object(outputSchema),
       annotations,
       callback,
       enabled: true,
@@ -1004,19 +897,16 @@ export class McpServer {
       update: (updates) => {
         if (typeof updates.name !== "undefined" && updates.name !== name) {
           delete this._registeredTools[name];
-          if (updates.name)
-            this._registeredTools[updates.name] = registeredTool;
+          if (updates.name) this._registeredTools[updates.name] = registeredTool;
         }
         if (typeof updates.description !== "undefined")
           registeredTool.description = updates.description;
         if (typeof updates.paramsSchema !== "undefined")
           registeredTool.inputSchema = z.object(updates.paramsSchema);
-        if (typeof updates.callback !== "undefined")
-          registeredTool.callback = updates.callback;
+        if (typeof updates.callback !== "undefined") registeredTool.callback = updates.callback;
         if (typeof updates.annotations !== "undefined")
           registeredTool.annotations = updates.annotations;
-        if (typeof updates.enabled !== "undefined")
-          registeredTool.enabled = updates.enabled;
+        if (typeof updates.enabled !== "undefined") registeredTool.enabled = updates.enabled;
         this.sendToolListChanged();
       },
     };
@@ -1184,11 +1074,7 @@ export class McpServer {
   /**
    * Registers a zero-argument prompt `name` (with a description) which will run the given function when the client calls it.
    */
-  prompt(
-    name: string,
-    description: string,
-    cb: PromptCallback
-  ): RegisteredPrompt;
+  prompt(name: string, description: string, cb: PromptCallback): RegisteredPrompt;
 
   /**
    * Registers a prompt `name` accepting the given arguments, which must be an object containing named properties associated with Zod schemas. When the client calls it, the function will be run with the parsed and validated arguments.
@@ -1236,17 +1122,14 @@ export class McpServer {
       update: (updates) => {
         if (typeof updates.name !== "undefined" && updates.name !== name) {
           delete this._registeredPrompts[name];
-          if (updates.name)
-            this._registeredPrompts[updates.name] = registeredPrompt;
+          if (updates.name) this._registeredPrompts[updates.name] = registeredPrompt;
         }
         if (typeof updates.description !== "undefined")
           registeredPrompt.description = updates.description;
         if (typeof updates.argsSchema !== "undefined")
           registeredPrompt.argsSchema = z.object(updates.argsSchema);
-        if (typeof updates.callback !== "undefined")
-          registeredPrompt.callback = updates.callback;
-        if (typeof updates.enabled !== "undefined")
-          registeredPrompt.enabled = updates.enabled;
+        if (typeof updates.callback !== "undefined") registeredPrompt.callback = updates.callback;
+        if (typeof updates.enabled !== "undefined") registeredPrompt.enabled = updates.enabled;
         this.sendPromptListChanged();
       },
     };
@@ -1297,9 +1180,7 @@ export class McpServer {
 /**
  * A callback to complete one variable within a resource template's URI template.
  */
-export type CompleteResourceTemplateCallback = (
-  value: string
-) => string[] | Promise<string[]>;
+export type CompleteResourceTemplateCallback = (value: string) => string[] | Promise<string[]>;
 
 /**
  * A resource template combines a URI pattern with optional functionality to enumerate
@@ -1325,9 +1206,7 @@ export class ResourceTemplate {
     }
   ) {
     this._uriTemplate =
-      typeof uriTemplate === "string"
-        ? new UriTemplate(uriTemplate)
-        : uriTemplate;
+      typeof uriTemplate === "string" ? new UriTemplate(uriTemplate) : uriTemplate;
   }
 
   /**
@@ -1347,9 +1226,7 @@ export class ResourceTemplate {
   /**
    * Gets the callback for completing a specific URI template variable, if one was provided.
    */
-  completeCallback(
-    variable: string
-  ): CompleteResourceTemplateCallback | undefined {
+  completeCallback(variable: string): CompleteResourceTemplateCallback | undefined {
     return this._callbacks.complete?.[variable];
   }
 }
@@ -1383,10 +1260,7 @@ export type RegisteredTool = {
   enabled: boolean;
   enable(): void;
   disable(): void;
-  update<
-    InputArgs extends ZodRawShape,
-    OutputArgs extends ZodRawShape
-  >(updates: {
+  update<InputArgs extends ZodRawShape, OutputArgs extends ZodRawShape>(updates: {
     name?: string | null;
     description?: string;
     paramsSchema?: InputArgs;
@@ -1493,16 +1367,15 @@ type PromptArgsRawShape = {
     | ZodOptional<ZodType<string, ZodTypeDef, string>>;
 };
 
-export type PromptCallback<
-  Args extends undefined | PromptArgsRawShape = undefined
-> = Args extends PromptArgsRawShape
-  ? (
-      args: z.objectOutputType<Args, ZodTypeAny>,
-      extra: RequestHandlerExtra<ServerRequest, ServerNotification>
-    ) => GetPromptResult | Promise<GetPromptResult>
-  : (
-      extra: RequestHandlerExtra<ServerRequest, ServerNotification>
-    ) => GetPromptResult | Promise<GetPromptResult>;
+export type PromptCallback<Args extends undefined | PromptArgsRawShape = undefined> =
+  Args extends PromptArgsRawShape
+    ? (
+        args: z.objectOutputType<Args, ZodTypeAny>,
+        extra: RequestHandlerExtra<ServerRequest, ServerNotification>
+      ) => GetPromptResult | Promise<GetPromptResult>
+    : (
+        extra: RequestHandlerExtra<ServerRequest, ServerNotification>
+      ) => GetPromptResult | Promise<GetPromptResult>;
 
 export type RegisteredPrompt = {
   description?: string;
@@ -1521,9 +1394,7 @@ export type RegisteredPrompt = {
   remove(): void;
 };
 
-function promptArgumentsFromSchema(
-  schema: ZodObject<PromptArgsRawShape>
-): PromptArgument[] {
+function promptArgumentsFromSchema(schema: ZodObject<PromptArgsRawShape>): PromptArgument[] {
   return Object.entries(schema.shape).map(
     ([name, field]): PromptArgument => ({
       name,

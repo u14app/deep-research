@@ -1,21 +1,16 @@
 "use client";
-import dynamic from "next/dynamic";
-import { useLayoutEffect, useCallback, useState } from "react";
-import { useTranslation } from "react-i18next";
 import { streamText } from "ai";
-import { toast } from "sonner";
 import { LoaderCircle } from "lucide-react";
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogFooter,
-} from "@/components/ui/dialog";
+import dynamic from "next/dynamic";
+import { useCallback, useLayoutEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogFooter, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { knowledgeGraphPrompt } from "@/constants/prompts";
 import useModelProvider from "@/hooks/useAiProvider";
 import { useTaskStore } from "@/store/task";
-import { knowledgeGraphPrompt } from "@/constants/prompts";
 import { parseError } from "@/utils/error";
 import { cn } from "@/utils/style";
 
@@ -45,9 +40,7 @@ function KnowledgeGraph({ open, onClose }: Props) {
     setLoading(true);
     const result = streamText({
       model: await createModelProvider(thinkingModel),
-      system:
-        knowledgeGraphPrompt +
-        `\n\n**The node text uses the same language as the article**`,
+      system: knowledgeGraphPrompt + `\n\n**The node text uses the same language as the article**`,
       prompt: finalReport,
       onError: handleError,
     });
@@ -116,9 +109,7 @@ function KnowledgeGraph({ open, onClose }: Props) {
                 {t("knowledgeGraph.regenerate")}
               </Button>
               <Button className="flex-1" onClick={() => chnageMode()}>
-                {mode === "view"
-                  ? t("knowledgeGraph.edit")
-                  : t("knowledgeGraph.view")}
+                {mode === "view" ? t("knowledgeGraph.edit") : t("knowledgeGraph.view")}
               </Button>
             </div>
           </DialogFooter>

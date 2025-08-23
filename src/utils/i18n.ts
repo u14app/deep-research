@@ -1,9 +1,9 @@
 import i18next from "i18next";
-import resourcesToBackend from "i18next-resources-to-backend";
 import LanguageDetector from "i18next-browser-languagedetector";
+import resourcesToBackend from "i18next-resources-to-backend";
+import { keys } from "radash";
 import { initReactI18next } from "react-i18next";
 import locales from "@/constants/locales";
-import { keys } from "radash";
 
 const normalizeLocale = (locale: string) => {
   if (locale.startsWith("en")) {
@@ -14,7 +14,7 @@ const normalizeLocale = (locale: string) => {
     return "es-ES";
   } else if (locale.startsWith("vi")) {
     return "vi-VN";
-  } else{
+  } else {
     return locale;
   }
 };

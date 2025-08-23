@@ -1,29 +1,29 @@
-import { ZodLiteral, ZodObject, ZodType, z } from "zod";
+import type { ZodLiteral, ZodObject, ZodType, z } from "zod";
 import {
   CancelledNotificationSchema,
-  ClientCapabilities,
+  type ClientCapabilities,
   ErrorCode,
   isJSONRPCError,
+  isJSONRPCNotification,
   isJSONRPCRequest,
   isJSONRPCResponse,
-  isJSONRPCNotification,
-  JSONRPCError,
-  JSONRPCNotification,
-  JSONRPCRequest,
-  JSONRPCResponse,
+  type JSONRPCError,
+  type JSONRPCNotification,
+  type JSONRPCRequest,
+  type JSONRPCResponse,
   McpError,
-  Notification,
+  type Notification,
   PingRequestSchema,
-  Progress,
-  ProgressNotification,
+  type Progress,
+  type ProgressNotification,
   ProgressNotificationSchema,
-  Request,
-  RequestId,
-  Result,
-  ServerCapabilities,
-  RequestMeta,
+  type Request,
+  type RequestId,
+  type RequestMeta,
+  type Result,
+  type ServerCapabilities,
 } from "../types";
-import { Transport, TransportSendOptions } from "./transport";
+import type { Transport, TransportSendOptions } from "./transport";
 
 /**
  * Callback for progress notifications.
@@ -100,7 +100,7 @@ export type NotificationOptions = {
  */
 export type RequestHandlerExtra<
   SendRequestT extends Request,
-  SendNotificationT extends Notification
+  SendNotificationT extends Notification,
 > = {
   /**
    * An abort signal used to communicate if the request was cancelled from the sender's side.
@@ -161,7 +161,7 @@ type TimeoutInfo = {
 export abstract class Protocol<
   SendRequestT extends Request,
   SendNotificationT extends Notification,
-  SendResultT extends Result
+  SendResultT extends Result,
 > {
   private _transport?: Transport;
   private _requestMessageId = 0;
@@ -172,16 +172,10 @@ export abstract class Protocol<
       extra: RequestHandlerExtra<SendRequestT, SendNotificationT>
     ) => Promise<SendResultT>
   > = new Map();
-  private _requestHandlerAbortControllers: Map<RequestId, AbortController> =
+  private _requestHandlerAbortControllers: Map<RequestId, AbortController> = new Map();
+  private _notificationHandlers: Map<string, (notification: JSONRPCNotification) => Promise<void>> =
     new Map();
-  private _notificationHandlers: Map<
-    string,
-    (notification: JSONRPCNotification) => Promise<void>
-  > = new Map();
-  private _responseHandlers: Map<
-    number,
-    (response: JSONRPCResponse | Error) => void
-  > = new Map();
+  private _responseHandlers: Map<number, (response: JSONRPCResponse | Error) => void> = new Map();
   private _progressHandlers: Map<number, ProgressCallback> = new Map();
   private _timeoutInfo: Map<number, TimeoutInfo> = new Map();
 
@@ -211,9 +205,7 @@ export abstract class Protocol<
 
   constructor(private _options?: ProtocolOptions) {
     this.setNotificationHandler(CancelledNotificationSchema, (notification) => {
-      const controller = this._requestHandlerAbortControllers.get(
-        notification.params.requestId
-      );
+      const controller = this._requestHandlerAbortControllers.get(notification.params.requestId);
       controller?.abort(notification.params.reason);
     });
 
@@ -224,7 +216,7 @@ export abstract class Protocol<
     this.setRequestHandler(
       PingRequestSchema,
       // Automatic pong by default.
-      () => ({} as SendResultT)
+      () => ({}) as SendResultT
     );
   }
 
@@ -252,11 +244,10 @@ export abstract class Protocol<
     const totalElapsed = Date.now() - info.startTime;
     if (info.maxTotalTimeout && totalElapsed >= info.maxTotalTimeout) {
       this._timeoutInfo.delete(messageId);
-      throw new McpError(
-        ErrorCode.RequestTimeout,
-        "Maximum total timeout exceeded",
-        { maxTotalTimeout: info.maxTotalTimeout, totalElapsed }
-      );
+      throw new McpError(ErrorCode.RequestTimeout, "Maximum total timeout exceeded", {
+        maxTotalTimeout: info.maxTotalTimeout,
+        totalElapsed,
+      });
     }
 
     clearTimeout(info.timeoutId);
@@ -295,9 +286,7 @@ export abstract class Protocol<
       } else if (isJSONRPCNotification(message)) {
         this._onnotification(message);
       } else {
-        this._onerror(
-          new Error(`Unknown message type: ${JSON.stringify(message)}`)
-        );
+        this._onerror(new Error(`Unknown message type: ${JSON.stringify(message)}`));
       }
     };
 
@@ -323,8 +312,7 @@ export abstract class Protocol<
 
   private _onnotification(notification: JSONRPCNotification): void {
     const handler =
-      this._notificationHandlers.get(notification.method) ??
-      this.fallbackNotificationHandler;
+      this._notificationHandlers.get(notification.method) ?? this.fallbackNotificationHandler;
 
     // Ignore notifications not being subscribed to.
     if (handler === undefined) {
@@ -335,15 +323,12 @@ export abstract class Protocol<
     Promise.resolve()
       .then(() => handler(notification))
       .catch((error) =>
-        this._onerror(
-          new Error(`Uncaught error in notification handler: ${error}`)
-        )
+        this._onerror(new Error(`Uncaught error in notification handler: ${error}`))
       );
   }
 
   private _onrequest(request: JSONRPCRequest): void {
-    const handler =
-      this._requestHandlers.get(request.method) ?? this.fallbackRequestHandler;
+    const handler = this._requestHandlers.get(request.method) ?? this.fallbackRequestHandler;
 
     if (handler === undefined) {
       this._transport
@@ -355,9 +340,7 @@ export abstract class Protocol<
             message: "Method not found",
           },
         })
-        .catch((error) =>
-          this._onerror(new Error(`Failed to send an error response: ${error}`))
-        );
+        .catch((error) => this._onerror(new Error(`Failed to send an error response: ${error}`)));
       return;
     }
 
@@ -402,17 +385,13 @@ export abstract class Protocol<
             jsonrpc: "2.0",
             id: request.id,
             error: {
-              code: Number.isSafeInteger(error["code"])
-                ? error["code"]
-                : ErrorCode.InternalError,
+              code: Number.isSafeInteger(error["code"]) ? error["code"] : ErrorCode.InternalError,
               message: error.message ?? "Internal error",
             },
           });
         }
       )
-      .catch((error) =>
-        this._onerror(new Error(`Failed to send response: ${error}`))
-      )
+      .catch((error) => this._onerror(new Error(`Failed to send response: ${error}`)))
       .finally(() => {
         this._requestHandlerAbortControllers.delete(request.id);
       });
@@ -426,9 +405,7 @@ export abstract class Protocol<
     if (!handler) {
       this._onerror(
         new Error(
-          `Received a progress notification for an unknown token: ${JSON.stringify(
-            notification
-          )}`
+          `Received a progress notification for an unknown token: ${JSON.stringify(notification)}`
         )
       );
       return;
@@ -454,11 +431,7 @@ export abstract class Protocol<
     const handler = this._responseHandlers.get(messageId);
     if (handler === undefined) {
       this._onerror(
-        new Error(
-          `Received a response for an unknown message ID: ${JSON.stringify(
-            response
-          )}`
-        )
+        new Error(`Received a response for an unknown message ID: ${JSON.stringify(response)}`)
       );
       return;
     }
@@ -470,11 +443,7 @@ export abstract class Protocol<
     if (isJSONRPCResponse(response)) {
       handler(response);
     } else {
-      const error = new McpError(
-        response.error.code,
-        response.error.message,
-        response.error.data
-      );
+      const error = new McpError(response.error.code, response.error.message, response.error.data);
       handler(error);
     }
   }
@@ -495,18 +464,14 @@ export abstract class Protocol<
    *
    * This should be implemented by subclasses.
    */
-  protected abstract assertCapabilityForMethod(
-    method: SendRequestT["method"]
-  ): void;
+  protected abstract assertCapabilityForMethod(method: SendRequestT["method"]): void;
 
   /**
    * A method to check if a notification is supported by the local side, for the given method to be sent.
    *
    * This should be implemented by subclasses.
    */
-  protected abstract assertNotificationCapability(
-    method: SendNotificationT["method"]
-  ): void;
+  protected abstract assertNotificationCapability(method: SendNotificationT["method"]): void;
 
   /**
    * A method to check if a request handler is supported by the local side, for the given method to be handled.
@@ -525,8 +490,7 @@ export abstract class Protocol<
     resultSchema: T,
     options?: RequestOptions
   ): Promise<z.infer<T>> {
-    const { relatedRequestId, resumptionToken, onresumptiontoken } =
-      options ?? {};
+    const { relatedRequestId, resumptionToken, onresumptiontoken } = options ?? {};
 
     return new Promise((resolve, reject) => {
       if (!this._transport) {
@@ -572,9 +536,7 @@ export abstract class Protocol<
             },
             { relatedRequestId, resumptionToken, onresumptiontoken }
           )
-          .catch((error) =>
-            this._onerror(new Error(`Failed to send cancellation: ${error}`))
-          );
+          .catch((error) => this._onerror(new Error(`Failed to send cancellation: ${error}`)));
 
         reject(reason);
       };
@@ -658,7 +620,7 @@ export abstract class Protocol<
   setRequestHandler<
     T extends ZodObject<{
       method: ZodLiteral<string>;
-    }>
+    }>,
   >(
     requestSchema: T,
     handler: (
@@ -686,9 +648,7 @@ export abstract class Protocol<
    */
   assertCanSetRequestHandler(method: string): void {
     if (this._requestHandlers.has(method)) {
-      throw new Error(
-        `A request handler for ${method} already exists, which would be overridden`
-      );
+      throw new Error(`A request handler for ${method} already exists, which would be overridden`);
     }
   }
 
@@ -700,15 +660,10 @@ export abstract class Protocol<
   setNotificationHandler<
     T extends ZodObject<{
       method: ZodLiteral<string>;
-    }>
-  >(
-    notificationSchema: T,
-    handler: (notification: z.infer<T>) => void | Promise<void>
-  ): void {
-    this._notificationHandlers.set(
-      notificationSchema.shape.method.value,
-      (notification) =>
-        Promise.resolve(handler(notificationSchema.parse(notification)))
+    }>,
+  >(notificationSchema: T, handler: (notification: z.infer<T>) => void | Promise<void>): void {
+    this._notificationHandlers.set(notificationSchema.shape.method.value, (notification) =>
+      Promise.resolve(handler(notificationSchema.parse(notification)))
     );
   }
 
@@ -720,9 +675,10 @@ export abstract class Protocol<
   }
 }
 
-export function mergeCapabilities<
-  T extends ServerCapabilities | ClientCapabilities
->(base: T, additional: T): T {
+export function mergeCapabilities<T extends ServerCapabilities | ClientCapabilities>(
+  base: T,
+  additional: T
+): T {
   return Object.entries(additional).reduce(
     (acc, [key, value]) => {
       if (value && typeof value === "object") {

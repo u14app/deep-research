@@ -5,11 +5,7 @@ export function generateSignature(key: string, timestamp: number): string {
   return Md5.hashStr(data);
 }
 
-export function verifySignature(
-  signature = "",
-  key: string,
-  timestamp: number
-): boolean {
+export function verifySignature(signature = "", key: string, timestamp: number): boolean {
   const generatedSignature = generateSignature(key, timestamp);
   return signature === generatedSignature;
 }

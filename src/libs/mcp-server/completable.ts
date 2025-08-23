@@ -1,12 +1,12 @@
 import {
-  ZodTypeAny,
-  ZodTypeDef,
+  type ParseInput,
+  type ParseReturnType,
+  type ProcessedCreateParams,
+  type RawCreateParams,
+  type ZodErrorMap,
   ZodType,
-  ParseInput,
-  ParseReturnType,
-  RawCreateParams,
-  ZodErrorMap,
-  ProcessedCreateParams,
+  type ZodTypeAny,
+  type ZodTypeDef,
 } from "zod";
 
 export enum McpZodTypeKind {
@@ -17,8 +17,7 @@ export type CompleteCallback<T extends ZodTypeAny = ZodTypeAny> = (
   value: T["_input"]
 ) => T["_input"][] | Promise<T["_input"][]>;
 
-export interface CompletableDef<T extends ZodTypeAny = ZodTypeAny>
-  extends ZodTypeDef {
+export interface CompletableDef<T extends ZodTypeAny = ZodTypeAny> extends ZodTypeDef {
   type: T;
   complete: CompleteCallback<T>;
   typeName: McpZodTypeKind.Completable;

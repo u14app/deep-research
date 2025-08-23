@@ -1,18 +1,18 @@
 import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 import {
+  citationRulesPrompt,
+  finalReportCitationImagePrompt,
+  finalReportPrompt,
+  finalReportReferencesPrompt,
+  queryResultPrompt,
+  reportPlanPrompt,
+  reviewPrompt,
+  searchKnowledgeResultPrompt,
+  searchResultPrompt,
+  serpQueriesPrompt,
   systemInstruction,
   systemQuestionPrompt,
-  reportPlanPrompt,
-  serpQueriesPrompt,
-  queryResultPrompt,
-  citationRulesPrompt,
-  searchResultPrompt,
-  searchKnowledgeResultPrompt,
-  reviewPrompt,
-  finalReportCitationImagePrompt,
-  finalReportReferencesPrompt,
-  finalReportPrompt,
 } from "@/constants/prompts";
 
 export function getSERPQuerySchema() {
@@ -56,9 +56,7 @@ export function generateSerpQueriesPrompt(plan: string) {
 }
 
 export function processResultPrompt(query: string, researchGoal: string) {
-  return queryResultPrompt
-    .replace("{query}", query)
-    .replace("{researchGoal}", researchGoal);
+  return queryResultPrompt.replace("{query}", query).replace("{researchGoal}", researchGoal);
 }
 
 export function processSearchResultPrompt(
@@ -69,13 +67,9 @@ export function processSearchResultPrompt(
 ) {
   const context = results.map(
     (result, idx) =>
-      `<content index="${idx + 1}" url="${result.url}">\n${
-        result.content
-      }\n</content>`
+      `<content index="${idx + 1}" url="${result.url}">\n${result.content}\n</content>`
   );
-  return (
-    searchResultPrompt + (enableReferences ? `\n\n${citationRulesPrompt}` : "")
-  )
+  return (searchResultPrompt + (enableReferences ? `\n\n${citationRulesPrompt}` : ""))
     .replace("{query}", query)
     .replace("{researchGoal}", researchGoal)
     .replace("{context}", context.join("\n"));
@@ -88,9 +82,7 @@ export function processSearchKnowledgeResultPrompt(
 ) {
   const context = results.map(
     (result, idx) =>
-      `<content index="${idx + 1}" url="${location.host}">\n${
-        result.content
-      }\n</content>`
+      `<content index="${idx + 1}" url="${location.host}">\n${result.content}\n</content>`
   );
   return searchKnowledgeResultPrompt
     .replace("{query}", query)
@@ -98,14 +90,8 @@ export function processSearchKnowledgeResultPrompt(
     .replace("{context}", context.join("\n"));
 }
 
-export function reviewSerpQueriesPrompt(
-  plan: string,
-  learning: string[],
-  suggestion: string
-) {
-  const learnings = learning.map(
-    (detail) => `<learning>\n${detail}\n</learning>`
-  );
+export function reviewSerpQueriesPrompt(plan: string, learning: string[], suggestion: string) {
+  const learnings = learning.map((detail) => `<learning>\n${detail}\n</learning>`);
   return reviewPrompt
     .replace("{plan}", plan)
     .replace("{learnings}", learnings.join("\n"))
@@ -122,12 +108,9 @@ export function writeFinalReportPrompt(
   enableCitationImage: boolean,
   enableReferences: boolean
 ) {
-  const learnings = learning.map(
-    (detail) => `<learning>\n${detail}\n</learning>`
-  );
+  const learnings = learning.map((detail) => `<learning>\n${detail}\n</learning>`);
   const sources = source.map(
-    (item, idx) =>
-      `<source index="${idx + 1}" url="${item.url}">\n${item.title}\n</source>`
+    (item, idx) => `<source index="${idx + 1}" url="${item.url}">\n${item.title}\n</source>`
   );
   const imageList = images.map(
     (source, idx) => `${idx + 1}. ![${source.description}](${source.url})`

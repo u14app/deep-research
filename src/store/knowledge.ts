@@ -1,7 +1,7 @@
+import { clone, pick } from "radash";
 import { create } from "zustand";
 import { persist, type StorageValue } from "zustand/middleware";
 import { researchStore } from "@/utils/storage";
-import { clone, pick } from "radash";
 
 export interface KnowledgeStore {
   knowledges: Knowledge[];
@@ -58,14 +58,9 @@ export const useKnowledgeStore = create(
       version: 1,
       storage: {
         getItem: async (key: string) => {
-          return await researchStore.getItem<
-            StorageValue<KnowledgeStore & KnowledgeActions>
-          >(key);
+          return await researchStore.getItem<StorageValue<KnowledgeStore & KnowledgeActions>>(key);
         },
-        setItem: async (
-          key: string,
-          store: StorageValue<KnowledgeStore & KnowledgeActions>
-        ) => {
+        setItem: async (key: string, store: StorageValue<KnowledgeStore & KnowledgeActions>) => {
           return await researchStore.setItem(key, {
             state: pick(store.state, ["knowledges"]),
             version: store.version,

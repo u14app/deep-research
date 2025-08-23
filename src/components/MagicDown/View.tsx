@@ -1,14 +1,14 @@
+import { clsx } from "clsx";
 import dynamic from "next/dynamic";
-import { useMemo, memo } from "react";
-import ReactMarkdown, { type Options, type Components } from "react-markdown";
-import rehypeRaw from "rehype-raw";
-import remarkGfm from "remark-gfm";
-import remarkMath from "remark-math";
-import remarkBreaks from "remark-breaks";
+import { omit } from "radash";
+import { memo, useMemo } from "react";
+import ReactMarkdown, { type Components, type Options } from "react-markdown";
 import rehypeHighlight from "rehype-highlight";
 import rehypeKatex from "rehype-katex";
-import { clsx } from "clsx";
-import { omit } from "radash";
+import rehypeRaw from "rehype-raw";
+import remarkBreaks from "remark-breaks";
+import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
 
 import "katex/dist/katex.min.css";
 import "./style.css";
@@ -24,14 +24,8 @@ export type MarkdownProps = {
 };
 
 function MarkdownBlock({ children: content, ...rest }: Options) {
-  const remarkPlugins = useMemo(
-    () => rest.remarkPlugins ?? [],
-    [rest.remarkPlugins]
-  );
-  const rehypePlugins = useMemo(
-    () => rest.rehypePlugins ?? [],
-    [rest.rehypePlugins]
-  );
+  const remarkPlugins = useMemo(() => rest.remarkPlugins ?? [], [rest.remarkPlugins]);
+  const rehypePlugins = useMemo(() => rest.rehypePlugins ?? [], [rest.rehypePlugins]);
   const components = useMemo(() => rest.components ?? {}, [rest.components]);
 
   return (
@@ -49,10 +43,7 @@ function MarkdownBlock({ children: content, ...rest }: Options) {
         pre: (props) => {
           const { children, className, ...rest } = props;
           return (
-            <pre
-              {...omit(rest, ["node"])}
-              className={clsx("my-4 not-prose", className)}
-            >
+            <pre {...omit(rest, ["node"])} className={clsx("my-4 not-prose", className)}>
               {children}
             </pre>
           );
@@ -83,21 +74,15 @@ function MarkdownBlock({ children: content, ...rest }: Options) {
               return <Mermaid>{children}</Mermaid>;
             }
             return (
-              <Code lang={lang ? lang[1] : "plaintext"}>
-                <code
-                  {...omit(rest, ["node"])}
-                  className={clsx("break-all", className)}
-                >
+              <Code lang={lang?.[1] || "plaintext"}>
+                <code {...omit(rest, ["node"])} className={clsx("break-all", className)}>
                   {children}
                 </code>
               </Code>
             );
           } else {
             return (
-              <code
-                {...omit(rest, ["node"])}
-                className={clsx("break-all", className)}
-              >
+              <code {...omit(rest, ["node"])} className={clsx("break-all", className)}>
                 {children}
               </code>
             );
@@ -128,7 +113,7 @@ function MarkdownBlock({ children: content, ...rest }: Options) {
                 reference: isReferenceLink,
               })}
               href={href}
-              target={isInternal ? "_self" : target ?? "_blank"}
+              target={isInternal ? "_self" : (target ?? "_blank")}
             >
               {children}
             </a>

@@ -1,11 +1,5 @@
 "use client";
-import {
-  useState,
-  useRef,
-  useEffect,
-  type RefObject,
-  type ReactNode,
-} from "react";
+import { type ReactNode, type RefObject, useEffect, useRef, useState } from "react";
 
 type FloatingMenuProps = {
   targetRef: RefObject<HTMLDivElement | null>;

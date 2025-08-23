@@ -31,10 +31,7 @@ const importPrivateKey = async (pemKey: string) => {
   const pemFooter = "-----END PRIVATE KEY-----";
 
   // Remove header, footer, and any whitespace/newlines
-  const pemContents = pemKey
-    .replace(pemHeader, "")
-    .replace(pemFooter, "")
-    .replace(/\s/g, "");
+  const pemContents = pemKey.replace(pemHeader, "").replace(pemFooter, "").replace(/\s/g, "");
 
   // Decode base64 to binary
   const binaryString = decodeBase64(pemContents);
@@ -77,21 +74,13 @@ const buildJwt = async (credentials: GoogleCredentials) => {
 
   const privateKey = await importPrivateKey(credentials.privateKey);
 
-  const signingInput = `${base64url(JSON.stringify(header))}.${base64url(
-    JSON.stringify(payload)
-  )}`;
+  const signingInput = `${base64url(JSON.stringify(header))}.${base64url(JSON.stringify(payload))}`;
   const encoder = new TextEncoder();
   const data = encoder.encode(signingInput);
 
-  const signature = await crypto.subtle.sign(
-    "RSASSA-PKCS1-v1_5",
-    privateKey,
-    data
-  );
+  const signature = await crypto.subtle.sign("RSASSA-PKCS1-v1_5", privateKey, data);
 
-  const signatureBase64 = base64url(
-    String.fromCharCode(...new Uint8Array(signature))
-  );
+  const signatureBase64 = base64url(String.fromCharCode(...new Uint8Array(signature)));
 
   return `${base64url(JSON.stringify(header))}.${base64url(
     JSON.stringify(payload)

@@ -14,8 +14,14 @@ env:
 
 # There is a single job in this workflow. It's configured to run on the latest available version of Ubuntu.
 jobs:
+  # Add quality check before building
+  quality-gate:
+    name: Quality Gate
+    uses: ./.github/workflows/ci.yml
+    
   build-and-push-image:
     runs-on: ubuntu-latest
+    needs: quality-gate
     # Sets the permissions granted to the `GITHUB_TOKEN` for the actions in this job.
     permissions:
       contents: read
