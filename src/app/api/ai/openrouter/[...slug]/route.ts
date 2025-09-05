@@ -27,7 +27,7 @@ async function handler(req: NextRequest) {
   const params = searchParams.toString();
 
   try {
-    let url = `${API_PROXY_BASE_URL}/api/${decodeURIComponent(path.join("/"))}`;
+    let url = `${API_PROXY_BASE_URL}/${decodeURIComponent(path.join("/"))}`;
     if (params) url += `?${params}`;
     console.log(url);
     const payload: RequestInit = {

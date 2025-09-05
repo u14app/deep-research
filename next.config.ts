@@ -10,7 +10,7 @@ const GOOGLE_GENERATIVE_AI_API_BASE_URL =
   process.env.GOOGLE_GENERATIVE_AI_API_BASE_URL ||
   "https://generativelanguage.googleapis.com";
 const OPENROUTER_API_BASE_URL =
-  process.env.OPENROUTER_API_BASE_URL || "https://openrouter.ai/api";
+  process.env.OPENROUTER_API_BASE_URL || "https://openrouter.ai";
 const OPENAI_API_BASE_URL =
   process.env.OPENAI_API_BASE_URL || "https://api.openai.com";
 const ANTHROPIC_API_BASE_URL =
