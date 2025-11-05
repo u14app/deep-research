@@ -84,7 +84,9 @@ function useDeepResearch() {
         // Enable OpenAI's built-in search tool
         if (
           ["openai", "azure", "openaicompatible"].includes(provider) &&
-          model.startsWith("gpt-4o")
+          (model.startsWith("gpt-4o") ||
+            model.startsWith("gpt-4.1") ||
+            model.startsWith("gpt-5"))
         ) {
           return {
             web_search_preview: openai.tools.webSearchPreview({

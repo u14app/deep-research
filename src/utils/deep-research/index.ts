@@ -211,7 +211,9 @@ class DeepResearch {
           if (
             provider === "model" &&
             ["openai", "azure", "openaicompatible"].includes(taskModel) &&
-            taskModel.startsWith("gpt-4o")
+            (taskModel.startsWith("gpt-4o") ||
+              taskModel.startsWith("gpt-4.1") ||
+              taskModel.startsWith("gpt-5"))
           ) {
             const { openai } = await import("@ai-sdk/openai");
             return {

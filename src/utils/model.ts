@@ -86,6 +86,7 @@ export function filterOpenAIModelList(modelList: string[]) {
     if (
       model.startsWith("gpt-4o") ||
       model.startsWith("gpt-4.1") ||
+      model.startsWith("gpt-5") ||
       !model.includes("nano")
     ) {
       networkingModelList.push(model);
