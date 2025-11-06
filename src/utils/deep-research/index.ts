@@ -95,7 +95,7 @@ class DeepResearch {
       provider: AIProvider.provider,
       model: AIProvider.taskModel,
       settings:
-        ["google", "google-vertex"].includes(AIProvider.provider) &&
+        ["google", "google-vertex", "modai"].includes(AIProvider.provider) &&
         isNetworkingModel(AIProvider.taskModel)
           ? { useSearchGrounding: true }
           : undefined,

@@ -72,7 +72,7 @@ function useDeepResearch() {
       const createModel = (model: string) => {
         // Enable Gemini's built-in search tool
         if (
-          ["google", "google-vertex"].includes(provider) &&
+          ["google", "google-vertex", "modai"].includes(provider) &&
           isNetworkingModel(model)
         ) {
           return createModelProvider(model, { useSearchGrounding: true });
