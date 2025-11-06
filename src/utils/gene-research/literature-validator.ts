@@ -152,6 +152,7 @@ export class LiteratureValidator {
    */
   private async validateByPMID(
     reference: LiteratureReference,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     organism: string
   ): Promise<EnhancedLiteratureReference> {
     const enhancedReference: EnhancedLiteratureReference = {
@@ -485,7 +486,7 @@ export class LiteratureValidator {
   deduplicateReferences(references: EnhancedLiteratureReference[]): { uniqueReferences: EnhancedLiteratureReference[], duplicateCount: number, stats: { validated: number, highConfidence: number, warnings: number } } {
     const uniqueMap = new Map<string, EnhancedLiteratureReference>();
     let duplicateCount = 0;
-    let stats = {
+    const stats = {
       validated: 0,
       highConfidence: 0,
       warnings: 0

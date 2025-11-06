@@ -13,7 +13,7 @@ import {
   BindingSite,
   PTM
 } from '@/types/gene-research';
-import { LiteratureValidator, EnhancedLiteratureReference } from './literature-validator';
+import { LiteratureValidator } from './literature-validator';
 
 export interface ReferenceQualityStatistics {
   validatedReferences: number;

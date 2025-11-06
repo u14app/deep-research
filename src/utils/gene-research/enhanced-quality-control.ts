@@ -164,8 +164,8 @@ export class EnhancedQualityControl {
     const maxJournalPercentage = maxJournalCount / references.length;
     
     // Inverse relationship - lower percentage means higher diversity
-    let diversityScore = 100 - (maxJournalPercentage / this.MAX_RECOMMENDED_REFERENCES_PER_JOURNAL) * 100;
-    
+    const diversityScore = 100 - (maxJournalPercentage / this.MAX_RECOMMENDED_REFERENCES_PER_JOURNAL) * 100;
+
     // Ensure score is within 0-100 range
     return Math.max(0, Math.min(100, diversityScore));
   }

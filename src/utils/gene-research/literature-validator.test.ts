@@ -1,10 +1,9 @@
-import { LiteratureValidator, EnhancedLiteratureReference } from './literature-validator';
+import { LiteratureValidator } from './literature-validator';
 import { LiteratureReference } from '@/types/gene-research';
 
 // Add Jest type definitions if not in Jest environment
 declare const jest: any;
 declare const describe: (name: string, fn: () => void) => void;
-declare const it: (name: string, fn: (...args: any[]) => Promise<void>) => void;
 declare const test: (name: string, fn: (...args: any[]) => Promise<void>) => void;
 declare const expect: any;
 declare const beforeEach: (fn: () => void) => void;
