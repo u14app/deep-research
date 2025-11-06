@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useSettingStore } from "@/store/setting";
 import {
   GEMINI_BASE_URL,
+  MODAI_BASE_URL,
   OPENROUTER_BASE_URL,
   OPENAI_BASE_URL,
   ANTHROPIC_BASE_URL,
@@ -146,10 +147,34 @@ function useModelList() {
       setModelList(newModelList);
       return newModelList;
     } else if (provider === "modai") {
-      // Mod AI Studio doesn't return model list - users must manually input model names
-      // This provider uses NewAPI.ai service which is Gemini-compatible
-      setModelList([]);
-      return [];
+      // Mod AI Studio uses NewAPI.ai which is Gemini-compatible and returns model list
+      const { modaiApiKey = "", modaiApiProxy } = useSettingStore.getState();
+      if (mode === "local" && !modaiApiKey) {
+        return [];
+      }
+      const key = multiApiKeyPolling(modaiApiKey);
+      const response = await fetch(
+        mode === "local"
+          ? completePath(modaiApiProxy || MODAI_BASE_URL, "/v1beta") + "/models"
+          : "/api/ai/modai/v1beta/models",
+        {
+          headers: {
+            "x-goog-api-key": mode === "local" ? key : accessKey,
+          },
+        }
+      );
+      const { models = [] } = await response.json();
+      const newModelList = (models as GeminiModel[])
+        .filter(
+          (item) =>
+            item.name.startsWith("models/gemini") ||
+            item.name.startsWith("gemini") ||
+            item.name.startsWith("ds-") ||
+            item.name.startsWith("gpt-")
+        )
+        .map((item) => item.name.replace("models/", ""));
+      setModelList(newModelList);
+      return newModelList;
     } else if (provider === "openrouter") {
       const { openRouterApiKey = "", openRouterApiProxy } =
         useSettingStore.getState();

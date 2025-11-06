@@ -5,6 +5,7 @@ import {
 } from "@/utils/deep-research/provider";
 import {
   GEMINI_BASE_URL,
+  MODAI_BASE_URL,
   OPENROUTER_BASE_URL,
   OPENAI_BASE_URL,
   ANTHROPIC_BASE_URL,
@@ -45,7 +46,7 @@ function useModelProvider() {
         const { modaiApiKey = "", modaiApiProxy } = useSettingStore.getState();
         if (mode === "local") {
           options.baseURL = completePath(
-            modaiApiProxy || GEMINI_BASE_URL,
+            modaiApiProxy || MODAI_BASE_URL,
             "/v1beta"
           );
           options.apiKey = multiApiKeyPolling(modaiApiKey);

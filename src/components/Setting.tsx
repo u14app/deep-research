@@ -584,7 +584,7 @@ function Setting({ open, onClose }: SettingProps) {
                           </FormLabel>
                           <FormControl className="form-field">
                             <Input
-                              placeholder="https://your-newapi-server.com/v1beta"
+                              placeholder="http://89.116.156.40:8081"
                               {...field}
                               onBlur={() =>
                                 updateSetting(

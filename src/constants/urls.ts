@@ -1,5 +1,6 @@
 // Models API Base URL
 export const GEMINI_BASE_URL = "https://generativelanguage.googleapis.com";
+export const MODAI_BASE_URL = "https://generativelanguage.googleapis.com"; // Gemini-compatible, users should configure their NewAPI server
 export const OPENROUTER_BASE_URL = "https://openrouter.ai";
 export const OPENAI_BASE_URL = "https://api.openai.com";
 export const ANTHROPIC_BASE_URL = "https://api.anthropic.com";
