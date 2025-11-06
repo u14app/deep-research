@@ -4,9 +4,25 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: deep-research
+    image: deep-research:latest
     container_name: deep-research
+    restart: unless-stopped
     env_file:
       - .env
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_BUILD_MODE=standalone
     ports:
       - "3333:3000"
+    volumes:
+      # Persist user data and settings
+      - deep-research-data:/app/.next/cache
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  deep-research-data:

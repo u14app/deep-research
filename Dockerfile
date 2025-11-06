@@ -28,6 +28,9 @@ RUN yarn run build:standalone
 FROM base AS runner
 WORKDIR /app
 
+# Install wget for healthcheck
+RUN apk add --no-cache wget
+
 ENV NODE_ENV=production
 ENV NEXT_PUBLIC_BUILD_MODE=standalone
 
