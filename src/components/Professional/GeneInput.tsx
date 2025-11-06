@@ -14,6 +14,13 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { useTranslation } from 'react-i18next';
 
 const geneResearchSchema = z.object({
@@ -24,6 +31,18 @@ const geneResearchSchema = z.object({
 });
 
 type GeneResearchForm = z.infer<typeof geneResearchSchema>;
+
+const organismOptions = [
+  { value: 'Homo sapiens', label: 'Homo sapiens (Human)' },
+  { value: 'Mus musculus', label: 'Mus musculus (Mouse)' },
+  { value: 'Rattus norvegicus', label: 'Rattus norvegicus (Rat)' },
+  { value: 'Danio rerio', label: 'Danio rerio (Zebrafish)' },
+  { value: 'Drosophila melanogaster', label: 'Drosophila melanogaster (Fruit fly)' },
+  { value: 'Caenorhabditis elegans', label: 'Caenorhabditis elegans (C. elegans)' },
+  { value: 'Saccharomyces cerevisiae', label: 'Saccharomyces cerevisiae (Yeast)' },
+  { value: 'Escherichia coli', label: 'Escherichia coli (E. coli)' },
+  { value: 'Arabidopsis thaliana', label: 'Arabidopsis thaliana (Thale cress)' },
+];
 
 const researchFocusOptions = [
   { id: 'general', label: 'General Function' },
@@ -94,13 +113,27 @@ export function GeneInput({ onSubmit, isLoading }: GeneInputProps) {
           render={({ field }) => (
             <FormItem>
               <FormLabel>{t('geneResearch.organism', 'Organism')}</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="e.g., Homo sapiens, E. coli"
-                  {...field}
-                  disabled={isLoading}
-                />
-              </FormControl>
+              <Select
+                onValueChange={field.onChange}
+                defaultValue={field.value}
+                disabled={isLoading}
+              >
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder={t('geneResearch.selectOrganism', 'Select an organism')} />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {organismOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormDescription>
+                {t('geneResearch.organismDesc', 'Select the organism for your gene research')}
+              </FormDescription>
             </FormItem>
           )}
         />
