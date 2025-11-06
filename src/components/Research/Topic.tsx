@@ -29,6 +29,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { GeneInput } from "@/components/Professional/GeneInput";
 import useDeepResearch from "@/hooks/useDeepResearch";
 import useAiProvider from "@/hooks/useAiProvider";
 import useKnowledge from "@/hooks/useKnowledge";
@@ -37,6 +45,7 @@ import { useGlobalStore } from "@/store/global";
 import { useSettingStore } from "@/store/setting";
 import { useTaskStore } from "@/store/task";
 import { useHistoryStore } from "@/store/history";
+import { useModeStore } from "@/store/mode";
 
 const formSchema = z.object({
   topic: z.string().min(2),
@@ -46,6 +55,7 @@ function Topic() {
   const { t } = useTranslation();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const taskStore = useTaskStore();
+  const { mode, setMode } = useModeStore();
   const { askQuestions } = useDeepResearch();
   const { hasApiKey } = useAiProvider();
   const { getKnowledgeFromFile } = useKnowledge();
@@ -123,13 +133,47 @@ function Topic() {
     form.setValue("topic", taskStore.question);
   }, [taskStore.question, form]);
 
+  async function handleGeneResearchSubmit(data: any) {
+    if (handleCheck()) {
+      const { id, setQuestion } = useTaskStore.getState();
+      try {
+        setIsThinking(true);
+        accurateTimerStart();
+        if (id !== "") {
+          createNewResearch();
+        }
+        // 构建基因研究查询
+        const geneQuery = `Gene: ${data.geneSymbol}, Organism: ${data.organism}, Focus: ${data.researchFocus.join(', ')}${data.diseaseContext ? `, Disease: ${data.diseaseContext}` : ''}`;
+        setQuestion(geneQuery);
+        await askQuestions();
+      } finally {
+        setIsThinking(false);
+        accurateTimerStop();
+      }
+    }
+  }
+
   return (
     <section className="p-4 border rounded-md mt-4 print:hidden">
       <div className="flex justify-between items-center border-b mb-2">
         <h3 className="font-semibold text-lg leading-10">
           {t("research.topic.title")}
         </h3>
-        <div className="flex gap-1">
+        <div className="flex gap-2 items-center">
+          {/* 模式切换选择器 */}
+          <Select value={mode} onValueChange={(value: any) => setMode(value)}>
+            <SelectTrigger className="w-[200px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="general">
+                🔍 {t("mode.general")}
+              </SelectItem>
+              <SelectItem value="professional">
+                🧬 {t("mode.professional")}
+              </SelectItem>
+            </SelectContent>
+          </Select>
           <Button
             variant="ghost"
             size="icon"
@@ -140,26 +184,44 @@ function Topic() {
           </Button>
         </div>
       </div>
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmit)}>
-          <FormField
-            control={form.control}
-            name="topic"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="mb-2 text-base font-semibold">
-                  {t("research.topic.topicLabel")}
-                </FormLabel>
-                <FormControl>
-                  <Textarea
-                    rows={3}
-                    placeholder={t("research.topic.topicPlaceholder")}
-                    {...field}
-                  />
-                </FormControl>
-              </FormItem>
-            )}
+      {/* 根据模式显示不同的输入界面 */}
+      {mode === "professional" ? (
+        /* 专业模式 - 基因研究输入 */
+        <div className="mt-4">
+          <GeneInput
+            onSubmit={handleGeneResearchSubmit}
+            isLoading={isThinking}
           />
+          {isThinking && (
+            <div className="text-sm text-gray-500 mt-2 flex items-center gap-2">
+              <LoaderCircle className="w-4 h-4 animate-spin" />
+              <span>{t("research.common.thinking")}</span>
+              <span className="font-mono">{formattedTime}</span>
+            </div>
+          )}
+        </div>
+      ) : (
+        /* 普通模式 - 通用研究输入 */
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(handleSubmit)}>
+            <FormField
+              control={form.control}
+              name="topic"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="mb-2 text-base font-semibold">
+                    {t("research.topic.topicLabel")}
+                  </FormLabel>
+                  <FormControl>
+                    <Textarea
+                      rows={3}
+                      placeholder={t("research.topic.topicPlaceholder")}
+                      {...field}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
           <FormItem className="mt-2">
             <FormLabel className="mb-2 text-base font-semibold">
               {t("knowledge.localResourceTitle")}
@@ -204,21 +266,22 @@ function Topic() {
               </div>
             </FormControl>
           </FormItem>
-          <Button className="w-full mt-4" disabled={isThinking} type="submit">
-            {isThinking ? (
-              <>
-                <LoaderCircle className="animate-spin" />
-                <span>{t("research.common.thinkingQuestion")}</span>
-                <small className="font-mono">{formattedTime}</small>
-              </>
-            ) : taskStore.questions === "" ? (
-              t("research.common.startThinking")
-            ) : (
-              t("research.common.rethinking")
-            )}
-          </Button>
-        </form>
-      </Form>
+            <Button className="w-full mt-4" disabled={isThinking} type="submit">
+              {isThinking ? (
+                <>
+                  <LoaderCircle className="animate-spin" />
+                  <span>{t("research.common.thinkingQuestion")}</span>
+                  <small className="font-mono">{formattedTime}</small>
+                </>
+              ) : taskStore.questions === "" ? (
+                t("research.common.startThinking")
+              ) : (
+                t("research.common.rethinking")
+              )}
+            </Button>
+          </form>
+        </Form>
+      )}
       <input
         ref={fileInputRef}
         type="file"
