@@ -13,6 +13,7 @@ import {
   FormDescription,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import {
   Select,
@@ -27,7 +28,10 @@ const geneResearchSchema = z.object({
   geneSymbol: z.string().min(1, 'Gene symbol is required'),
   organism: z.string().min(1, 'Organism is required'),
   researchFocus: z.array(z.string()).min(1, 'Select at least one focus'),
+  specificAspects: z.array(z.string()).optional(),
   diseaseContext: z.string().optional(),
+  experimentalApproach: z.string().optional(),
+  researchQuestion: z.string().optional(),
 });
 
 type GeneResearchForm = z.infer<typeof geneResearchSchema>;
@@ -54,6 +58,17 @@ const researchFocusOptions = [
   { id: 'therapeutic', label: 'Therapeutic Potential' },
 ];
 
+const specificAspectsOptions = [
+  { id: 'mutations', label: 'Mutations' },
+  { id: 'protein_interactions', label: 'Protein Interactions' },
+  { id: 'biological_pathways', label: 'Biological Pathways' },
+  { id: 'evolution', label: 'Evolution' },
+  { id: 'gene_regulation', label: 'Gene Regulation' },
+  { id: 'expression_patterns', label: 'Expression Patterns' },
+  { id: 'protein_structure', label: 'Protein Structure' },
+  { id: 'molecular_function', label: 'Molecular Function' },
+];
+
 interface GeneInputProps {
   onSubmit: (data: GeneResearchForm) => void;
   isLoading?: boolean;
@@ -67,11 +82,15 @@ export function GeneInput({ onSubmit, isLoading }: GeneInputProps) {
       geneSymbol: '',
       organism: 'Homo sapiens',
       researchFocus: ['general'],
+      specificAspects: [],
       diseaseContext: '',
+      experimentalApproach: '',
+      researchQuestion: '',
     },
   });
 
   const [selectedFocus, setSelectedFocus] = useState<string[]>(['general']);
+  const [selectedAspects, setSelectedAspects] = useState<string[]>([]);
 
   const toggleFocus = (focusId: string) => {
     const newFocus = selectedFocus.includes(focusId)
@@ -80,6 +99,15 @@ export function GeneInput({ onSubmit, isLoading }: GeneInputProps) {
 
     setSelectedFocus(newFocus);
     form.setValue('researchFocus', newFocus);
+  };
+
+  const toggleAspect = (aspectId: string) => {
+    const newAspects = selectedAspects.includes(aspectId)
+      ? selectedAspects.filter(id => id !== aspectId)
+      : [...selectedAspects, aspectId];
+
+    setSelectedAspects(newAspects);
+    form.setValue('specificAspects', newAspects);
   };
 
   return (
@@ -167,6 +195,40 @@ export function GeneInput({ onSubmit, isLoading }: GeneInputProps) {
           </div>
         </div>
 
+        {/* Specific Aspects (Optional) */}
+        <div className="space-y-3">
+          <FormLabel>
+            {t('geneResearch.specificAspects', 'Specific Aspects')} ({t('common.optional', 'Optional')})
+          </FormLabel>
+          <FormDescription>
+            {t('geneResearch.specificAspectsDesc', 'Select specific aspects you want to focus on')}
+          </FormDescription>
+          <div className="grid grid-cols-2 gap-3">
+            {specificAspectsOptions.map((option) => (
+              <div
+                key={option.id}
+                className={`flex items-center space-x-2 p-3 border rounded-lg cursor-pointer transition-colors ${
+                  selectedAspects.includes(option.id)
+                    ? 'border-primary bg-primary/5'
+                    : 'border-border hover:border-primary/50'
+                }`}
+                onClick={() => !isLoading && toggleAspect(option.id)}
+              >
+                <input
+                  type="checkbox"
+                  checked={selectedAspects.includes(option.id)}
+                  onChange={() => toggleAspect(option.id)}
+                  disabled={isLoading}
+                  className="rounded"
+                />
+                <label className="cursor-pointer text-sm">
+                  {t(`geneResearch.aspects.${option.id}`, option.label)}
+                </label>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* Disease Context (Optional) */}
         <FormField
           control={form.control}
@@ -183,6 +245,53 @@ export function GeneInput({ onSubmit, isLoading }: GeneInputProps) {
                   disabled={isLoading}
                 />
               </FormControl>
+            </FormItem>
+          )}
+        />
+
+        {/* Experimental Approach (Optional) */}
+        <FormField
+          control={form.control}
+          name="experimentalApproach"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>
+                {t('geneResearch.experimentalApproach', 'Experimental Approach')} ({t('common.optional', 'Optional')})
+              </FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="e.g., CRISPR, RNA-seq, ChIP-seq"
+                  {...field}
+                  disabled={isLoading}
+                />
+              </FormControl>
+              <FormDescription>
+                {t('geneResearch.experimentalApproachDesc', 'Specify the experimental approach if applicable')}
+              </FormDescription>
+            </FormItem>
+          )}
+        />
+
+        {/* Research Question (Optional) */}
+        <FormField
+          control={form.control}
+          name="researchQuestion"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>
+                {t('geneResearch.researchQuestion', 'Research Question')} ({t('common.optional', 'Optional')})
+              </FormLabel>
+              <FormControl>
+                <Textarea
+                  rows={4}
+                  placeholder={t('geneResearch.researchQuestionPlaceholder', 'What is the function, structure, and biological role of the gene {geneSymbol} in {organism}?')}
+                  {...field}
+                  disabled={isLoading}
+                />
+              </FormControl>
+              <FormDescription>
+                {t('geneResearch.researchQuestionDesc', 'Define your specific research question. Use {geneSymbol} and {organism} as placeholders.')}
+              </FormDescription>
             </FormItem>
           )}
         />

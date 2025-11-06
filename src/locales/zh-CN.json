@@ -256,7 +256,14 @@
     "selectOrganism": "选择一个物种",
     "organismDesc": "选择用于基因研究的物种",
     "researchFocus": "研究焦点",
+    "specificAspects": "特定研究方面",
+    "specificAspectsDesc": "选择您想要关注的特定方面",
     "diseaseContext": "疾病背景",
+    "experimentalApproach": "实验方法",
+    "experimentalApproachDesc": "指定实验方法（如适用）",
+    "researchQuestion": "研究问题",
+    "researchQuestionPlaceholder": "基因 {geneSymbol} 在 {organism} 中的功能、结构和生物学作用是什么？",
+    "researchQuestionDesc": "定义您的具体研究问题。使用 {geneSymbol} 和 {organism} 作为占位符。",
     "startResearch": "开始基因研究",
     "researching": "研究中...",
     "focus": {
@@ -267,6 +274,16 @@
       "interactions": "蛋白质相互作用",
       "evolution": "进化分析",
       "therapeutic": "治疗潜力"
+    },
+    "aspects": {
+      "mutations": "突变",
+      "protein_interactions": "蛋白质相互作用",
+      "biological_pathways": "生物学通路",
+      "evolution": "进化",
+      "gene_regulation": "基因调控",
+      "expression_patterns": "表达模式",
+      "protein_structure": "蛋白质结构",
+      "molecular_function": "分子功能"
     }
   },
   "database": {

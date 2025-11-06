@@ -256,7 +256,14 @@
     "selectOrganism": "Selecciona un organismo",
     "organismDesc": "Selecciona el organismo para tu investigación genética",
     "researchFocus": "Enfoque de Investigación",
+    "specificAspects": "Aspectos Específicos",
+    "specificAspectsDesc": "Selecciona aspectos específicos en los que quieras enfocarte",
     "diseaseContext": "Contexto de Enfermedad",
+    "experimentalApproach": "Enfoque Experimental",
+    "experimentalApproachDesc": "Especifica el enfoque experimental si aplica",
+    "researchQuestion": "Pregunta de Investigación",
+    "researchQuestionPlaceholder": "¿Cuál es la función, estructura y papel biológico del gen {geneSymbol} en {organism}?",
+    "researchQuestionDesc": "Define tu pregunta de investigación específica. Usa {geneSymbol} y {organism} como marcadores de posición.",
     "startResearch": "Iniciar Investigación Genética",
     "researching": "Investigando...",
     "focus": {
@@ -267,6 +274,16 @@
       "interactions": "Interacciones Proteicas",
       "evolution": "Análisis Evolutivo",
       "therapeutic": "Potencial Terapéutico"
+    },
+    "aspects": {
+      "mutations": "Mutaciones",
+      "protein_interactions": "Interacciones Proteicas",
+      "biological_pathways": "Vías Biológicas",
+      "evolution": "Evolución",
+      "gene_regulation": "Regulación Génica",
+      "expression_patterns": "Patrones de Expresión",
+      "protein_structure": "Estructura Proteica",
+      "molecular_function": "Función Molecular"
     }
   },
   "database": {

@@ -256,7 +256,14 @@
     "selectOrganism": "Chọn một sinh vật",
     "organismDesc": "Chọn sinh vật cho nghiên cứu gen của bạn",
     "researchFocus": "Trọng Tâm Nghiên Cứu",
+    "specificAspects": "Các Khía Cạnh Cụ Thể",
+    "specificAspectsDesc": "Chọn các khía cạnh cụ thể bạn muốn tập trung",
     "diseaseContext": "Bối Cảnh Bệnh",
+    "experimentalApproach": "Phương Pháp Thực Nghiệm",
+    "experimentalApproachDesc": "Chỉ định phương pháp thực nghiệm nếu có",
+    "researchQuestion": "Câu Hỏi Nghiên Cứu",
+    "researchQuestionPlaceholder": "Chức năng, cấu trúc và vai trò sinh học của gen {geneSymbol} trong {organism} là gì?",
+    "researchQuestionDesc": "Xác định câu hỏi nghiên cứu cụ thể của bạn. Sử dụng {geneSymbol} và {organism} làm placeholder.",
     "startResearch": "Bắt Đầu Nghiên Cứu Gen",
     "researching": "Đang Nghiên Cứu...",
     "focus": {
@@ -267,6 +274,16 @@
       "interactions": "Tương Tác Protein",
       "evolution": "Phân Tích Tiến Hóa",
       "therapeutic": "Tiềm Năng Điều Trị"
+    },
+    "aspects": {
+      "mutations": "Đột Biến",
+      "protein_interactions": "Tương Tác Protein",
+      "biological_pathways": "Con Đường Sinh Học",
+      "evolution": "Tiến Hóa",
+      "gene_regulation": "Điều Hòa Gen",
+      "expression_patterns": "Mẫu Biểu Hiện",
+      "protein_structure": "Cấu Trúc Protein",
+      "molecular_function": "Chức Năng Phân Tử"
     }
   },
   "database": {

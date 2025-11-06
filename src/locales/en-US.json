@@ -256,7 +256,14 @@
     "selectOrganism": "Select an organism",
     "organismDesc": "Select the organism for your gene research",
     "researchFocus": "Research Focus",
+    "specificAspects": "Specific Aspects",
+    "specificAspectsDesc": "Select specific aspects you want to focus on",
     "diseaseContext": "Disease Context",
+    "experimentalApproach": "Experimental Approach",
+    "experimentalApproachDesc": "Specify the experimental approach if applicable",
+    "researchQuestion": "Research Question",
+    "researchQuestionPlaceholder": "What is the function, structure, and biological role of the gene {geneSymbol} in {organism}?",
+    "researchQuestionDesc": "Define your specific research question. Use {geneSymbol} and {organism} as placeholders.",
     "startResearch": "Start Gene Research",
     "researching": "Researching...",
     "focus": {
@@ -267,6 +274,16 @@
       "interactions": "Protein Interactions",
       "evolution": "Evolutionary Analysis",
       "therapeutic": "Therapeutic Potential"
+    },
+    "aspects": {
+      "mutations": "Mutations",
+      "protein_interactions": "Protein Interactions",
+      "biological_pathways": "Biological Pathways",
+      "evolution": "Evolution",
+      "gene_regulation": "Gene Regulation",
+      "expression_patterns": "Expression Patterns",
+      "protein_structure": "Protein Structure",
+      "molecular_function": "Molecular Function"
     }
   },
   "database": {
