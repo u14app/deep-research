@@ -253,6 +253,8 @@
     "geneSymbol": "基因符号",
     "geneSymbolDesc": "输入标准基因符号或名称",
     "organism": "物种",
+    "selectOrganism": "选择一个物种",
+    "organismDesc": "选择用于基因研究的物种",
     "researchFocus": "研究焦点",
     "diseaseContext": "疾病背景",
     "startResearch": "开始基因研究",

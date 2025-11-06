@@ -253,6 +253,8 @@
     "geneSymbol": "Gene Symbol",
     "geneSymbolDesc": "Enter the standard gene symbol or name",
     "organism": "Organism",
+    "selectOrganism": "Select an organism",
+    "organismDesc": "Select the organism for your gene research",
     "researchFocus": "Research Focus",
     "diseaseContext": "Disease Context",
     "startResearch": "Start Gene Research",

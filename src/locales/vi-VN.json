@@ -243,6 +243,45 @@
     },
     "placeholder": "Vui lòng nhập văn bản, hoặc nhập \"/\" để sử dụng lệnh"
   },
+  "mode": {
+    "general": "Chế Độ Chung",
+    "professional": "Chế Độ Chuyên Nghiệp (Nghiên Cứu Gen)",
+    "switchTo": "Chuyển sang {{mode}}"
+  },
+  "geneResearch": {
+    "title": "Nghiên Cứu Gen",
+    "geneSymbol": "Ký Hiệu Gen",
+    "geneSymbolDesc": "Nhập ký hiệu hoặc tên gen tiêu chuẩn",
+    "organism": "Sinh Vật",
+    "selectOrganism": "Chọn một sinh vật",
+    "organismDesc": "Chọn sinh vật cho nghiên cứu gen của bạn",
+    "researchFocus": "Trọng Tâm Nghiên Cứu",
+    "diseaseContext": "Bối Cảnh Bệnh",
+    "startResearch": "Bắt Đầu Nghiên Cứu Gen",
+    "researching": "Đang Nghiên Cứu...",
+    "focus": {
+      "general": "Chức Năng Chung",
+      "disease": "Liên Quan Đến Bệnh",
+      "structure": "Cấu Trúc Protein",
+      "expression": "Phân Tích Biểu Hiện",
+      "interactions": "Tương Tác Protein",
+      "evolution": "Phân Tích Tiến Hóa",
+      "therapeutic": "Tiềm Năng Điều Trị"
+    }
+  },
+  "database": {
+    "pubmed": "PubMed (Tài liệu)",
+    "uniprot": "UniProt (Protein)",
+    "ncbiGene": "NCBI Gene",
+    "geo": "GEO (Biểu hiện)",
+    "pdb": "PDB (Cấu trúc)",
+    "kegg": "KEGG (Con đường)",
+    "string": "STRING (Tương tác)",
+    "omim": "OMIM (Bệnh)"
+  },
+  "common": {
+    "optional": "Tùy Chọn"
+  },
   "setting": {
     "title": "Cài Đặt",
     "description": "Tất cả cài đặt được lưu trong trình duyệt của người dùng.",

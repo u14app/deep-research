@@ -243,6 +243,45 @@
     },
     "placeholder": "Por favor, introduce texto, o escribe \"/ \" para usar comandos"
   },
+  "mode": {
+    "general": "Modo General",
+    "professional": "Modo Profesional (Investigación Genética)",
+    "switchTo": "Cambiar a {{mode}}"
+  },
+  "geneResearch": {
+    "title": "Investigación Genética",
+    "geneSymbol": "Símbolo del Gen",
+    "geneSymbolDesc": "Introduce el símbolo o nombre estándar del gen",
+    "organism": "Organismo",
+    "selectOrganism": "Selecciona un organismo",
+    "organismDesc": "Selecciona el organismo para tu investigación genética",
+    "researchFocus": "Enfoque de Investigación",
+    "diseaseContext": "Contexto de Enfermedad",
+    "startResearch": "Iniciar Investigación Genética",
+    "researching": "Investigando...",
+    "focus": {
+      "general": "Función General",
+      "disease": "Asociación con Enfermedades",
+      "structure": "Estructura Proteica",
+      "expression": "Análisis de Expresión",
+      "interactions": "Interacciones Proteicas",
+      "evolution": "Análisis Evolutivo",
+      "therapeutic": "Potencial Terapéutico"
+    }
+  },
+  "database": {
+    "pubmed": "PubMed (Literatura)",
+    "uniprot": "UniProt (Proteína)",
+    "ncbiGene": "NCBI Gene",
+    "geo": "GEO (Expresión)",
+    "pdb": "PDB (Estructura)",
+    "kegg": "KEGG (Vías)",
+    "string": "STRING (Interacciones)",
+    "omim": "OMIM (Enfermedad)"
+  },
+  "common": {
+    "optional": "Opcional"
+  },
   "setting": {
     "title": "Configuración",
     "description": "Todos los ajustes se guardan en el navegador del usuario.",
