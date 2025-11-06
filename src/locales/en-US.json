@@ -243,11 +243,50 @@
     },
     "placeholder": "Please enter text, or enter \"/ \" to use commands"
   },
+  "mode": {
+    "general": "General Mode",
+    "professional": "Professional Mode (Gene Research)",
+    "switchTo": "Switch to {{mode}}"
+  },
+  "geneResearch": {
+    "title": "Gene Research",
+    "geneSymbol": "Gene Symbol",
+    "geneSymbolDesc": "Enter the standard gene symbol or name",
+    "organism": "Organism",
+    "researchFocus": "Research Focus",
+    "diseaseContext": "Disease Context",
+    "startResearch": "Start Gene Research",
+    "researching": "Researching...",
+    "focus": {
+      "general": "General Function",
+      "disease": "Disease Association",
+      "structure": "Protein Structure",
+      "expression": "Expression Analysis",
+      "interactions": "Protein Interactions",
+      "evolution": "Evolutionary Analysis",
+      "therapeutic": "Therapeutic Potential"
+    }
+  },
+  "database": {
+    "pubmed": "PubMed (Literature)",
+    "uniprot": "UniProt (Protein)",
+    "ncbiGene": "NCBI Gene",
+    "geo": "GEO (Expression)",
+    "pdb": "PDB (Structure)",
+    "kegg": "KEGG (Pathways)",
+    "string": "STRING (Interactions)",
+    "omim": "OMIM (Disease)"
+  },
+  "common": {
+    "optional": "Optional"
+  },
   "setting": {
     "title": "Setting",
     "description": "All settings are saved in the user's browser.",
     "model": "Model",
     "general": "System",
+    "researchMode": "Research Mode",
+    "researchModeTip": "Choose research mode: General mode for universal topics, Professional mode for gene function research",
     "provider": "AI Provider",
     "providerTip": "AI service provider. For AI aggregation services such as One Api and New Api, please select `Compatible OpenAI`.",
     "openAICompatible": "OpenAI Compatible",

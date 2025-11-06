@@ -243,11 +243,50 @@
     },
     "placeholder": "请输入文本，或输入 \"/ \" 使用指令"
   },
+  "mode": {
+    "general": "普通模式",
+    "professional": "专业模式（基因研究）",
+    "switchTo": "切换到 {{mode}}"
+  },
+  "geneResearch": {
+    "title": "基因研究",
+    "geneSymbol": "基因符号",
+    "geneSymbolDesc": "输入标准基因符号或名称",
+    "organism": "物种",
+    "researchFocus": "研究焦点",
+    "diseaseContext": "疾病背景",
+    "startResearch": "开始基因研究",
+    "researching": "研究中...",
+    "focus": {
+      "general": "常规功能",
+      "disease": "疾病关联",
+      "structure": "蛋白质结构",
+      "expression": "表达分析",
+      "interactions": "蛋白质相互作用",
+      "evolution": "进化分析",
+      "therapeutic": "治疗潜力"
+    }
+  },
+  "database": {
+    "pubmed": "PubMed（文献）",
+    "uniprot": "UniProt（蛋白质）",
+    "ncbiGene": "NCBI Gene（基因）",
+    "geo": "GEO（表达数据）",
+    "pdb": "PDB（结构）",
+    "kegg": "KEGG（通路）",
+    "string": "STRING（相互作用）",
+    "omim": "OMIM（疾病）"
+  },
+  "common": {
+    "optional": "可选"
+  },
   "setting": {
     "title": "设置",
     "description": "所有设置都将保存在您的浏览器中。",
     "model": "语言模型",
     "general": "系统设置",
+    "researchMode": "研究模式",
+    "researchModeTip": "选择研究模式：普通模式用于通用主题研究，专业模式专注于基因功能研究",
     "provider": "AI 服务",
     "providerTip": "AI 服务提供商。对于 One API 和 New API 这类 AI 聚合服务，请选择 `兼容 OpenAI`。",
     "openAICompatible": "OpenAI 兼容",
