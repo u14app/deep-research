@@ -27,7 +27,7 @@ GOOGLE_GENERATIVE_AI_API_KEY=your_api_key_here
 
 # 或者配置 Mod AI Studio (NewAPI.ai)
 # MODAI_API_KEY=your_newapi_key
-# MODAI_API_BASE_URL=http://89.116.156.40:8081
+# MODAI_API_BASE_URL=https://your-newapi-server.com
 
 # 或者配置 OpenAI
 # OPENAI_API_KEY=your_openai_key

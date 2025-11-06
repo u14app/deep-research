@@ -256,7 +256,7 @@ else if (provider === "modai") {
 - 最终 URL：`https://server.com/v1beta/v1beta/...` ❌
 
 **解决**:
-- Placeholder 改为：`http://89.116.156.40:8081` (不含 /v1beta)
+- Placeholder 改为：`http://your-newapi-server.com` (不含 /v1beta)
 - 代码统一添加 `/v1beta`
 - 对齐 Google AI Studio 的实现模式
 
@@ -266,7 +266,7 @@ else if (provider === "modai") {
 
 **实际情况**: 用户测试后发现 API **可以返回模型列表**：
 ```bash
-curl "http://89.116.156.40:8081/v1beta/models?key=$KEY"
+curl "http://your-newapi-server.com/v1beta/models?key=$KEY"
 # 返回 70+ 个模型，包括 gemini-2.5-pro, ds-R1-Max, gpt-OSS 等
 ```
 
@@ -430,15 +430,15 @@ HSL 转换：
 - 导致用户填写后路径重复
 
 **修正方案**：
-- Placeholder: `http://89.116.156.40:8081` ✅
+- Placeholder: `http://your-newapi-server.com` ✅
 - `.env.example`: 移除 `/v1beta`
 - `DOCKER.md`: 更新示例地址
 
 **URL 构建逻辑**：
 ```
-用户配置: http://89.116.156.40:8081
+用户配置: http://your-newapi-server.com
 代码添加: /v1beta
-最终URL: http://89.116.156.40:8081/v1beta/models/...
+最终URL: http://your-newapi-server.com/v1beta/models/...
 ```
 
 #### 模型列表支持完善

@@ -50,6 +50,11 @@ export default async function Config(phase: string) {
       NEXT_PUBLIC_VERSION: pkg.version,
     },
     transpilePackages: ["pdfjs-dist", "mermaid"],
+    // Allow cross-origin requests in development (e.g., from external IPs or proxy)
+    // This suppresses the warning about cross-origin requests to /_next/* resources
+    ...(process.env.NODE_ENV === "development" && {
+      allowedDevOrigins: ["*"],
+    }),
   };
 
   if (BUILD_MODE === "export") {
