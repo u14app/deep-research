@@ -116,6 +116,10 @@ const formSchema = z.object({
   openAIApiProxy: z.string().optional(),
   openAIThinkingModel: z.string().optional(),
   openAINetworkingModel: z.string().optional(),
+  modaiApiKey: z.string().optional(),
+  modaiApiProxy: z.string().optional(),
+  modaiThinkingModel: z.string().optional(),
+  modaiNetworkingModel: z.string().optional(),
   anthropicApiKey: z.string().optional(),
   anthropicApiProxy: z.string().optional(),
   anthropicThinkingModel: z.string().optional(),
@@ -466,50 +470,13 @@ function Setting({ open, onClose }: SettingProps) {
                                 Google AI Studio
                               </SelectItem>
                             ) : null}
+                            {!isDisabledAIProvider("modai") ? (
+                              <SelectItem value="modai">
+                                Mod AI Studio
+                              </SelectItem>
+                            ) : null}
                             {!isDisabledAIProvider("openai") ? (
                               <SelectItem value="openai">OpenAI</SelectItem>
-                            ) : null}
-                            {!isDisabledAIProvider("anthropic") ? (
-                              <SelectItem value="anthropic">
-                                Anthropic
-                              </SelectItem>
-                            ) : null}
-                            {!isDisabledAIProvider("deepseek") ? (
-                              <SelectItem value="deepseek">DeepSeek</SelectItem>
-                            ) : null}
-                            {!isDisabledAIProvider("xai") ? (
-                              <SelectItem value="xai">xAI Grok</SelectItem>
-                            ) : null}
-                            {!isDisabledAIProvider("mistral") ? (
-                              <SelectItem value="mistral">Mistral</SelectItem>
-                            ) : null}
-                            {!isDisabledAIProvider("openaicompatible") ? (
-                              <SelectItem value="openaicompatible">
-                                {t("setting.openAICompatible")}
-                              </SelectItem>
-                            ) : null}
-                            {!isDisabledAIProvider("pollinations") ? (
-                              <SelectItem value="pollinations">
-                                Pollinations ({t("setting.free")})
-                              </SelectItem>
-                            ) : null}
-                            {!isDisabledAIProvider("azure") ? (
-                              <SelectItem value="azure">
-                                Azure OpenAI (Beta)
-                              </SelectItem>
-                            ) : null}
-                            {!isDisabledAIProvider("google-vertex") ? (
-                              <SelectItem value="google-vertex">
-                                Google Vertex (Alpha)
-                              </SelectItem>
-                            ) : null}
-                            {!isDisabledAIProvider("openrouter") ? (
-                              <SelectItem value="openrouter">
-                                OpenRouter
-                              </SelectItem>
-                            ) : null}
-                            {!isDisabledAIProvider("ollama") ? (
-                              <SelectItem value="ollama">Ollama</SelectItem>
                             ) : null}
                           </SelectContent>
                         </Select>
@@ -566,6 +533,63 @@ function Setting({ open, onClose }: SettingProps) {
                                 updateSetting(
                                   "apiProxy",
                                   form.getValues("apiProxy")
+                                )
+                              }
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  {/* Mod AI Studio Configuration */}
+                  <div
+                    className={cn("space-y-4", {
+                      hidden: provider !== "modai",
+                    })}
+                  >
+                    <FormField
+                      control={form.control}
+                      name="modaiApiKey"
+                      render={({ field }) => (
+                        <FormItem className="from-item">
+                          <FormLabel className="from-label">
+                            {t("setting.apiKeyLabel")}
+                            <span className="ml-1 text-red-500 max-sm:hidden">
+                              *
+                            </span>
+                          </FormLabel>
+                          <FormControl className="form-field">
+                            <Password
+                              type="text"
+                              placeholder={t("setting.apiKeyPlaceholder")}
+                              {...field}
+                              onBlur={() =>
+                                updateSetting(
+                                  "modaiApiKey",
+                                  form.getValues("modaiApiKey")
+                                )
+                              }
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="modaiApiProxy"
+                      render={({ field }) => (
+                        <FormItem className="from-item">
+                          <FormLabel className="from-label">
+                            {t("setting.apiUrlLabel")}
+                          </FormLabel>
+                          <FormControl className="form-field">
+                            <Input
+                              placeholder="https://your-newapi-server.com/v1beta"
+                              {...field}
+                              onBlur={() =>
+                                updateSetting(
+                                  "modaiApiProxy",
+                                  form.getValues("modaiApiProxy")
                                 )
                               }
                             />
@@ -1439,6 +1463,69 @@ function Setting({ open, onClose }: SettingProps) {
                               )}
                             </Button>
                           </div>
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                {/* Mod AI Studio Model Configuration - Manual Input */}
+                <div
+                  className={cn("space-y-4", {
+                    hidden: provider !== "modai",
+                  })}
+                >
+                  <FormField
+                    control={form.control}
+                    name="modaiThinkingModel"
+                    render={({ field }) => (
+                      <FormItem className="from-item">
+                        <FormLabel className="from-label">
+                          <HelpTip tip={t("setting.thinkingModelTip")}>
+                            {t("setting.thinkingModel")}
+                            <span className="ml-1 text-red-500 max-sm:hidden">
+                              *
+                            </span>
+                          </HelpTip>
+                        </FormLabel>
+                        <FormControl className="form-field">
+                          <Input
+                            placeholder="gemini-2.0-flash-thinking-exp"
+                            {...field}
+                            onBlur={() =>
+                              updateSetting(
+                                "modaiThinkingModel",
+                                form.getValues("modaiThinkingModel")
+                              )
+                            }
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="modaiNetworkingModel"
+                    render={({ field }) => (
+                      <FormItem className="from-item">
+                        <FormLabel className="from-label">
+                          <HelpTip tip={t("setting.networkingModelTip")}>
+                            {t("setting.networkingModel")}
+                            <span className="ml-1 text-red-500 max-sm:hidden">
+                              *
+                            </span>
+                          </HelpTip>
+                        </FormLabel>
+                        <FormControl className="form-field">
+                          <Input
+                            placeholder="gemini-2.0-flash-exp"
+                            {...field}
+                            onBlur={() =>
+                              updateSetting(
+                                "modaiNetworkingModel",
+                                form.getValues("modaiNetworkingModel")
+                              )
+                            }
+                          />
                         </FormControl>
                       </FormItem>
                     )}

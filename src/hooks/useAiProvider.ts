@@ -41,6 +41,18 @@ function useModelProvider() {
           options.baseURL = location.origin + "/api/ai/google/v1beta";
         }
         break;
+      case "modai":
+        const { modaiApiKey = "", modaiApiProxy } = useSettingStore.getState();
+        if (mode === "local") {
+          options.baseURL = completePath(
+            modaiApiProxy || GEMINI_BASE_URL,
+            "/v1beta"
+          );
+          options.apiKey = multiApiKeyPolling(modaiApiKey);
+        } else {
+          options.baseURL = location.origin + "/api/ai/modai/v1beta";
+        }
+        break;
       case "google-vertex":
         const {
           googleVertexProject,
@@ -213,6 +225,13 @@ function useModelProvider() {
       case "google":
         const { thinkingModel, networkingModel } = useSettingStore.getState();
         return { thinkingModel, networkingModel };
+      case "modai":
+        const { modaiThinkingModel, modaiNetworkingModel } =
+          useSettingStore.getState();
+        return {
+          thinkingModel: modaiThinkingModel,
+          networkingModel: modaiNetworkingModel,
+        };
       case "google-vertex":
         const { googleVertexThinkingModel, googleVertexNetworkingModel } =
           useSettingStore.getState();
@@ -304,6 +323,9 @@ function useModelProvider() {
       case "google":
         const { apiKey } = useSettingStore.getState();
         return apiKey.length > 0;
+      case "modai":
+        const { modaiApiKey } = useSettingStore.getState();
+        return modaiApiKey.length > 0;
       case "google-vertex":
         const { googleVertexProject, googleVertexLocation } =
           useSettingStore.getState();

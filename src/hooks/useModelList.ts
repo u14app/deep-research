@@ -145,6 +145,11 @@ function useModelList() {
         .map((item) => item.name.replace("models/", ""));
       setModelList(newModelList);
       return newModelList;
+    } else if (provider === "modai") {
+      // Mod AI Studio doesn't return model list - users must manually input model names
+      // This provider uses NewAPI.ai service which is Gemini-compatible
+      setModelList([]);
+      return [];
     } else if (provider === "openrouter") {
       const { openRouterApiKey = "", openRouterApiProxy } =
         useSettingStore.getState();

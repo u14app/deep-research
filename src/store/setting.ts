@@ -21,6 +21,10 @@ export interface SettingStore {
   openAIApiProxy: string;
   openAIThinkingModel: string;
   openAINetworkingModel: string;
+  modaiApiKey: string;
+  modaiApiProxy: string;
+  modaiThinkingModel: string;
+  modaiNetworkingModel: string;
   anthropicApiKey: string;
   anthropicApiProxy: string;
   anthropicThinkingModel: string;
@@ -109,6 +113,10 @@ export const defaultValues: SettingStore = {
   openAIApiProxy: "",
   openAIThinkingModel: "gpt-5",
   openAINetworkingModel: "gpt-5-mini",
+  modaiApiKey: "",
+  modaiApiProxy: "",
+  modaiThinkingModel: "gemini-2.0-flash-thinking-exp",
+  modaiNetworkingModel: "gemini-2.0-flash-exp",
   anthropicApiKey: "",
   anthropicApiProxy: "",
   anthropicThinkingModel: "",
