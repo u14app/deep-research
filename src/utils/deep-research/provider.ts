@@ -27,6 +27,14 @@ export async function createAIProvider({
       apiKey,
     });
     return google(model, settings);
+  } else if (provider === "modai") {
+    // Mod AI Studio uses NewAPI.ai which is Gemini-compatible
+    const { createGoogleGenerativeAI } = await import("@ai-sdk/google");
+    const modai = createGoogleGenerativeAI({
+      baseURL,
+      apiKey,
+    });
+    return modai(model, settings);
   } else if (provider === "google-vertex") {
     const { createVertex } = await import("@ai-sdk/google-vertex/edge");
     const googleVertexOptions: GoogleVertexProviderSettings = {};
