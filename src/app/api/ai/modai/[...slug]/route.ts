@@ -46,7 +46,9 @@ async function handler(req: NextRequest) {
         "Content-Type": req.headers.get("Content-Type") || "application/json",
         "x-goog-api-client":
           req.headers.get("x-goog-api-client") || "genai-js/0.24.0",
-        // Don't include the API key in headers for NewAPI.ai - it goes in query params
+        // Include API key in both header and query param for maximum compatibility
+        // NewAPI.ai supports both methods, and some features (like citations) may need header auth
+        "x-goog-api-key": apiKey,
       },
     };
     if (body) payload.body = JSON.stringify(body);
