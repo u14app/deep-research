@@ -39,6 +39,9 @@ import {
   geneReportPlanPrompt,
   geneSerpQueriesPrompt,
 } from "@/constants/gene-research-prompts";
+import { createGeneQueryGenerator } from "@/utils/gene-research/query-generator";
+import { generateGeneReportTemplate } from "@/utils/gene-research/report-templates";
+import type { GeneSearchTask } from "@/types/gene-research";
 import { isNetworkingModel } from "@/utils/model";
 import { ThinkTagStreamProcessor, removeJsonMarkdown } from "@/utils/text";
 import { parseError } from "@/utils/error";
@@ -72,6 +75,18 @@ function useDeepResearch() {
   const { search } = useWebSearch();
   const { searchBiologicalDatabases } = useProfessionalSearch();
   const [status, setStatus] = useState<string>("");
+
+  // Helper function to convert GeneSearchTask to SearchTask
+  function convertGeneTasksToSearchTasks(geneTasks: GeneSearchTask[]): SearchTask[] {
+    return geneTasks.map(task => ({
+      state: "unprocessed" as const,
+      query: task.query,
+      researchGoal: task.researchGoal,
+      learning: "",
+      sources: [],
+      images: [],
+    }));
+  }
 
   // Helper function to perform mode-aware search
   async function modeAwareSearch(query: string): Promise<{ sources: Source[]; images: ImageSource[] }> {
@@ -627,7 +642,9 @@ function useDeepResearch() {
       setSources,
       requirement,
       updateFinalReport,
+      question,
     } = useTaskStore.getState();
+    const { mode } = useModeStore.getState();
     const { save } = useHistoryStore.getState();
     const { thinkingModel } = getModel();
     setStatus(t("research.common.writing"));
@@ -647,6 +664,34 @@ function useDeepResearch() {
     const enableReferences = sources.length > 0 && references === "enable";
     const enableFileFormatResource = useFileFormatResource === "enable";
     const thinkTagStreamProcessor = new ThinkTagStreamProcessor();
+
+    // Professional mode: Generate gene research report template
+    let professionalReportTemplate = "";
+    if (mode === 'professional') {
+      const geneSymbolMatch = question.match(/Gene:\s*(\w+)/i);
+      const organismMatch = question.match(/Organism:\s*([^,]+)/i);
+
+      if (geneSymbolMatch && organismMatch) {
+        const geneSymbol = geneSymbolMatch[1].trim();
+        const organism = organismMatch[1].trim();
+
+        console.log(`[Professional Mode] Generating professional report template for ${geneSymbol}`);
+
+        const template = generateGeneReportTemplate(
+          geneSymbol,
+          organism,
+          'comprehensive',
+          'researchers'
+        );
+
+        // Extract section structure for prompt guidance
+        const sectionStructure = template.sections
+          .map(section => `## ${section.title}\n${section.subsections ? section.subsections.map(sub => `### ${sub.title}`).join('\n') : ''}`)
+          .join('\n\n');
+
+        professionalReportTemplate = `\n\nIMPORTANT: Structure your report according to the following professional gene research template:\n\n${sectionStructure}\n\nEnsure each section includes:\n- Specific molecular details\n- Quantitative data where available\n- Literature citations\n- Experimental evidence\n\n`;
+      }
+    }
 
     const sourceList = enableReferences
       ? sources.map((item) => pick(item, ["title", "url"]))
@@ -692,6 +737,7 @@ function useDeepResearch() {
             enableReferences,
             enableFileFormatResource
           ),
+          professionalReportTemplate,  // Add professional template guidance
           getResponseLanguagePrompt(),
         ].join("\n\n"),
       },
@@ -767,10 +813,65 @@ function useDeepResearch() {
   }
 
   async function deepResearch() {
-    const { reportPlan } = useTaskStore.getState();
+    const { reportPlan, question } = useTaskStore.getState();
+    const { mode } = useModeStore.getState();
     const { thinkingModel } = getModel();
     setStatus(t("research.common.thinking"));
+
     try {
+      let queries: SearchTask[] = [];
+
+      // Professional mode: Use GeneQueryGenerator for specialized queries
+      if (mode === 'professional') {
+        console.log('[Professional Mode] Using GeneQueryGenerator for query generation');
+
+        // Extract gene information from the question
+        const geneSymbolMatch = question.match(/Gene:\s*(\w+)/i);
+        const organismMatch = question.match(/Organism:\s*([^,]+)/i);
+        const focusMatch = question.match(/Focus:\s*([^,\n]+)/i);
+        const aspectsMatch = question.match(/Specific Aspects:\s*([^,\n]+)/i);
+        const diseaseMatch = question.match(/Disease:\s*([^,\n]+)/i);
+        const approachMatch = question.match(/Experimental Approach:\s*([^,\n]+)/i);
+
+        if (geneSymbolMatch && organismMatch) {
+          const geneSymbol = geneSymbolMatch[1].trim();
+          const organism = organismMatch[1].trim();
+          const researchFocus = focusMatch ? focusMatch[1].split(',').map(f => f.trim()) : [];
+          const specificAspects = aspectsMatch ? aspectsMatch[1].split(',').map(a => a.trim()) : [];
+          const diseaseContext = diseaseMatch ? diseaseMatch[1].trim() : undefined;
+          const experimentalApproach = approachMatch ? approachMatch[1].trim() : undefined;
+
+          console.log(`[Professional Mode] Gene: ${geneSymbol}, Organism: ${organism}`);
+          console.log(`[Professional Mode] Focus: ${researchFocus.join(', ')}`);
+
+          // Create query generator
+          const queryGenerator = createGeneQueryGenerator({
+            geneSymbol,
+            organism,
+            researchFocus,
+            specificAspects,
+            diseaseContext,
+            experimentalApproach
+          });
+
+          // Generate comprehensive queries
+          const geneQueries = queryGenerator.generateComprehensiveQueries();
+          console.log(`[Professional Mode] Generated ${geneQueries.length} specialized queries`);
+
+          // Convert to SearchTask format
+          queries = convertGeneTasksToSearchTasks(geneQueries);
+          taskStore.update(queries);
+
+          // Execute searches immediately
+          await runSearchTask(queries);
+          return;
+        }
+
+        // Fall through to general mode if gene info not found
+        console.log('[Professional Mode] Could not extract gene info, falling back to general query generation');
+      }
+
+      // General mode: Use AI-generated queries
       const thinkTagStreamProcessor = new ThinkTagStreamProcessor();
       const result = streamText({
         model: await createModelProvider(thinkingModel),
@@ -786,7 +887,6 @@ function useDeepResearch() {
       const querySchema = getSERPQuerySchema();
       let content = "";
       let reasoning = "";
-      let queries: SearchTask[] = [];
       for await (const textPart of result.textStream) {
         thinkTagStreamProcessor.processChunk(
           textPart,
