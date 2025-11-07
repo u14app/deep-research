@@ -103,6 +103,160 @@ export class GeneQueryGenerator {
     ];
   }
 
+  /**
+   * Smart mode: Dynamically generate queries based on research focus
+   * Adapts query count (6-17 queries) based on selected research focuses
+   * Balances comprehensiveness with efficiency
+   *
+   * Strategy:
+   * 1. Core queries (3-4): Always included, essential for any gene research
+   * 2. Focus-driven queries (2-4 per focus): Based on researchFocus array
+   * 3. Context-enhanced queries (0-2): Based on diseaseContext/experimentalApproach
+   *
+   * Examples:
+   * - 1 focus (function): 6-9 queries
+   * - 2 focuses (function + disease): 8-13 queries
+   * - 3 focuses (function + disease + structure): 10-17 queries
+   */
+  generateSmartQueries(): GeneSearchTask[] {
+    const queries: GeneSearchTask[] = [];
+
+    // === TIER 1: Core Queries (Always included, 3-4 queries) ===
+    console.log('[Smart Query Generation] Adding core queries...');
+    const basicInfo = this.generateBasicInfoQueries();
+    const functionQueries = this.generateFunctionQueries();
+
+    // Always include these 3 core queries
+    queries.push(
+      basicInfo[0],         // Basic gene information
+      basicInfo[1],         // Gene nomenclature
+      functionQueries[0]    // Primary molecular function
+    );
+
+    // === TIER 2: Focus-Driven Queries (2-4 queries per focus) ===
+    const focusMap: Record<string, () => GeneSearchTask[]> = {
+      'function': () => [
+        functionQueries[1],  // Biological processes
+        functionQueries[2],  // Protein domains
+      ],
+      'structure': () => {
+        const structureQueries = this.generateStructureQueries();
+        return [
+          structureQueries[0],  // 3D protein structure
+          structureQueries[1],  // Active site analysis
+        ];
+      },
+      'expression': () => {
+        const expressionQueries = this.generateExpressionQueries();
+        return [
+          expressionQueries[0],  // Tissue-specific expression
+          expressionQueries[1],  // Developmental expression
+        ];
+      },
+      'disease': () => {
+        const diseaseQueries = this.generateDiseaseQueries();
+        return diseaseQueries.slice(0, 2);  // Top 2 disease queries
+      },
+      'interaction': () => {
+        const interactionQueries = this.generateInteractionQueries();
+        return [
+          interactionQueries[0],  // Protein-protein interactions
+          interactionQueries[1],  // Protein complexes
+        ];
+      },
+      'regulation': () => {
+        const regulatoryQueries = this.generateRegulatoryQueries();
+        return [
+          regulatoryQueries[0],  // Transcription regulation
+          regulatoryQueries[2],  // Post-translational modification
+        ];
+      },
+      'pathway': () => {
+        const pathwayQueries = this.generatePathwayQueries();
+        return [
+          pathwayQueries[0],  // Metabolic pathway
+          pathwayQueries[1],  // Signaling pathway
+        ];
+      },
+      'evolution': () => {
+        const evolutionQueries = this.generateEvolutionaryQueries();
+        return [
+          evolutionQueries[0],  // Orthologs and paralogs
+        ];
+      }
+    };
+
+    // Add queries based on research focus
+    if (this.researchFocus.includes('general') || this.researchFocus.length === 0) {
+      console.log('[Smart Query Generation] General mode: adding balanced queries across all categories');
+      // For general research, add 1-2 queries from each major category
+      queries.push(
+        functionQueries[1],                                    // Biological processes
+        ...this.generateDiseaseQueries().slice(0, 1),         // Disease association
+        ...this.generateExpressionQueries().slice(0, 1),      // Expression pattern
+        ...this.generateInteractionQueries().slice(0, 1),     // Protein interactions
+      );
+      // Total: 3 (core) + 4 (general) = 7 queries
+    } else {
+      // Add focused queries based on specific research focuses
+      console.log(`[Smart Query Generation] Focus mode: ${this.researchFocus.join(', ')}`);
+      this.researchFocus.forEach(focus => {
+        const focusKey = focus.toLowerCase();
+        if (focusMap[focusKey]) {
+          const focusQueries = focusMap[focusKey]();
+          console.log(`[Smart Query Generation] Adding ${focusQueries.length} queries for focus: ${focus}`);
+          queries.push(...focusQueries);
+        }
+      });
+    }
+
+    // === TIER 3: Context-Enhanced Queries (0-2 queries) ===
+    // Add disease-specific deep-dive queries if disease context is provided
+    if (this.diseaseContext) {
+      console.log(`[Smart Query Generation] Adding disease-specific queries for: ${this.diseaseContext}`);
+      const diseaseQueries = this.generateDiseaseQueries();
+      const diseaseCtx = this.diseaseContext; // Store in const for type safety
+      // Disease-specific queries are already in generateDiseaseQueries when diseaseContext is set
+      // Add one more if not already included
+      if (!queries.some(q => q.query.includes(diseaseCtx))) {
+        queries.push(diseaseQueries[0]);
+      }
+    }
+
+    // Add experimental approach-specific queries if specified
+    if (this.experimentalApproach) {
+      console.log(`[Smart Query Generation] Adding experimental approach query: ${this.experimentalApproach}`);
+      queries.push({
+        query: `${this.geneSymbol} ${this.experimentalApproach} experimental evidence ${this.organism}`,
+        researchGoal: `Investigate experimental evidence and research findings about ${this.geneSymbol} using ${this.experimentalApproach} approaches.`,
+        database: 'pubmed',
+        priority: 'high',
+        category: 'function',
+        status: 'pending'
+      });
+    }
+
+    // Add specific aspect queries if provided
+    if (this.specificAspects && this.specificAspects.length > 0) {
+      console.log(`[Smart Query Generation] Adding specific aspect queries: ${this.specificAspects.join(', ')}`);
+      this.specificAspects.slice(0, 2).forEach(aspect => {  // Limit to 2 specific aspects
+        queries.push({
+          query: `${this.geneSymbol} ${aspect} ${this.organism}`,
+          researchGoal: `Investigate the specific aspect: ${aspect} for ${this.geneSymbol}.`,
+          database: 'pubmed',
+          priority: 'high',
+          category: 'function',
+          status: 'pending'
+        });
+      });
+    }
+
+    console.log(`[Smart Query Generation] Total queries generated: ${queries.length}`);
+    console.log(`[Smart Query Generation] Breakdown: ${queries.map(q => q.category).join(', ')}`);
+
+    return queries;
+  }
+
   private generateBasicInfoQueries(): GeneSearchTask[] {
     return [
       {

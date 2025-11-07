@@ -1040,9 +1040,9 @@ function useDeepResearch() {
             experimentalApproach
           });
 
-          // Generate quick queries (8 core queries for faster research)
-          const geneQueries = queryGenerator.generateQuickQueries();
-          console.log(`[Professional Mode] Generated ${geneQueries.length} quick queries (optimized for speed)`);
+          // Generate smart queries (dynamic count based on research focus)
+          const geneQueries = queryGenerator.generateSmartQueries();
+          console.log(`[Professional Mode] Generated ${geneQueries.length} smart queries (focus-driven optimization)`);
 
           // Convert to SearchTask format
           queries = convertGeneTasksToSearchTasks(geneQueries);
