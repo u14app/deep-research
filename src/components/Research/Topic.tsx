@@ -56,7 +56,7 @@ function Topic() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const taskStore = useTaskStore();
   const { mode, setMode } = useModeStore();
-  const { askQuestions } = useDeepResearch();
+  const { askQuestions, writeReportPlan } = useDeepResearch();
   const { hasApiKey } = useAiProvider();
   const { getKnowledgeFromFile } = useKnowledge();
   const {
@@ -164,7 +164,12 @@ function Topic() {
         }
 
         setQuestion(geneQuery);
-        await askQuestions();
+        // Professional mode: Skip askQuestions step
+        // Set query directly and go to writeReportPlan
+        // This avoids the unnecessary question-generation/feedback cycle
+        const { setQuery } = useTaskStore.getState();
+        setQuery(geneQuery);
+        await writeReportPlan();
       } finally {
         setIsThinking(false);
         accurateTimerStop();
