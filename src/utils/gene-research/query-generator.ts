@@ -34,40 +34,73 @@ export class GeneQueryGenerator {
 
     // Always include basic gene information queries
     queries.push(...this.generateBasicInfoQueries());
-    
+
     // Generate queries based on selected research focuses
     if (this.researchFocus.includes('general') || this.researchFocus.includes('function')) {
       queries.push(...this.generateFunctionQueries());
     }
-    
+
     if (this.researchFocus.includes('general') || this.researchFocus.includes('structure')) {
       queries.push(...this.generateStructureQueries());
     }
-    
+
     if (this.researchFocus.includes('general') || this.researchFocus.includes('expression')) {
       queries.push(...this.generateExpressionQueries());
     }
-    
+
     if (this.researchFocus.includes('general') || this.researchFocus.includes('interaction')) {
       queries.push(...this.generateInteractionQueries());
     }
-    
+
     if (this.researchFocus.includes('general') || this.researchFocus.includes('disease')) {
       queries.push(...this.generateDiseaseQueries());
     }
-    
+
     if (this.researchFocus.includes('general') || this.researchFocus.includes('evolution')) {
       queries.push(...this.generateEvolutionaryQueries());
     }
-    
+
     if (this.researchFocus.includes('general') || this.researchFocus.includes('therapeutic')) {
       queries.push(...this.generatePathwayQueries());
     }
-    
+
     // Always include regulatory mechanism queries as they're fundamental
     queries.push(...this.generateRegulatoryQueries());
 
     return queries;
+  }
+
+  /**
+   * Quick mode: Generate only core essential queries (8 queries)
+   * Reduces query count by ~73% while retaining critical information
+   * Recommended for faster research with acceptable information coverage
+   */
+  generateQuickQueries(): GeneSearchTask[] {
+    const basicInfo = this.generateBasicInfoQueries();
+    const functionQueries = this.generateFunctionQueries();
+    const diseaseQueries = this.generateDiseaseQueries();
+    const expressionQueries = this.generateExpressionQueries();
+    const interactionQueries = this.generateInteractionQueries();
+
+    return [
+      // Basic Information (2 queries) - Essential for gene identification
+      basicInfo[0],  // Basic information
+      basicInfo[1],  // Nomenclature and symbols
+
+      // Molecular Function (2 queries) - Core biological function
+      functionQueries[0],  // Molecular function and catalytic activity
+      functionQueries[1],  // Biological processes
+
+      // Disease Association (2 queries) - Clinical relevance
+      diseaseQueries[0],  // Disease associations
+      diseaseQueries.length > 1 ? diseaseQueries[1] : diseaseQueries[0],  // Genetic disorders
+
+      // Expression Pattern (1 query) - Where and when gene is active
+      expressionQueries[0],  // Tissue-specific expression
+
+      // Protein Interactions (1 query) - Molecular context
+      interactionQueries[0]  // Protein-protein interactions
+    ];
   }
 
   private generateBasicInfoQueries(): GeneSearchTask[] {
