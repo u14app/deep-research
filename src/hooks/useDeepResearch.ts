@@ -398,8 +398,16 @@ function useDeepResearch() {
     setStatus(t("research.common.research"));
     const plimit = Plimit(parallelSearch);
     const thinkTagStreamProcessor = new ThinkTagStreamProcessor();
+
+    // Filter out already completed tasks - only process unprocessed or failed tasks
+    const tasksToProcess = queries.filter(task =>
+      task.state === "unprocessed" || task.state === "failed"
+    );
+
+    console.log(`[runSearchTask] Total tasks: ${queries.length}, To process: ${tasksToProcess.length}, Skipped (completed): ${queries.length - tasksToProcess.length}`);
+
     await Promise.all(
-      queries.map((item) => {
+      tasksToProcess.map((item) => {
         plimit(async () => {
           let content = "";
           let reasoning = "";
