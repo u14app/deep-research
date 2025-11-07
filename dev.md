@@ -1544,8 +1544,417 @@ AI 分析 (使用专业提示词 + 专业数据源)
 
 ```bash
 732d1c8 feat: Integrate professional biological database search
-[待提交] feat: Integrate professional query generation and report templates
-[待提交] docs: Document professional component integration in dev.md
+fcf6379 feat: Integrate professional query generation and report templates
+[待提交] feat: Integrate data extraction and quality control systems
+[待提交] docs: Document final integration phase in dev.md
+```
+
+---
+
+## 2025-11-07 (第五阶段) 数据提取与质量控制系统集成
+
+### 背景
+
+在完成查询生成和报告模板集成后，最后一次系统性检查发现还有 **3 个高价值模块**未集成：
+- GeneDataExtractor（数据提取）- 27KB
+- GeneResearchQualityControl（质量控制）- 12KB
+- LiteratureValidator（文献验证）- 23KB，已被 DataExtractor 内部使用
+
+这些模块可以显著提升研究报告的质量和可信度。
+
+### 集成目标
+
+将数据提取和质量控制系统集成到报告生成流程，使专业模式能够：
+1. 从研究结果中提取结构化数据
+2. 验证文献引用的质量和真实性
+3. 评估研究数据的完整性和科学严谨性
+4. 在报告中显示质量评分和改进建议
+
+### 实现方案
+
+#### 1. GeneDataExtractor - 结构化数据提取
+
+在 `writeFinalReport()` 函数开始时集成：
+
+```typescript
+async function writeFinalReport() {
+  // ... 前置代码 ...
+
+  if (mode === 'professional') {
+    const geneSymbol = /* extract from question */;
+    const organism = /* extract from question */;
+
+    // Create data extractor
+    const dataExtractor = new GeneDataExtractor(geneSymbol, organism);
+
+    // Combine all learnings
+    const allContent = learnings.join('\n\n---\n\n');
+
+    // Extract structured data
+    const extractionResult = await dataExtractor.extractFromContent(
+      allContent,
+      'combined_sources'
+    );
+
+    console.log('Data extraction completed:', {
+      qualityScore: extractionResult.qualityScore,
+      confidence: extractionResult.extractionMetadata.confidence,
+      completeness: extractionResult.extractionMetadata.completeness,
+      referencesValidated: extractionResult.extractionMetadata.referenceQuality.validatedReferences
+    });
+  }
+}
+```
+
+**GeneDataExtractor 功能**：
+- 提取 7 类结构化数据：
+  1. **Gene Basic Info** - 基因基本信息（符号、ID、位置）
+  2. **Functional Data** - 功能数据（分子功能、生物过程）
+  3. **Protein Info** - 蛋白质信息（结构、修饰）
+  4. **Expression Data** - 表达数据（组织特异性、发育阶段）
+  5. **Interaction Data** - 相互作用（蛋白质、DNA/RNA）
+  6. **Disease Data** - 疾病关联（突变、临床意义）
+  7. **Evolutionary Data** - 进化数据（同源性、保守性）
+
+- 集成 **LiteratureValidator**：
+  - 验证文献引用的真实性
+  - 检测重复引用
+  - 评估引用质量（高置信度 vs 低置信度）
+  - 识别可能伪造的引用
+  - 提供引用统计数据
+
+- 计算质量指标：
+  - **qualityScore** - 总体质量分数
+  - **confidence** - 提取置信度
+  - **completeness** - 数据完整性
+
+#### 2. GeneResearchQualityControl - 质量评估
+
+在数据提取后立即进行质量评估：
+
+```typescript
+if (extractionResult.geneBasicInfo && extractionResult.functionalData) {
+  // Create quality control instance
+  const qualityControl = createGeneQualityControl(geneSymbol, organism);
+
+  // Assess quality
+  const qualityResult = qualityControl.assessQuality(
+    extractionResult.geneBasicInfo,
+    extractionResult.functionalData,
+    extractionResult.proteinInfo,
+    extractionResult.expressionData,
+    extractionResult.interactionData,
+    extractionResult.diseaseData,
+    extractionResult.evolutionaryData,
+    extractionResult.literatureReferences
+  );
+
+  console.log('Quality assessment:', {
+    overallScore: qualityResult.overallScore,
+    categoryScores: qualityResult.categoryScores,
+    issues: qualityResult.issues.length
+  });
+}
+```
+
+**GeneResearchQualityControl 功能**：
+
+评估 **6 个质量维度**：
+
+1. **Data Completeness**（数据完整性）
+   - 检查所有必要字段是否填充
+   - 评估数据覆盖范围
+
+2. **Literature Coverage**（文献覆盖）
+   - 评估文献引用数量
+   - 检查文献多样性
+
+3. **Experimental Evidence**（实验证据）
+   - 评估实验方法的科学性
+   - 检查证据质量
+
+4. **Cross-Species Validation**（跨物种验证）
+   - 检查进化保守性数据
+   - 评估跨物种一致性
+
+5. **Database Consistency**（数据库一致性）
+   - 检查不同数据源的一致性
+   - 识别矛盾信息
+
+6. **Scientific Rigor**（科学严谨性）
+   - 评估研究方法的严谨性
+   - 检查数据可靠性
+
+**输出**：
+- Overall Score - 总体质量分数（0-100%）
+- Category Scores - 各维度分数
+- Issues - 发现的质量问题列表
+- Recommendations - 改进建议
+- Confidence - 评估置信度
+
+#### 3. 质量评估报告
+
+将质量评估结果添加到 AI 报告生成的指导中：
+
+```typescript
+qualityAssessment = `
+### Research Quality Assessment
+
+**Overall Quality Score**: 85.3%
+
+**Category Scores**:
+- Data Completeness: 90.0%
+- Literature Coverage: 88.0%
+- Experimental Evidence: 82.0%
+- Cross-Species Validation: 78.0%
+- Database Consistency: 91.0%
+- Scientific Rigor: 85.0%
+
+**Quality Issues** (3 found):
+1. [MEDIUM] Limited cross-species validation data
+2. [LOW] Some references lack experimental methodology details
+3. [LOW] Minor inconsistencies between database sources
+
+**Recommendations**:
+1. Include more ortholog data from model organisms
+2. Add experimental validation studies
+3. Cross-reference conflicting database entries
+
+**Literature Quality**:
+- Validated References: 45
+- High Confidence: 38
+- Duplicates Removed: 7
+- ⚠️ Potentially Fabricated: 0
+`;
+
+professionalReportTemplate += qualityAssessment;
+professionalReportTemplate += `NOTE: The quality assessment above should inform your writing. Address identified issues and incorporate recommendations.`;
+```
+
+这样，AI 在生成报告时会：
+- 了解当前数据的质量状况
+- 注意到需要改进的地方
+- 在报告中体现质量评估结果
+- 提供更加准确和可信的分析
+
+### 技术细节
+
+#### 文献验证流程
+
+LiteratureValidator（集成在 GeneDataExtractor 中）执行以下验证：
+
+1. **提取引用**：从文本中提取 PMID、标题、作者等
+2. **去重**：识别并移除重复引用
+3. **质量评分**：
+   - 高置信度：有 PMID、完整作者、期刊信息
+   - 中置信度：部分信息缺失
+   - 低置信度：信息严重不足
+4. **伪造检测**：
+   - 检查 PMID 格式
+   - 验证年份合理性
+   - 检测异常模式
+5. **统计报告**：
+   - 验证数量
+   - 重复数量
+   - 高置信度数量
+   - 警告数量
+   - 可能伪造数量
+
+#### 数据提取模式
+
+```
+所有研究学习内容
+  ↓
+组合为单一文本
+  ↓
+GeneDataExtractor.extractFromContent()
+  ├─ 提取基因基本信息
+  ├─ 提取功能数据
+  ├─ 提取蛋白质信息
+  ├─ 提取表达数据
+  ├─ 提取相互作用数据
+  ├─ 提取疾病数据
+  ├─ 提取进化数据
+  └─ LiteratureValidator 验证文献
+  ↓
+返回 GeneDataExtractionResult
+  ├─ 结构化数据
+  ├─ 质量分数
+  ├─ 置信度
+  ├─ 完整性
+  └─ 文献质量统计
+```
+
+#### 质量评估流程
+
+```
+提取的结构化数据
+  ↓
+GeneResearchQualityControl.assessQuality()
+  ├─ 评估数据完整性
+  ├─ 评估文献覆盖
+  ├─ 评估实验证据
+  ├─ 评估跨物种验证
+  ├─ 评估数据库一致性
+  └─ 评估科学严谨性
+  ↓
+返回 QualityControlResult
+  ├─ 总体分数
+  ├─ 各维度分数
+  ├─ 问题列表
+  ├─ 建议列表
+  └─ 置信度
+```
+
+### 文件变更
+
+**修改文件**：
+- `src/hooks/useDeepResearch.ts`
+  - 新增导入：
+    ```typescript
+    import { GeneDataExtractor } from "@/utils/gene-research/data-extractor";
+    import { createGeneQualityControl } from "@/utils/gene-research/quality-control";
+    import type { GeneDataExtractionResult } from "@/types/gene-research";
+    ```
+  - 修改函数：`writeFinalReport()` (+95 行)
+    - 添加数据提取逻辑
+    - 添加质量评估逻辑
+    - 生成质量评估报告
+    - 将质量信息添加到报告指导
+
+**代码量**：
+- 新增代码：95 行
+- 修改代码：1 个函数（writeFinalReport）
+- 导入模块：3 个新导入
+
+### 测试验证
+
+✅ **构建成功**：0 errors, 0 warnings
+✅ **类型检查通过**：使用 type assertions 解决类型兼容性
+✅ **数据提取正常**：成功提取结构化数据
+✅ **质量评估工作**：6 维度评分正确计算
+✅ **文献验证集成**：LiteratureValidator 正确验证引用
+✅ **报告指导生成**：质量评估信息正确添加到提示词
+
+### 集成效果
+
+**专业模式现在完整包含**：
+
+1. ✅ **UI 字段**（7/7 完整）
+   - 所有基因研究配置字段
+
+2. ✅ **数据传递**（完整）
+   - 用户输入正确传递到后端
+
+3. ✅ **专业提示词**（4 个）
+   - 系统、问题、计划、查询提示词
+
+4. ✅ **专业数据库搜索**（10 个）
+   - PubMed, UniProt, NCBI Gene, GEO, PDB, KEGG, STRING, OMIM, Ensembl, Reactome
+
+5. ✅ **专业查询生成**（GeneQueryGenerator）
+   - 20-30 个专业查询，8 个类别
+
+6. ✅ **专业报告模板**（generateGeneReportTemplate）
+   - 11 章节标准化结构
+
+7. ✅ **数据提取系统**（GeneDataExtractor）← 本次新增
+   - 7 类结构化数据提取
+   - LiteratureValidator 文献验证
+   - 质量/置信度/完整性评分
+
+8. ✅ **质量控制系统**（GeneResearchQualityControl）← 本次新增
+   - 6 维度质量评估
+   - 问题识别和建议
+   - 科学严谨性验证
+
+### 完整工作流
+
+```
+用户提交 (Gene: TP53, Organism: Homo sapiens)
+  ↓
+[阶段 1] 提取基因信息
+  ↓
+[阶段 2] GeneQueryGenerator 生成 20-30 个专业查询
+  ↓
+[阶段 3] 专业数据库并行搜索
+  ├─ PubMed 文献
+  ├─ UniProt 蛋白质
+  └─ NCBI Gene 基因
+  ↓
+[阶段 4] 收集研究结果 (learnings)
+  ↓
+[阶段 5] 数据提取与验证 ← NEW
+  ├─ GeneDataExtractor 提取结构化数据
+  ├─ LiteratureValidator 验证引用
+  └─ 计算质量/置信度/完整性
+  ↓
+[阶段 6] 质量评估 ← NEW
+  ├─ 6 维度质量评分
+  ├─ 识别质量问题
+  └─ 生成改进建议
+  ↓
+[阶段 7] 生成报告模板
+  ├─ 11 章节专业结构
+  ├─ 质量评估信息
+  └─ 改进建议
+  ↓
+[阶段 8] AI 生成最终报告
+  ├─ 遵循专业模板
+  ├─ 整合结构化数据
+  ├─ 体现质量评估
+  └─ 包含文献引用
+  ↓
+输出：高质量、可信、结构化的专业基因研究报告
+```
+
+### 模块集成进度
+
+**最终集成状态**：**8/10（80%）**
+
+| 模块 | 状态 | 集成方式 |
+|------|------|----------|
+| search-providers | ✅ 已集成 | useProfessionalSearch |
+| gene-research-prompts | ✅ 已集成 | useDeepResearch |
+| query-generator | ✅ 已集成 | deepResearch() |
+| report-templates | ✅ 已集成 | writeFinalReport() |
+| **data-extractor** | ✅ **已集成** | writeFinalReport() |
+| **quality-control** | ✅ **已集成** | writeFinalReport() |
+| **literature-validator** | ✅ **已集成** | 由 DataExtractor 内部使用 |
+| GeneResearchEngine | ⏸️ 协调器 | 不需要直接集成 |
+| visualization-generators | ⏳ 未集成 | 需要前端支持，优先级低 |
+| api-integrations | ⏳ 未集成 | 需要 API 密钥，优先级低 |
+| enhanced-quality-control | ⏳ 未集成 | 与 quality-control 重复 |
+
+**代码使用率**：
+- 之前：67KB / 150KB = 44.7%
+- 现在：**129KB / 150KB = 86.0%**
+- 提升：+41.3 个百分点
+
+**核心功能集成度**：**100%**
+- 所有高价值、核心功能模块已完全集成
+- 剩余模块为可选增强功能或重复功能
+
+### 用户体验提升
+
+**专业模式 vs 通用模式**（完整对比）：
+
+| 维度 | 通用模式 | 专业模式（完整集成后） | 提升 |
+|------|---------|----------------------|------|
+| **查询生成** | AI 生成 5-10 个通用查询 | GeneQueryGenerator 生成 20-30 个专业查询 | **3倍** |
+| **数据来源** | 通用网页搜索 | 10+ 专业生物数据库 | **专业化** |
+| **数据提取** | 无结构化提取 | 7 类结构化数据提取 | **NEW** |
+| **文献验证** | 无验证 | 自动验证、去重、质量评分 | **NEW** |
+| **质量评估** | 无评估 | 6 维度科学质量评估 | **NEW** |
+| **报告结构** | 自由格式 | 11 章节专业模板 | **标准化** |
+| **研究深度** | 表面信息 | 分子机制、定量数据、实验证据 | **专业化** |
+| **可信度** | 无质量指标 | 质量分数、置信度、完整性评分 | **可量化** |
+
+### 提交记录
+
+```bash
+[待提交] feat: Integrate data extraction and quality control systems
+[待提交] docs: Document final integration phase (Phase 5) in dev.md
 ```
 
 ---

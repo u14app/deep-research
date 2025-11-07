@@ -41,7 +41,9 @@ import {
 } from "@/constants/gene-research-prompts";
 import { createGeneQueryGenerator } from "@/utils/gene-research/query-generator";
 import { generateGeneReportTemplate } from "@/utils/gene-research/report-templates";
-import type { GeneSearchTask } from "@/types/gene-research";
+import { GeneDataExtractor } from "@/utils/gene-research/data-extractor";
+import { createGeneQualityControl } from "@/utils/gene-research/quality-control";
+import type { GeneSearchTask, GeneDataExtractionResult } from "@/types/gene-research";
 import { isNetworkingModel } from "@/utils/model";
 import { ThinkTagStreamProcessor, removeJsonMarkdown } from "@/utils/text";
 import { parseError } from "@/utils/error";
@@ -665,8 +667,10 @@ function useDeepResearch() {
     const enableFileFormatResource = useFileFormatResource === "enable";
     const thinkTagStreamProcessor = new ThinkTagStreamProcessor();
 
-    // Professional mode: Generate gene research report template
+    // Professional mode: Extract data and assess quality
     let professionalReportTemplate = "";
+    let qualityAssessment = "";
+
     if (mode === 'professional') {
       const geneSymbolMatch = question.match(/Gene:\s*(\w+)/i);
       const organismMatch = question.match(/Organism:\s*([^,]+)/i);
@@ -675,6 +679,86 @@ function useDeepResearch() {
         const geneSymbol = geneSymbolMatch[1].trim();
         const organism = organismMatch[1].trim();
 
+        console.log(`[Professional Mode] Extracting structured data for ${geneSymbol}`);
+
+        // Extract structured data from learnings
+        const dataExtractor = new GeneDataExtractor(geneSymbol, organism);
+        let combinedExtractionResult: Partial<GeneDataExtractionResult> | null = null;
+
+        try {
+          // Combine all learnings into one text for extraction
+          const allContent = learnings.join('\n\n---\n\n');
+          const sourceName = sources.length > 0 ? sources[0].url : 'combined_sources';
+
+          combinedExtractionResult = await dataExtractor.extractFromContent(allContent, sourceName);
+
+          console.log(`[Professional Mode] Data extraction completed:`, {
+            qualityScore: combinedExtractionResult.qualityScore,
+            confidence: combinedExtractionResult.extractionMetadata?.confidence,
+            completeness: combinedExtractionResult.extractionMetadata?.completeness,
+            referencesValidated: (combinedExtractionResult.extractionMetadata as any)?.referenceQuality?.validatedReferences
+          });
+
+          // Assess quality if we have sufficient data
+          if (combinedExtractionResult.geneBasicInfo && combinedExtractionResult.functionalData) {
+            console.log(`[Professional Mode] Performing quality assessment`);
+
+            const qualityControl = createGeneQualityControl(geneSymbol, organism);
+            const qualityResult = qualityControl.assessQuality(
+              combinedExtractionResult.geneBasicInfo,
+              combinedExtractionResult.functionalData,
+              combinedExtractionResult.proteinInfo!,
+              combinedExtractionResult.expressionData!,
+              combinedExtractionResult.interactionData!,
+              combinedExtractionResult.diseaseData || [],
+              combinedExtractionResult.evolutionaryData!,
+              combinedExtractionResult.literatureReferences || []
+            );
+
+            console.log(`[Professional Mode] Quality assessment completed:`, {
+              overallScore: (qualityResult.overallScore * 100).toFixed(1) + '%',
+              dataCompleteness: (qualityResult.categoryScores.dataCompleteness * 100).toFixed(1) + '%',
+              literatureCoverage: (qualityResult.categoryScores.literatureCoverage * 100).toFixed(1) + '%',
+              issues: qualityResult.issues.length
+            });
+
+            // Add quality assessment to report guidance
+            qualityAssessment = `\n\n### Research Quality Assessment\n\n**Overall Quality Score**: ${(qualityResult.overallScore * 100).toFixed(1)}%\n\n**Category Scores**:\n- Data Completeness: ${(qualityResult.categoryScores.dataCompleteness * 100).toFixed(1)}%\n- Literature Coverage: ${(qualityResult.categoryScores.literatureCoverage * 100).toFixed(1)}%\n- Experimental Evidence: ${(qualityResult.categoryScores.experimentalEvidence * 100).toFixed(1)}%\n- Cross-Species Validation: ${(qualityResult.categoryScores.crossSpeciesValidation * 100).toFixed(1)}%\n- Database Consistency: ${(qualityResult.categoryScores.databaseConsistency * 100).toFixed(1)}%\n- Scientific Rigor: ${(qualityResult.categoryScores.scientificRigor * 100).toFixed(1)}%\n\n`;
+
+            if (qualityResult.issues.length > 0) {
+              qualityAssessment += `**Quality Issues** (${qualityResult.issues.length} found):\n`;
+              qualityResult.issues.slice(0, 5).forEach((issue, idx) => {
+                qualityAssessment += `${idx + 1}. [${issue.severity.toUpperCase()}] ${issue.description}\n`;
+              });
+              qualityAssessment += '\n';
+            }
+
+            if (qualityResult.recommendations.length > 0) {
+              qualityAssessment += `**Recommendations**:\n`;
+              qualityResult.recommendations.slice(0, 5).forEach((rec, idx) => {
+                qualityAssessment += `${idx + 1}. ${rec}\n`;
+              });
+              qualityAssessment += '\n';
+            }
+
+            // Add literature quality info if available
+            const refQuality = (combinedExtractionResult.extractionMetadata as any)?.referenceQuality;
+            if (refQuality) {
+              qualityAssessment += `**Literature Quality**:\n`;
+              qualityAssessment += `- Validated References: ${refQuality.validatedReferences}\n`;
+              qualityAssessment += `- High Confidence: ${refQuality.highConfidenceReferences}\n`;
+              qualityAssessment += `- Duplicates Removed: ${refQuality.duplicateReferences}\n`;
+              if (refQuality.potentiallyFabricated > 0) {
+                qualityAssessment += `- ⚠️ Potentially Fabricated: ${refQuality.potentiallyFabricated}\n`;
+              }
+              qualityAssessment += '\n';
+            }
+          }
+        } catch (error) {
+          console.error('[Professional Mode] Data extraction error:', error);
+        }
+
+        // Generate report template
         console.log(`[Professional Mode] Generating professional report template for ${geneSymbol}`);
 
         const template = generateGeneReportTemplate(
@@ -689,7 +773,7 @@ function useDeepResearch() {
           .map(section => `## ${section.title}\n${section.subsections ? section.subsections.map(sub => `### ${sub.title}`).join('\n') : ''}`)
           .join('\n\n');
 
-        professionalReportTemplate = `\n\nIMPORTANT: Structure your report according to the following professional gene research template:\n\n${sectionStructure}\n\nEnsure each section includes:\n- Specific molecular details\n- Quantitative data where available\n- Literature citations\n- Experimental evidence\n\n`;
+        professionalReportTemplate = `\n\nIMPORTANT: Structure your report according to the following professional gene research template:\n\n${sectionStructure}\n\nEnsure each section includes:\n- Specific molecular details\n- Quantitative data where available\n- Literature citations\n- Experimental evidence\n\n${qualityAssessment}NOTE: The quality assessment above should inform your writing. Address any identified issues and incorporate recommendations where relevant.\n\n`;
       }
     }
 
