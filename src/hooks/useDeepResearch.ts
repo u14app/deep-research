@@ -18,6 +18,7 @@ import { useTaskStore } from "@/store/task";
 import { useHistoryStore } from "@/store/history";
 import { useSettingStore } from "@/store/setting";
 import { useKnowledgeStore } from "@/store/knowledge";
+import { useModeStore } from "@/store/mode";
 import { outputGuidelinesPrompt } from "@/constants/prompts";
 import {
   getSystemPrompt,
@@ -31,6 +32,12 @@ import {
   writeFinalReportPrompt,
   getSERPQuerySchema,
 } from "@/utils/deep-research/prompts";
+import {
+  geneResearchSystemInstruction,
+  geneResearchQuestionPrompt,
+  geneReportPlanPrompt,
+  geneSerpQueriesPrompt,
+} from "@/constants/gene-research-prompts";
 import { isNetworkingModel } from "@/utils/model";
 import { ThinkTagStreamProcessor, removeJsonMarkdown } from "@/utils/text";
 import { parseError } from "@/utils/error";
@@ -63,6 +70,39 @@ function useDeepResearch() {
   const { createModelProvider, getModel } = useModelProvider();
   const { search } = useWebSearch();
   const [status, setStatus] = useState<string>("");
+
+  // Helper functions to select prompts based on mode
+  function getModeAwareSystemPrompt(): string {
+    const { mode } = useModeStore.getState();
+    if (mode === 'professional') {
+      return geneResearchSystemInstruction.replace('{now}', new Date().toISOString());
+    }
+    return getSystemPrompt();
+  }
+
+  function getModeAwareQuestionsPrompt(query: string): string {
+    const { mode } = useModeStore.getState();
+    if (mode === 'professional') {
+      return geneResearchQuestionPrompt.replace('{query}', query);
+    }
+    return generateQuestionsPrompt(query);
+  }
+
+  function getModeAwareReportPlanPrompt(query: string): string {
+    const { mode } = useModeStore.getState();
+    if (mode === 'professional') {
+      return geneReportPlanPrompt.replace('{query}', query);
+    }
+    return writeReportPlanPrompt(query);
+  }
+
+  function getModeAwareSerpQueriesPrompt(plan: string): string {
+    const { mode } = useModeStore.getState();
+    if (mode === 'professional') {
+      return geneSerpQueriesPrompt.replace('{plan}', plan);
+    }
+    return generateSerpQueriesPrompt(plan);
+  }
 
   async function generateSearchSettings(searchModel: string) {
     const { provider, enableSearch, searchProvider, searchMaxResult } =
@@ -145,9 +185,9 @@ function useDeepResearch() {
     const searchSettings = await generateSearchSettings(thinkingModel);
     const result = streamText({
       ...searchSettings,
-      system: getSystemPrompt(),
+      system: getModeAwareSystemPrompt(),
       prompt: [
-        generateQuestionsPrompt(question),
+        getModeAwareQuestionsPrompt(question),
         getResponseLanguagePrompt(),
       ].join("\n\n"),
       experimental_transform: smoothTextStream(smoothTextStreamType),
@@ -183,8 +223,8 @@ function useDeepResearch() {
     const searchSettings = await generateSearchSettings(thinkingModel);
     const result = streamText({
       ...searchSettings,
-      system: getSystemPrompt(),
-      prompt: [writeReportPlanPrompt(query), getResponseLanguagePrompt()].join(
+      system: getModeAwareSystemPrompt(),
+      prompt: [getModeAwareReportPlanPrompt(query), getResponseLanguagePrompt()].join(
         "\n\n"
       ),
       experimental_transform: smoothTextStream(smoothTextStreamType),
@@ -230,7 +270,7 @@ function useDeepResearch() {
     const thinkTagStreamProcessor = new ThinkTagStreamProcessor();
     const searchResult = streamText({
       model: await createModelProvider(networkingModel),
-      system: getSystemPrompt(),
+      system: getModeAwareSystemPrompt(),
       prompt: [
         processSearchKnowledgeResultPrompt(query, researchGoal, knowledges),
         getResponseLanguagePrompt(),
@@ -330,7 +370,7 @@ function useDeepResearch() {
                 sources.length > 0 && references === "enable";
               searchResult = streamText({
                 model: await createModelProvider(networkingModel),
-                system: getSystemPrompt(),
+                system: getModeAwareSystemPrompt(),
                 prompt: [
                   processSearchResultPrompt(
                     item.query,
@@ -349,7 +389,7 @@ function useDeepResearch() {
               );
               searchResult = streamText({
                 ...searchSettings,
-                system: getSystemPrompt(),
+                system: getModeAwareSystemPrompt(),
                 prompt: [
                   processResultPrompt(item.query, item.researchGoal),
                   getResponseLanguagePrompt(),
@@ -361,7 +401,7 @@ function useDeepResearch() {
           } else {
             searchResult = streamText({
               model: await createModelProvider(networkingModel),
-              system: getSystemPrompt(),
+              system: getModeAwareSystemPrompt(),
               prompt: [
                 processResultPrompt(item.query, item.researchGoal),
                 getResponseLanguagePrompt(),
@@ -460,7 +500,7 @@ function useDeepResearch() {
     const thinkTagStreamProcessor = new ThinkTagStreamProcessor();
     const result = streamText({
       model: await createModelProvider(thinkingModel),
-      system: getSystemPrompt(),
+      system: getModeAwareSystemPrompt(),
       prompt: [
         reviewSerpQueriesPrompt(reportPlan, learnings, suggestion),
         getResponseLanguagePrompt(),
@@ -599,7 +639,7 @@ function useDeepResearch() {
 
     const result = streamText({
       model: await createModelProvider(thinkingModel),
-      system: [getSystemPrompt(), outputGuidelinesPrompt].join("\n\n"),
+      system: [getModeAwareSystemPrompt(), outputGuidelinesPrompt].join("\n\n"),
       messages: [
         {
           role: "user",
@@ -666,9 +706,9 @@ function useDeepResearch() {
       const thinkTagStreamProcessor = new ThinkTagStreamProcessor();
       const result = streamText({
         model: await createModelProvider(thinkingModel),
-        system: getSystemPrompt(),
+        system: getModeAwareSystemPrompt(),
         prompt: [
-          generateSerpQueriesPrompt(reportPlan),
+          getModeAwareSerpQueriesPrompt(reportPlan),
           getResponseLanguagePrompt(),
         ].join("\n\n"),
         experimental_transform: smoothTextStream(smoothTextStreamType),

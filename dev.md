@@ -863,6 +863,216 @@ b5445de feat: Add complete gene research configuration fields
 
 ---
 
+## 2025-11-07 (第二阶段) 专业提示词系统集成
+
+### 背景
+
+在完成 UI 字段和数据流修复后，发现虽然所有配置字段都能正确传递，但研究过程仍使用通用提示词，没有利用专业的基因研究提示词系统。
+
+### 集成目标
+
+将 `src/constants/gene-research-prompts.ts` 中的专业提示词集成到主研究流程中，使专业模式真正使用针对分子生物学优化的提示词。
+
+### 实现方案
+
+#### 1. 模式感知提示词选择
+
+在 `src/hooks/useDeepResearch.ts` 中添加辅助函数，根据当前模式动态选择提示词：
+
+```typescript
+// Helper functions to select prompts based on mode
+function getModeAwareSystemPrompt(): string {
+  const { mode } = useModeStore.getState();
+  if (mode === 'professional') {
+    return geneResearchSystemInstruction.replace('{now}', new Date().toISOString());
+  }
+  return getSystemPrompt();
+}
+
+function getModeAwareQuestionsPrompt(query: string): string {
+  const { mode } = useModeStore.getState();
+  if (mode === 'professional') {
+    return geneResearchQuestionPrompt.replace('{query}', query);
+  }
+  return generateQuestionsPrompt(query);
+}
+
+function getModeAwareReportPlanPrompt(query: string): string {
+  const { mode } = useModeStore.getState();
+  if (mode === 'professional') {
+    return geneReportPlanPrompt.replace('{query}', query);
+  }
+  return writeReportPlanPrompt(query);
+}
+
+function getModeAwareSerpQueriesPrompt(plan: string): string {
+  const { mode } = useModeStore.getState();
+  if (mode === 'professional') {
+    return geneSerpQueriesPrompt.replace('{plan}', plan);
+  }
+  return generateSerpQueriesPrompt(plan);
+}
+```
+
+#### 2. 全局替换提示词调用
+
+使用模式感知函数替换所有直接调用：
+
+**替换映射**：
+- `getSystemPrompt()` → `getModeAwareSystemPrompt()`
+- `generateQuestionsPrompt(query)` → `getModeAwareQuestionsPrompt(query)`
+- `writeReportPlanPrompt(query)` → `getModeAwareReportPlanPrompt(query)`
+- `generateSerpQueriesPrompt(plan)` → `getModeAwareSerpQueriesPrompt(plan)`
+
+**影响的函数**：
+- `askQuestions()` - 生成研究问题
+- `writeReportPlan()` - 生成研究计划
+- `searchLocalKnowledges()` - 搜索本地知识库
+- `searchWeb()` - 网页搜索
+- `deepResearch()` - 深度研究主流程
+- `writeFinalReport()` - 生成最终报告
+- 所有其他使用 streamText 的函数
+
+#### 3. 专业提示词的优势
+
+**geneResearchSystemInstruction** 针对分子生物学优化：
+```typescript
+- Focus specifically on gene function, protein structure, regulatory mechanisms
+- Prioritize primary literature from PubMed, NCBI, UniProt, and specialized databases
+- Include quantitative data (Kd values, expression levels, mutation effects)
+- Analyze gene function across different organisms and evolutionary contexts
+- Consider both normal and pathological gene function
+- Emphasize experimental evidence over computational predictions
+- Include structural biology insights when relevant
+- Use precise molecular biology terminology and gene nomenclature
+- Always provide proper scientific citations with DOI/PMID
+```
+
+**排除非相关内容**：
+```typescript
+**CRITICAL: Do NOT include sections that are not relevant to gene function research:**
+- Data Availability & Reproducibility Bundle
+- Code & Protocols
+- Strain & Plasmid Requests
+- Materials and Methods (unless specifically about experiments)
+- Supplementary Information
+- Author Contributions
+- Funding Information
+- Competing Interests
+- Ethics Statements
+```
+
+**geneReportPlanPrompt** 包含10个专业研究部分：
+1. Gene Overview - 基因概述
+2. Molecular Function - 分子功能
+3. Protein Structure - 蛋白质结构
+4. Regulatory Mechanisms - 调控机制
+5. Expression Patterns - 表达模式
+6. Protein Interactions - 蛋白质相互作用
+7. Evolutionary Conservation - 进化保守性
+8. Disease Associations - 疾病关联
+9. Therapeutic Implications - 治疗意义
+10. Research Gaps - 研究空白
+
+### 代码变更
+
+**文件**: `src/hooks/useDeepResearch.ts`
+
+**新增导入**:
+```typescript
+import { useModeStore } from "@/store/mode";
+import {
+  geneResearchSystemInstruction,
+  geneResearchQuestionPrompt,
+  geneReportPlanPrompt,
+  geneSerpQueriesPrompt,
+} from "@/constants/gene-research-prompts";
+```
+
+**新增函数**: 4 个模式感知提示词选择器（见上文）
+
+**修改函数**: 替换所有直接提示词调用为模式感知调用
+
+### 技术细节
+
+#### 运行时模式检测
+
+```typescript
+const { mode } = useModeStore.getState();
+if (mode === 'professional') {
+  // Use gene research prompts
+} else {
+  // Use general research prompts
+}
+```
+
+每次生成提示词时都会检查当前模式，确保使用正确的提示词集合。
+
+#### 占位符替换
+
+专业提示词使用占位符模板：
+- `{now}` - 当前日期时间
+- `{query}` - 用户查询
+- `{plan}` - 研究计划
+
+示例：
+```typescript
+geneResearchSystemInstruction.replace('{now}', new Date().toISOString())
+geneResearchQuestionPrompt.replace('{query}', query)
+```
+
+### 测试验证
+
+✅ 构建成功，无错误和警告
+✅ 模式切换正常工作
+✅ 专业模式使用基因研究提示词
+✅ 普通模式使用通用研究提示词
+✅ 所有研究阶段都正确使用模式感知提示词
+
+### 影响
+
+现在专业模式（DeepGeneResearch）的完整研究流程包括：
+
+**完整数据流**：
+```
+UI 输入 (GeneInput - 7 字段)
+  ↓
+表单提交 (handleGeneResearchSubmit - 使用所有字段)
+  ↓
+查询构建 (mode-adapter - 生成专业提示词)
+  ↓
+研究执行 (useDeepResearch - 使用基因研究系统提示词)
+  ↓
+  ├─ askQuestions() - geneResearchQuestionPrompt
+  ├─ writeReportPlan() - geneReportPlanPrompt
+  ├─ deepResearch() - geneSerpQueriesPrompt
+  └─ writeFinalReport() - geneResearchSystemInstruction
+  ↓
+AI 响应 (分子生物学专业内容)
+```
+
+**已集成组件**：
+- ✅ UI 字段（7/7）
+- ✅ 数据传递（完整）
+- ✅ 查询构建（包含所有字段）
+- ✅ 专业提示词（4 个核心提示词）
+- ✅ 模式感知切换（动态选择）
+
+**仍待集成**：
+- ⏳ GeneResearchEngine（完整引擎）
+- ⏳ 专业搜索提供商（10+ 生物数据库）
+- ⏳ 数据提取和处理模块
+- ⏳ 质量控制和验证系统
+- ⏳ 可视化生成器
+
+### 提交记录
+
+```bash
+[待提交] feat: Integrate gene research prompts into useDeepResearch hook
+```
+
+---
+
 ## 未来计划
 
 ### 短期目标
