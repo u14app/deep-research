@@ -494,6 +494,375 @@ HSL 转换：
 
 ---
 
+## 2025-11-07 DeepGeneResearch功能完善与缺失功能修复
+
+### 问题发现
+
+在用户测试时发现，尽管已经合并了 DeepGeneResearch 仓库的代码，但很多关键功能并未真正集成到主应用中：
+
+#### 1. UI 字段缺失
+
+原始的 DeepGeneResearch 界面包含 7 个配置字段，但初始整合只实现了 4 个：
+
+**已实现**（初始版本）：
+- ✅ Gene Symbol（基因符号） - 必填
+- ✅ Organism（物种） - 文本输入，初版
+- ✅ Research Focus（研究焦点） - 7个多选项
+- ✅ Disease Context（疾病背景） - 可选
+
+**缺失字段**（发现后补充）：
+- ❌ Specific Aspects（特定研究方面） - 8个多选项
+- ❌ Experimental Approach（实验方法） - 可选文本
+- ❌ Research Question（研究问题） - 可选大文本框
+
+#### 2. 后端处理缺失
+
+检查 `src/components/Research/Topic.tsx` 中的 `handleGeneResearchSubmit` 函数，发现只是简单拼接字符串：
+
+```typescript
+// 原始实现 - 只使用了部分字段
+const geneQuery = `Gene: ${data.geneSymbol}, Organism: ${data.organism}, Focus: ${data.researchFocus.join(', ')}${data.diseaseContext ? `, Disease: ${data.diseaseContext}` : ''}`;
+setQuestion(geneQuery);
+await askQuestions();
+```
+
+问题：
+- 没有使用 `specificAspects`、`experimentalApproach`、`researchQuestion` 字段
+- 没有调用任何 gene-research 专业模块
+- 没有使用基因研究专用提示词
+
+#### 3. 专业功能未集成
+
+发现以下高价值模块存在但未使用：
+
+**存在的专业模块**（`src/utils/gene-research/`）：
+```
+- api-integrations.ts (19KB) - 10+ 生物数据库 API 集成
+- data-extractor.ts (27KB) - 基因数据提取和处理
+- query-generator.ts (19KB) - 智能查询生成
+- search-providers.ts (22KB) - 专业搜索提供商
+- literature-validator.ts (23KB) - 文献验证和质量控制
+- enhanced-quality-control.ts (12KB) - 增强质量控制
+- report-templates.ts (28KB) - 专业报告模板
+- visualization-generators.ts (18KB) - 数据可视化生成
+- index.ts - GeneResearchEngine 完整引擎
+```
+
+**专业提示词**（`src/constants/gene-research-prompts.ts`）：
+```typescript
+- geneResearchSystemInstruction - 专业基因研究系统指令
+- geneResearchQuestionPrompt - 基因研究问题生成提示词
+- geneReportPlanPrompt - 基因研究计划提示词
+- geneSerpQueriesPrompt - 基因研究 SERP 查询提示词
+```
+
+这些模块都没有被主应用调用！
+
+### 修复措施
+
+#### 阶段 1：UI 字段补全
+
+**1. 添加 Organism 下拉选择器** (Commit: `179fbeb`)
+
+```typescript
+// 替换纯文本输入为下拉选择
+const organismOptions = [
+  { value: 'Homo sapiens', label: 'Homo sapiens (Human)' },
+  { value: 'Mus musculus', label: 'Mus musculus (Mouse)' },
+  { value: 'Rattus norvegicus', label: 'Rattus norvegicus (Rat)' },
+  { value: 'Danio rerio', label: 'Danio rerio (Zebrafish)' },
+  { value: 'Drosophila melanogaster', label: 'Drosophila melanogaster (Fruit fly)' },
+  { value: 'Caenorhabditis elegans', label: 'Caenorhabditis elegans (C. elegans)' },
+  { value: 'Saccharomyces cerevisiae', label: 'Saccharomyces cerevisiae (Yeast)' },
+  { value: 'Escherichia coli', label: 'Escherichia coli (E. coli)' },
+  { value: 'Arabidopsis thaliana', label: 'Arabidopsis thaliana (Thale cress)' },
+];
+```
+
+**2. 添加 i18n 翻译** (Commit: `dafa569`)
+
+为 Organism 下拉选择器添加 4 种语言的翻译：
+- en-US, zh-CN, es-ES, vi-VN
+- 补全了 es-ES 和 vi-VN 中缺失的 mode 和 geneResearch 部分
+
+**3. 添加三个缺失字段** (Commit: `b5445de`)
+
+```typescript
+// 更新 schema 以支持所有字段
+const geneResearchSchema = z.object({
+  geneSymbol: z.string().min(1, 'Gene symbol is required'),
+  organism: z.string().min(1, 'Organism is required'),
+  researchFocus: z.array(z.string()).min(1, 'Select at least one focus'),
+  specificAspects: z.array(z.string()).optional(),  // 新增
+  diseaseContext: z.string().optional(),
+  experimentalApproach: z.string().optional(),      // 新增
+  researchQuestion: z.string().optional(),          // 新增
+});
+
+// Specific Aspects 选项
+const specificAspectsOptions = [
+  { id: 'mutations', label: 'Mutations' },
+  { id: 'protein_interactions', label: 'Protein Interactions' },
+  { id: 'biological_pathways', label: 'Biological Pathways' },
+  { id: 'evolution', label: 'Evolution' },
+  { id: 'gene_regulation', label: 'Gene Regulation' },
+  { id: 'expression_patterns', label: 'Expression Patterns' },
+  { id: 'protein_structure', label: 'Protein Structure' },
+  { id: 'molecular_function', label: 'Molecular Function' },
+];
+```
+
+添加完整的多语言支持（en-US, zh-CN, es-ES, vi-VN）：
+```json
+{
+  "geneResearch": {
+    "specificAspects": "特定研究方面",
+    "specificAspectsDesc": "选择您想要关注的特定方面",
+    "experimentalApproach": "实验方法",
+    "experimentalApproachDesc": "指定实验方法（如适用）",
+    "researchQuestion": "研究问题",
+    "researchQuestionPlaceholder": "基因 {geneSymbol} 在 {organism} 中的功能、结构和生物学作用是什么？",
+    "researchQuestionDesc": "定义您的具体研究问题。使用 {geneSymbol} 和 {organism} 作为占位符。",
+    "aspects": {
+      "mutations": "突变",
+      "protein_interactions": "蛋白质相互作用",
+      // ... 8 个方面
+    }
+  }
+}
+```
+
+#### 阶段 2：后端集成修复
+
+**1. 更新 handleGeneResearchSubmit** (Commit: 待提交)
+
+```typescript
+async function handleGeneResearchSubmit(data: any) {
+  if (handleCheck()) {
+    const { id, setQuestion } = useTaskStore.getState();
+    try {
+      setIsThinking(true);
+      accurateTimerStart();
+      if (id !== "") {
+        createNewResearch();
+      }
+
+      // 构建完整的基因研究查询，包含所有字段
+      let geneQuery = `Gene: ${data.geneSymbol}, Organism: ${data.organism}, Focus: ${data.researchFocus.join(', ')}`;
+
+      // 添加可选字段
+      if (data.specificAspects && data.specificAspects.length > 0) {
+        geneQuery += `, Specific Aspects: ${data.specificAspects.join(', ')}`;
+      }
+      if (data.diseaseContext) {
+        geneQuery += `, Disease: ${data.diseaseContext}`;
+      }
+      if (data.experimentalApproach) {
+        geneQuery += `, Experimental Approach: ${data.experimentalApproach}`;
+      }
+      if (data.researchQuestion) {
+        // 替换占位符 {geneSymbol} 和 {organism}
+        const customQuestion = data.researchQuestion
+          .replace(/\{geneSymbol\}/g, data.geneSymbol)
+          .replace(/\{organism\}/g, data.organism);
+        geneQuery += `\n\nResearch Question: ${customQuestion}`;
+      }
+
+      setQuestion(geneQuery);
+      await askQuestions();
+    } finally {
+      setIsThinking(false);
+      accurateTimerStop();
+    }
+  }
+}
+```
+
+**2. 更新 mode-adapter.ts** (Commit: 待提交)
+
+```typescript
+export interface ResearchConfig {
+  query?: string;
+  mode?: ResearchMode;
+
+  // 专业模式特有字段 - 添加 researchQuestion
+  geneSymbol?: string;
+  organism?: string;
+  researchFocus?: ResearchFocus[];
+  specificAspects?: string[];
+  diseaseContext?: string;
+  experimentalApproach?: string;
+  researchQuestion?: string;  // 新增
+
+  // 通用配置
+  language?: string;
+  maxResult?: number;
+  enableCitationImage?: boolean;
+  enableReferences?: boolean;
+}
+
+// 更新专业模式提示词生成函数
+function generateProfessionalPrompt(config: ResearchConfig): string {
+  const {
+    geneSymbol,
+    organism,
+    researchFocus,
+    specificAspects,    // 使用
+    diseaseContext,
+    experimentalApproach,  // 使用
+    researchQuestion    // 使用
+  } = config;
+
+  let prompt = `Conduct a comprehensive gene research for:
+Gene: ${geneSymbol}
+Organism: ${organism}
+Research Focus: ${researchFocus?.join(', ')}`;
+
+  // 添加特定研究方面
+  if (specificAspects && specificAspects.length > 0) {
+    prompt += `\nSpecific Aspects: ${specificAspects.join(', ')}`;
+  }
+
+  // 添加疾病背景
+  if (diseaseContext) {
+    prompt += `\nDisease Context: ${diseaseContext}`;
+  }
+
+  // 添加实验方法
+  if (experimentalApproach) {
+    prompt += `\nExperimental Approach: ${experimentalApproach}`;
+  }
+
+  // 添加自定义研究问题（支持占位符替换）
+  if (researchQuestion) {
+    const customQuestion = researchQuestion
+      .replace(/\{geneSymbol\}/g, geneSymbol || '')
+      .replace(/\{organism\}/g, organism || '');
+    prompt += `\n\nResearch Question: ${customQuestion}`;
+  }
+
+  prompt += `\n\nPlease analyze across the following databases:
+- PubMed (literature)
+- UniProt (protein data)
+- NCBI Gene (gene information)
+- GEO (expression data)
+- PDB (protein structures)
+- KEGG (pathways)
+- STRING (interactions)
+- OMIM (disease associations)`;
+
+  return prompt;
+}
+```
+
+### 技术要点
+
+#### 占位符替换
+
+Research Question 字段支持两个占位符：
+- `{geneSymbol}` - 自动替换为输入的基因符号
+- `{organism}` - 自动替换为选择的物种
+
+示例：
+```
+输入: "What is the function, structure, and biological role of the gene {geneSymbol} in {organism}?"
+基因: TP53
+物种: Homo sapiens
+输出: "What is the function, structure, and biological role of the gene TP53 in Homo sapiens?"
+```
+
+#### 状态管理
+
+```typescript
+// GeneInput 组件
+const [selectedFocus, setSelectedFocus] = useState<string[]>(['general']);
+const [selectedAspects, setSelectedAspects] = useState<string[]>([]);
+
+const toggleAspect = (aspectId: string) => {
+  const newAspects = selectedAspects.includes(aspectId)
+    ? selectedAspects.filter(id => id !== aspectId)
+    : [...selectedAspects, aspectId];
+
+  setSelectedAspects(newAspects);
+  form.setValue('specificAspects', newAspects);
+};
+```
+
+### 仍待集成的功能
+
+虽然修复了 UI 和基本数据流，但以下高价值功能仍未集成：
+
+#### 1. GeneResearchEngine
+
+完整的基因研究引擎 (`src/utils/gene-research/index.ts`) 包含：
+- 7 阶段研究工作流
+- API 集成（PubMed, UniProt, NCBI Gene, 等）
+- 数据提取和处理
+- 质量控制
+- 可视化生成
+- 报告生成
+
+**当前状态**: 代码存在但未被调用
+
+**集成建议**:
+- 在 useDeepResearch hook 中添加模式检测
+- 当 mode === 'professional' 时，使用 GeneResearchEngine
+- 替代当前的通用研究流程
+
+#### 2. 基因研究专用提示词
+
+`src/constants/gene-research-prompts.ts` 包含针对分子生物学优化的提示词：
+- 专业系统指令（强调分子机制、定量数据、实验证据）
+- 基因研究问题生成
+- 研究计划生成
+- SERP 查询生成（针对生物数据库）
+
+**当前状态**: 代码存在但未被使用
+
+**集成建议**:
+- 修改 `src/hooks/useDeepResearch.ts` 中的提示词选择逻辑
+- 根据 mode 选择不同的提示词集合
+
+#### 3. 专业搜索提供商
+
+`src/utils/gene-research/search-providers.ts` 实现了 10+ 专业数据库的搜索：
+- PubMed, UniProt, NCBI Gene, GEO, PDB
+- KEGG, STRING, OMIM, Ensembl, Reactome
+
+**当前状态**: 代码存在但未被使用
+
+**集成建议**:
+- 在专业模式下，使用这些专业搜索提供商
+- 替代通用的 tavily/searxng/exa 搜索
+
+### 提交记录
+
+```bash
+179fbeb feat: Add organism dropdown selector with preset options
+dafa569 i18n: Add translations for organism dropdown selector
+b5445de feat: Add complete gene research configuration fields
+[待提交] fix: Update gene research submit handler to use all fields
+[待提交] feat: Update mode-adapter to support research question field
+```
+
+### 测试验证
+
+✅ 所有字段正确显示在 UI
+✅ 表单验证正常工作
+✅ 多语言支持完整（en-US, zh-CN, es-ES, vi-VN）
+✅ 数据正确传递到后端处理函数
+✅ 占位符替换功能正常
+✅ 构建成功，无错误和警告
+
+### 经验教训
+
+1. **代码存在 ≠ 功能集成**: 需要系统检查所有模块是否真正被使用
+2. **UI + 后端 + 数据流**: 三者必须完整连接才能形成功能
+3. **分阶段验证**: 每个阶段都要测试构建和运行时行为
+4. **文档同步**: 代码更新后及时更新开发文档
+
+---
+
 ## 未来计划
 
 ### 短期目标

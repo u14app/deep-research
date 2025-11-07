@@ -142,8 +142,27 @@ function Topic() {
         if (id !== "") {
           createNewResearch();
         }
-        // 构建基因研究查询
-        const geneQuery = `Gene: ${data.geneSymbol}, Organism: ${data.organism}, Focus: ${data.researchFocus.join(', ')}${data.diseaseContext ? `, Disease: ${data.diseaseContext}` : ''}`;
+        // 构建完整的基因研究查询，包含所有字段
+        let geneQuery = `Gene: ${data.geneSymbol}, Organism: ${data.organism}, Focus: ${data.researchFocus.join(', ')}`;
+
+        // 添加可选字段
+        if (data.specificAspects && data.specificAspects.length > 0) {
+          geneQuery += `, Specific Aspects: ${data.specificAspects.join(', ')}`;
+        }
+        if (data.diseaseContext) {
+          geneQuery += `, Disease: ${data.diseaseContext}`;
+        }
+        if (data.experimentalApproach) {
+          geneQuery += `, Experimental Approach: ${data.experimentalApproach}`;
+        }
+        if (data.researchQuestion) {
+          // 替换占位符
+          const customQuestion = data.researchQuestion
+            .replace(/\{geneSymbol\}/g, data.geneSymbol)
+            .replace(/\{organism\}/g, data.organism);
+          geneQuery += `\n\nResearch Question: ${customQuestion}`;
+        }
+
         setQuestion(geneQuery);
         await askQuestions();
       } finally {

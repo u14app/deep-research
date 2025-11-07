@@ -14,6 +14,7 @@ export interface ResearchConfig {
   specificAspects?: string[];
   diseaseContext?: string;
   experimentalApproach?: string;
+  researchQuestion?: string;
 
   // 通用配置
   language?: string;
@@ -48,14 +49,45 @@ export function getPromptForMode(
  * 生成专业模式提示词
  */
 function generateProfessionalPrompt(config: ResearchConfig): string {
-  const { geneSymbol, organism, researchFocus, diseaseContext } = config;
+  const {
+    geneSymbol,
+    organism,
+    researchFocus,
+    specificAspects,
+    diseaseContext,
+    experimentalApproach,
+    researchQuestion
+  } = config;
 
   let prompt = `Conduct a comprehensive gene research for:
 Gene: ${geneSymbol}
 Organism: ${organism}
-Research Focus: ${researchFocus?.join(', ')}
+Research Focus: ${researchFocus?.join(', ')}`;
 
-Please analyze across the following databases:
+  // 添加特定研究方面
+  if (specificAspects && specificAspects.length > 0) {
+    prompt += `\nSpecific Aspects: ${specificAspects.join(', ')}`;
+  }
+
+  // 添加疾病背景
+  if (diseaseContext) {
+    prompt += `\nDisease Context: ${diseaseContext}`;
+  }
+
+  // 添加实验方法
+  if (experimentalApproach) {
+    prompt += `\nExperimental Approach: ${experimentalApproach}`;
+  }
+
+  // 添加自定义研究问题
+  if (researchQuestion) {
+    const customQuestion = researchQuestion
+      .replace(/\{geneSymbol\}/g, geneSymbol || '')
+      .replace(/\{organism\}/g, organism || '');
+    prompt += `\n\nResearch Question: ${customQuestion}`;
+  }
+
+  prompt += `\n\nPlease analyze across the following databases:
 - PubMed (literature)
 - UniProt (protein data)
 - NCBI Gene (gene information)
@@ -64,10 +96,6 @@ Please analyze across the following databases:
 - KEGG (pathways)
 - STRING (interactions)
 - OMIM (disease associations)`;
-
-  if (diseaseContext) {
-    prompt += `\n\nDisease Context: ${diseaseContext}`;
-  }
 
   return prompt;
 }
