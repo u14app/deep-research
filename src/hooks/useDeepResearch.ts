@@ -14,6 +14,7 @@ import Plimit from "p-limit";
 import { toast } from "sonner";
 import useModelProvider from "@/hooks/useAiProvider";
 import useWebSearch from "@/hooks/useWebSearch";
+import useProfessionalSearch from "@/hooks/useProfessionalSearch";
 import { useTaskStore } from "@/store/task";
 import { useHistoryStore } from "@/store/history";
 import { useSettingStore } from "@/store/setting";
@@ -69,7 +70,74 @@ function useDeepResearch() {
   const { smoothTextStreamType } = useSettingStore();
   const { createModelProvider, getModel } = useModelProvider();
   const { search } = useWebSearch();
+  const { searchBiologicalDatabases } = useProfessionalSearch();
   const [status, setStatus] = useState<string>("");
+
+  // Helper function to perform mode-aware search
+  async function modeAwareSearch(query: string): Promise<{ sources: Source[]; images: ImageSource[] }> {
+    const { mode } = useModeStore.getState();
+    const { question } = useTaskStore.getState();
+
+    // In professional mode, use specialized biological database search
+    if (mode === 'professional') {
+      try {
+        // Extract gene symbol and organism from question if available
+        const geneSymbolMatch = question.match(/Gene:\s*(\w+)/i);
+        const organismMatch = question.match(/Organism:\s*([^,]+)/i);
+
+        const geneSymbol = geneSymbolMatch ? geneSymbolMatch[1].trim() : undefined;
+        const organism = organismMatch ? organismMatch[1].trim() : undefined;
+
+        console.log(`[Professional Search] Searching biological databases for: ${query}`);
+        console.log(`[Professional Search] Gene: ${geneSymbol}, Organism: ${organism}`);
+
+        const bioResults = await searchBiologicalDatabases({
+          query,
+          geneSymbol,
+          organism,
+          databases: ['pubmed', 'uniprot', 'ncbi_gene'],  // Start with core databases
+          maxResult: 5,
+        });
+
+        // Convert biological database results to standard Source format
+        const sources: Source[] = [];
+        const images: ImageSource[] = [];
+
+        for (const [, result] of bioResults) {
+          for (const source of result.sources) {
+            sources.push({
+              title: source.title,
+              content: source.content,
+              url: source.url,
+            });
+          }
+
+          for (const image of result.images) {
+            images.push({
+              url: image.url,
+              description: image.description,
+            });
+          }
+        }
+
+        console.log(`[Professional Search] Found ${sources.length} sources from biological databases`);
+
+        // If biological databases returned results, use them
+        if (sources.length > 0) {
+          return { sources, images };
+        }
+
+        // Fall back to standard search if no results
+        console.log(`[Professional Search] No results from biological databases, falling back to standard search`);
+      } catch (error) {
+        console.error('[Professional Search] Error:', error);
+        // Fall through to standard search
+      }
+    }
+
+    // Use standard search for general mode or as fallback
+    return await search(query);
+  }
 
   // Helper functions to select prompts based on mode
   function getModeAwareSystemPrompt(): string {
@@ -350,7 +418,7 @@ function useDeepResearch() {
           if (enableSearch) {
             if (searchProvider !== "model") {
               try {
-                const results = await search(item.query);
+                const results = await modeAwareSearch(item.query);
                 sources = results.sources;
                 images = results.images;
 
