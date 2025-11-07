@@ -75,7 +75,12 @@ function SearchResult() {
   } = useAccurateTimer();
   const [isThinking, setIsThinking] = useState<boolean>(false);
   const unfinishedTasks = useMemo(() => {
+    // Only return tasks that are truly incomplete (not completed)
     return taskStore.tasks.filter((item) => item.state !== "completed");
+  }, [taskStore.tasks]);
+  const failedTasks = useMemo(() => {
+    // Only return tasks that actually failed
+    return taskStore.tasks.filter((item) => item.state === "failed");
   }, [taskStore.tasks]);
   const taskFinished = useMemo(() => {
     return taskStore.tasks.length > 0 && unfinishedTasks.length === 0;
@@ -118,9 +123,20 @@ function SearchResult() {
     try {
       accurateTimerStart();
       setIsThinking(true);
-      if (unfinishedTasks.length > 0) {
+
+      // Priority 1: Retry only failed tasks first
+      if (failedTasks.length > 0) {
+        console.log(`[Continue Research] Retrying ${failedTasks.length} failed tasks`);
+        await runSearchTask(failedTasks);
+      }
+      // Priority 2: If no failed tasks, continue with unfinished tasks
+      else if (unfinishedTasks.length > 0) {
+        console.log(`[Continue Research] Continuing with ${unfinishedTasks.length} unfinished tasks`);
         await runSearchTask(unfinishedTasks);
-      } else {
+      }
+      // Priority 3: All tasks completed, review results
+      else {
+        console.log(`[Continue Research] All tasks completed, reviewing results`);
         if (values.suggestion) setSuggestion(values.suggestion);
         await reviewSearchResult();
         // Clear previous research suggestions
