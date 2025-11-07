@@ -68,6 +68,7 @@ Generate a comprehensive research plan for gene function analysis. Your plan sho
 10. **Research Gaps** - Current limitations and future research directions
 
 **IMPORTANT: Do NOT include the following sections in your research plan:**
+- References (this is a research plan, not a final report)
 - Data Availability & Reproducibility Bundle
 - Code & Protocols
 - Strain & Plasmid Requests
@@ -77,6 +78,11 @@ Generate a comprehensive research plan for gene function analysis. Your plan sho
 - Funding Information
 - Competing Interests
 - Ethics Statements
+- Acknowledgments
+- Appendices
+
+**CRITICAL: This is a RESEARCH PLAN (what to research), NOT a final report format.**
+A research plan should only contain TOPICS and RESEARCH QUESTIONS, not report structure elements like References, Acknowledgments, etc.
 
 Each section should have a clear research goal and specific questions to investigate, focusing exclusively on gene function and molecular mechanisms.`;
 

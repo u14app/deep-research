@@ -74,6 +74,19 @@ Your plan should be tight and focused with NO overlapping sections or unnecessar
 
 ${guidelinesPrompt}
 
+**IMPORTANT: Do NOT include the following sections in your research plan:**
+- References (this is a research plan, not a final report)
+- Bibliography
+- Works Cited
+- Acknowledgments
+- Appendices
+- Data Availability
+- Author Contributions
+- Supplementary Information
+
+**CRITICAL: This is a RESEARCH PLAN (what topics to research), NOT a final report format.**
+A research plan should only contain CONTENT TOPICS and RESEARCH QUESTIONS, not metadata sections like References, Acknowledgments, etc.
+
 Before submitting, review your structure to ensure it has no redundant sections and follows a logical flow.`;
 
 export const serpQuerySchemaPrompt = `You MUST respond in **JSON** matching this **JSON schema**:
