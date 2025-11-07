@@ -173,7 +173,7 @@ export const defaultValues: SettingStore = {
   citationImage: "enable",
   smoothTextStreamType: "word",
   onlyUseLocalResource: "disable",
-  useFileFormatResource: "disable",
+  useFileFormatResource: "enable",
 };
 
 export const useSettingStore = create(

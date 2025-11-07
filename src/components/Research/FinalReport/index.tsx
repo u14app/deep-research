@@ -31,6 +31,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import useAccurateTimer from "@/hooks/useAccurateTimer";
 import useDeepResearch from "@/hooks/useDeepResearch";
 import useKnowledge from "@/hooks/useKnowledge";
@@ -39,6 +46,7 @@ import { useKnowledgeStore } from "@/store/knowledge";
 import { getSystemPrompt } from "@/utils/deep-research/prompts";
 import { downloadFile } from "@/utils/file";
 import { markdownToDoc } from "@/utils/markdown";
+import { WRITING_TEMPLATES, TEMPLATE_OPTIONS } from "@/constants/writing-templates";
 
 const MagicDown = dynamic(() => import("@/components/MagicDown"));
 const Artifact = dynamic(() => import("@/components/Artifact"));
@@ -309,9 +317,29 @@ function FinalReport() {
                     <FormLabel className="mb-2 font-semibold">
                       {t("research.finalReport.writingRequirementLabel")}
                     </FormLabel>
+                    <Select
+                      onValueChange={(value) => {
+                        if (value !== 'custom') {
+                          form.setValue('requirement', WRITING_TEMPLATES[value].content);
+                        } else {
+                          form.setValue('requirement', '');
+                        }
+                      }}
+                    >
+                      <SelectTrigger className="mb-2">
+                        <SelectValue placeholder="选择写作模板 / Select Writing Template" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {TEMPLATE_OPTIONS.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <FormControl>
                       <Textarea
-                        rows={3}
+                        rows={10}
                         placeholder={t(
                           "research.finalReport.writingRequirementPlaceholder"
                         )}
