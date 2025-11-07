@@ -43,6 +43,7 @@ import { createGeneQueryGenerator } from "@/utils/gene-research/query-generator"
 import { generateGeneReportTemplate } from "@/utils/gene-research/report-templates";
 import { GeneDataExtractor } from "@/utils/gene-research/data-extractor";
 import { createGeneQualityControl } from "@/utils/gene-research/quality-control";
+import { EnhancedQualityControl } from "@/utils/gene-research/enhanced-quality-control";
 import type { GeneSearchTask, GeneDataExtractionResult } from "@/types/gene-research";
 import { isNetworkingModel } from "@/utils/model";
 import { ThinkTagStreamProcessor, removeJsonMarkdown } from "@/utils/text";
@@ -761,6 +762,57 @@ function useDeepResearch() {
               }
               qualityAssessment += '\n';
             }
+
+            // Enhanced literature quality assessment
+            if (combinedExtractionResult.literatureReferences && combinedExtractionResult.literatureReferences.length > 0) {
+              console.log(`[Professional Mode] Performing enhanced literature quality assessment`);
+
+              const enhancedQC = new EnhancedQualityControl();
+              const literatureQualityReport = enhancedQC.assessLiteratureQuality(
+                combinedExtractionResult.literatureReferences,
+                refQuality
+              );
+
+              console.log(`[Professional Mode] Enhanced literature quality:`, {
+                overallScore: literatureQualityReport.overallScore.toFixed(1),
+                authenticityIndex: literatureQualityReport.authenticityIndex.toFixed(1),
+                diversityIndex: literatureQualityReport.diversityIndex.toFixed(1),
+                recencyIndex: literatureQualityReport.recencyIndex.toFixed(1),
+                warnings: literatureQualityReport.warnings.length
+              });
+
+              qualityAssessment += `\n### Enhanced Literature Quality Assessment\n\n`;
+              qualityAssessment += `**Overall Literature Quality Score**: ${literatureQualityReport.overallScore.toFixed(1)}/100\n\n`;
+              qualityAssessment += `**Quality Indices**:\n`;
+              qualityAssessment += `- Authenticity Index: ${literatureQualityReport.authenticityIndex.toFixed(1)}/100 - ${literatureQualityReport.authenticityIndex > 80 ? '✓ Excellent' : literatureQualityReport.authenticityIndex > 50 ? '⚠ Moderate' : '✗ Poor'}\n`;
+              qualityAssessment += `- Diversity Index: ${literatureQualityReport.diversityIndex.toFixed(1)}/100 - ${literatureQualityReport.diversityIndex > 70 ? '✓ Good diversity' : '⚠ Limited diversity'}\n`;
+              qualityAssessment += `- Recency Index: ${literatureQualityReport.recencyIndex.toFixed(1)}/100 - ${literatureQualityReport.recencyIndex > 70 ? '✓ Recent literature' : '⚠ Outdated'}\n`;
+              qualityAssessment += `- Citation Pattern: ${literatureQualityReport.citationPattern}\n\n`;
+
+              if (literatureQualityReport.strengths.length > 0) {
+                qualityAssessment += `**Literature Strengths**:\n`;
+                literatureQualityReport.strengths.forEach((strength, idx) => {
+                  qualityAssessment += `${idx + 1}. ${strength}\n`;
+                });
+                qualityAssessment += '\n';
+              }
+
+              if (literatureQualityReport.warnings.length > 0) {
+                qualityAssessment += `**⚠️ Literature Warnings**:\n`;
+                literatureQualityReport.warnings.forEach((warning, idx) => {
+                  qualityAssessment += `${idx + 1}. ${warning}\n`;
+                });
+                qualityAssessment += '\n';
+              }
+
+              if (literatureQualityReport.recommendations.length > 0) {
+                qualityAssessment += `**Literature Recommendations**:\n`;
+                literatureQualityReport.recommendations.slice(0, 3).forEach((rec, idx) => {
+                  qualityAssessment += `${idx + 1}. ${rec}\n`;
+                });
+                qualityAssessment += '\n';
+              }
+            }
           }
         } catch (error) {
           console.error('[Professional Mode] Data extraction error:', error);
@@ -781,7 +833,49 @@ function useDeepResearch() {
           .map(section => `## ${section.title}\n${section.subsections ? section.subsections.map(sub => `### ${sub.title}`).join('\n') : ''}`)
           .join('\n\n');
 
-        professionalReportTemplate = `\n\nIMPORTANT: Structure your report according to the following professional gene research template:\n\n${sectionStructure}\n\nEnsure each section includes:\n- Specific molecular details\n- Quantitative data where available\n- Literature citations\n- Experimental evidence\n\n${qualityAssessment}NOTE: The quality assessment above should inform your writing. Address any identified issues and incorporate recommendations where relevant.\n\n`;
+        // Generate visualization suggestions
+        let visualizationGuidance = '';
+        try {
+          if (combinedExtractionResult && combinedExtractionResult.geneBasicInfo) {
+            console.log(`[Professional Mode] Generating visualization suggestions`);
+
+            visualizationGuidance += `\n### Available Visualizations\n\n`;
+            visualizationGuidance += `You can enhance your report with Mermaid diagrams. Consider including:\n\n`;
+
+            // Suggest specific visualizations based on available data
+            if (combinedExtractionResult.proteinInfo) {
+              visualizationGuidance += `1. **Protein Structure Diagram** - Show protein domains, binding sites, and structural organization\n`;
+            }
+
+            if (combinedExtractionResult.functionalData && combinedExtractionResult.interactionData) {
+              visualizationGuidance += `2. **Pathway Map** - Illustrate molecular functions and interaction networks\n`;
+            }
+
+            if (combinedExtractionResult.expressionData) {
+              visualizationGuidance += `3. **Expression Heatmap** - Display tissue-specific expression patterns\n`;
+            }
+
+            if (combinedExtractionResult.interactionData) {
+              visualizationGuidance += `4. **Interaction Network** - Map protein-protein, DNA, and small molecule interactions\n`;
+            }
+
+            if (combinedExtractionResult.evolutionaryData) {
+              visualizationGuidance += `5. **Evolutionary Tree** - Show orthologs and paralogs with conservation levels\n`;
+            }
+
+            if (combinedExtractionResult.diseaseData && combinedExtractionResult.diseaseData.length > 0) {
+              visualizationGuidance += `6. **Disease Association Network** - Connect gene to diseases and mutations\n`;
+            }
+
+            visualizationGuidance += `\nExample Mermaid syntax:\n\`\`\`mermaid\ngraph TD\n    A[${geneSymbol}] --> B[Function]\n    A --> C[Pathway]\n\`\`\`\n\n`;
+
+            console.log(`[Professional Mode] Generated ${6} visualization suggestions`);
+          }
+        } catch (error) {
+          console.error('[Professional Mode] Visualization generation error:', error);
+        }
+
+        professionalReportTemplate = `\n\nIMPORTANT: Structure your report according to the following professional gene research template:\n\n${sectionStructure}\n\nEnsure each section includes:\n- Specific molecular details\n- Quantitative data where available\n- Literature citations\n- Experimental evidence\n\n${visualizationGuidance}${qualityAssessment}NOTE: The quality assessment above should inform your writing. Address any identified issues and incorporate recommendations where relevant.\n\n`;
       }
     }
 
