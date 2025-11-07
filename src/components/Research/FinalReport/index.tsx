@@ -43,10 +43,15 @@ import useDeepResearch from "@/hooks/useDeepResearch";
 import useKnowledge from "@/hooks/useKnowledge";
 import { useTaskStore } from "@/store/task";
 import { useKnowledgeStore } from "@/store/knowledge";
+import { useModeStore } from "@/store/mode";
 import { getSystemPrompt } from "@/utils/deep-research/prompts";
 import { downloadFile } from "@/utils/file";
 import { markdownToDoc } from "@/utils/markdown";
-import { WRITING_TEMPLATES, TEMPLATE_OPTIONS } from "@/constants/writing-templates";
+import {
+  WRITING_TEMPLATES,
+  PROFESSIONAL_TEMPLATE_OPTIONS,
+  GENERAL_TEMPLATE_OPTIONS
+} from "@/constants/writing-templates";
 
 const MagicDown = dynamic(() => import("@/components/MagicDown"));
 const Artifact = dynamic(() => import("@/components/Artifact"));
@@ -68,6 +73,13 @@ function FinalReport() {
   } = useAccurateTimer();
   const [isWriting, setIsWriting] = useState<boolean>(false);
   const [openKnowledgeGraph, setOpenKnowledgeGraph] = useState<boolean>(false);
+  const { mode } = useModeStore();
+
+  // Select template options based on current mode
+  const templateOptions = useMemo(() => {
+    return mode === 'professional' ? PROFESSIONAL_TEMPLATE_OPTIONS : GENERAL_TEMPLATE_OPTIONS;
+  }, [mode]);
+
   const taskFinished = useMemo(() => {
     const unfinishedTasks = taskStore.tasks.filter(
       (task) => task.state !== "completed"
@@ -330,7 +342,7 @@ function FinalReport() {
                         <SelectValue placeholder="选择写作模板 / Select Writing Template" />
                       </SelectTrigger>
                       <SelectContent>
-                        {TEMPLATE_OPTIONS.map((option) => (
+                        {templateOptions.map((option) => (
                           <SelectItem key={option.value} value={option.value}>
                             {option.label}
                           </SelectItem>
