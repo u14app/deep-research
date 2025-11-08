@@ -1,11 +1,11 @@
 #!/bin/bash
 
 ###############################################################################
-# Deep Research - 闭源版构建脚本
+# Deep Research - 分发版构建脚本
 #
 # 功能：
 # - 清理 Docker 构建缓存
-# - 构建闭源版本镜像（API 地址预配置）
+# - 构建分发版本镜像（API 地址预配置）
 # - 精简 UI，只保留 API 密钥输入
 #
 # 安全提示：
@@ -20,7 +20,7 @@
 set -e  # 遇到错误立即退出
 
 echo "=========================================="
-echo "  Deep Research - 闭源版构建"
+echo "  Deep Research - 分发版构建"
 echo "=========================================="
 echo ""
 
@@ -113,19 +113,19 @@ docker builder prune -f
 echo -e "${GREEN}✓ 缓存清理完成${NC}"
 echo ""
 
-echo -e "${YELLOW}[2/4] 开始构建闭源版镜像...${NC}"
+echo -e "${YELLOW}[2/4] 开始构建分发版镜像...${NC}"
 echo "----------------------------------------"
 echo "  镜像名称: ${FULL_IMAGE}"
-echo "  构建模式: 闭源版 (Closed Source)"
+echo "  构建模式: 分发版 (Distribution Mode)"
 echo "  功能特性:"
 echo "    - ✓ 只支持 Modai 提供商"
 echo "    - ✓ API URL 预配置（不可见）"
 echo "    - ✓ 模型预配置（不可见）"
 echo "    - ✓ 精简 UI，只保留 API 密钥输入"
-echo "    - ✓ 适合闭源分发"
+echo "    - ✓ 适合定制分发"
 echo ""
 
-# 构建闭源版
+# 构建分发版
 docker build \
   --no-cache \
   --build-arg CLOSED_SOURCE_MODE=true \
@@ -161,11 +161,11 @@ echo "----------------------------------------"
 echo "  镜像名称: ${FULL_IMAGE}"
 echo "  构建时间: $(date)"
 echo "  镜像大小: $(docker images ${FULL_IMAGE} --format '{{.Size}}')"
-echo "  配置状态: 闭源模式已启用"
+echo "  配置状态: 分发模式已启用"
 echo ""
 
 echo -e "${GREEN}=========================================="
-echo "  ✓ 闭源版构建成功！"
+echo "  ✓ 分发版构建成功！"
 echo "==========================================${NC}"
 echo ""
 echo "下一步操作："
@@ -177,7 +177,7 @@ echo "2. 访问应用:"
 echo "   http://localhost:3333"
 echo "   应该只显示 API 密钥输入框"
 echo ""
-echo "3. 验证闭源模式:"
+echo "3. 验证分发模式:"
 echo "   - 不应显示 Mode 选择器"
 echo "   - Provider 只显示 \"Mod AI Studio\""
 echo "   - 不应显示 API URL 输入框"

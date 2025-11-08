@@ -4,7 +4,7 @@
 # Deep Research - 通用构建脚本
 #
 # 功能：
-# - 支持构建开源版和闭源版
+# - 支持构建开源版和分发版
 # - 清理 Docker 构建缓存
 # - 交互式选择构建类型
 #
@@ -155,7 +155,7 @@ function build_closed() {
     echo ""
     clean_docker ${image_name} ${image_tag}
 
-    echo -e "${YELLOW}开始构建闭源版...${NC}"
+    echo -e "${YELLOW}开始构建分发版...${NC}"
     echo "----------------------------------------"
     echo "  镜像: ${full_image}"
     echo "  特性: 精简UI，预配置API"
@@ -171,7 +171,7 @@ function build_closed() {
       .
 
     echo ""
-    echo -e "${GREEN}✓ 闭源版构建成功！${NC}"
+    echo -e "${GREEN}✓ 分发版构建成功！${NC}"
     echo ""
     echo "镜像信息:"
     docker images | grep ${image_name} | head -1

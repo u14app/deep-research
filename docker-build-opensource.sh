@@ -65,7 +65,7 @@ echo "    - ✓ 用户可选择模型"
 echo "    - ✓ 支持 local/proxy 模式切换"
 echo ""
 
-# 构建开源版（使用默认参数，不设置 CLOSED_SOURCE_MODE）
+# 构建开源版（CLOSED_SOURCE_MODE=false）
 docker build \
   --no-cache \
   --build-arg CLOSED_SOURCE_MODE=false \

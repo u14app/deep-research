@@ -91,7 +91,7 @@ interface SettingActions {
   reset: () => void;
 }
 
-// Closed source mode configuration
+// Distribution mode configuration
 const CLOSED_SOURCE_MODE = typeof window !== 'undefined'
   ? process.env.NEXT_PUBLIC_CLOSED_SOURCE_MODE === 'true'
   : false;

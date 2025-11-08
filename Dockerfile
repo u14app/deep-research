@@ -26,7 +26,7 @@ COPY . .
 # Uncomment the following line in case you want to disable telemetry during the build.
 # ENV NEXT_TELEMETRY_DISABLED 1
 
-# Build arguments for closed source mode (no defaults - must be provided at build time)
+# Build arguments for distribution mode (no defaults - must be provided at build time)
 ARG CLOSED_SOURCE_MODE=false
 ARG MODAI_API_BASE_URL
 ARG MODAI_DEFAULT_THINKING_MODEL=gemini-2.5-pro
