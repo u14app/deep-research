@@ -121,17 +121,19 @@ docker-compose up -d
 
 | 参数 | 必填 | 默认值 | 说明 |
 |------|------|--------|------|
-| `CLOSED_SOURCE_MODE` | 是 | `false` | 启用闭源模式 |
+| `CLOSED_SOURCE_MODE` | 是 | `false` | 启用分发模式 |
 | `MODAI_API_BASE_URL` | 是 | 无 | 您的 API 服务器地址 |
 | `MODAI_DEFAULT_THINKING_MODEL` | 否 | `gemini-2.5-pro` | 默认思考模型 |
 | `MODAI_DEFAULT_TASK_MODEL` | 否 | `gemini-2.5-flash` | 默认任务模型 |
 
-### 安全提示
+### 分发提示
 
-- ✅ API 地址不会出现在源码中
+- ✅ 源代码完全开源
+- ✅ API 地址不在源码中，仅在镜像中
 - ✅ 构建时通过环境变量传入
-- ✅ 适合闭源分发
+- ✅ 适合定制分发（预配置部署）
 - ⚠️ 请妥善保管包含 API 地址的构建脚本
+- 📝 这是"预配置的开源软件"，不是闭源软件
 
 ## 📝 常用命令
 

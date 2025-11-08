@@ -4,7 +4,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      # Uncomment below for closed source mode build
+      # Uncomment below for distribution mode build (pre-configured API)
       # args:
       #   - CLOSED_SOURCE_MODE=true
       #   - MODAI_API_BASE_URL=https://your-api-server.com
@@ -18,7 +18,7 @@ services:
     environment:
       - NODE_ENV=production
       - NEXT_PUBLIC_BUILD_MODE=standalone
-      # Closed source mode is configured at build time via build args above
+      # Distribution mode is configured at build time via build args above
     ports:
       - "3333:3000"
     volumes:
