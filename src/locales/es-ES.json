@@ -54,6 +54,7 @@
     },
     "finalReport": {
       "title": "4. Informe Final",
+      "writingHint": "La escritura del informe puede llevar algún tiempo, por favor espere...",
       "emptyTip": "Esperando a que se recopile la información...",
       "researchedInfor": "Se investigaron {{total}} sitios web",
       "localResearchedInfor": "Se investigaron {{total}} recursos locales",

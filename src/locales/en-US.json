@@ -54,6 +54,7 @@
     },
     "finalReport": {
       "title": "4. Final Report",
+      "writingHint": "Writing the report may take some time, please wait...",
       "emptyTip": "Waiting for data to be collated...",
       "researchedInfor": "Researched {{total}} websites",
       "localResearchedInfor": "Researched {{total}} local resources",

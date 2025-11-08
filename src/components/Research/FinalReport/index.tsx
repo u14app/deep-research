@@ -190,6 +190,9 @@ function FinalReport() {
         <h3 className="font-semibold text-lg border-b mb-2 leading-10 print:hidden">
           {t("research.finalReport.title")}
         </h3>
+        <p className="text-sm text-gray-400 mb-2 print:hidden">
+          {t("research.finalReport.writingHint")}
+        </p>
         {taskStore.finalReport !== "" ? (
           <article>
             <MagicDown

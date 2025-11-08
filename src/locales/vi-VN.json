@@ -54,6 +54,7 @@
     },
     "finalReport": {
       "title": "4. Báo Cáo Cuối Cùng",
+      "writingHint": "Việc viết báo cáo có thể mất một chút thời gian, vui lòng đợi...",
       "emptyTip": "Đang chờ tổng hợp dữ liệu...",
       "researchedInfor": "Đã nghiên cứu {{total}} trang web",
       "localResearchedInfor": "Đã nghiên cứu {{total}} tài nguyên cục bộ",

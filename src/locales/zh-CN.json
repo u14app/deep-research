@@ -54,6 +54,7 @@
     },
     "finalReport": {
       "title": "4. 最终报告",
+      "writingHint": "撰写报告可能需要一些时间，请稍候...",
       "emptyTip": "等待数据汇总...",
       "researchedInfor": "已研究 {{total}} 个网站",
       "localResearchedInfor": "已研究 {{total}} 个本地资源",
