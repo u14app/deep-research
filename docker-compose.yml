@@ -4,6 +4,12 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      # Uncomment below for closed source mode build
+      # args:
+      #   - CLOSED_SOURCE_MODE=true
+      #   - MODAI_API_BASE_URL=https://your-api-server.com
+      #   - MODAI_DEFAULT_THINKING_MODEL=gemini-2.5-pro
+      #   - MODAI_DEFAULT_TASK_MODEL=gemini-2.5-flash
     image: deep-research:latest
     container_name: deep-research
     restart: unless-stopped
@@ -12,6 +18,7 @@ services:
     environment:
       - NODE_ENV=production
       - NEXT_PUBLIC_BUILD_MODE=standalone
+      # Closed source mode is configured at build time via build args above
     ports:
       - "3333:3000"
     volumes:

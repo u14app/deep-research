@@ -91,9 +91,23 @@ interface SettingActions {
   reset: () => void;
 }
 
+// Closed source mode configuration
+const CLOSED_SOURCE_MODE = typeof window !== 'undefined'
+  ? process.env.NEXT_PUBLIC_CLOSED_SOURCE_MODE === 'true'
+  : false;
+const MODAI_DEFAULT_API = typeof window !== 'undefined'
+  ? process.env.NEXT_PUBLIC_MODAI_API_BASE_URL || ''
+  : '';
+const MODAI_DEFAULT_THINKING = typeof window !== 'undefined'
+  ? process.env.NEXT_PUBLIC_MODAI_DEFAULT_THINKING || 'gemini-2.5-pro'
+  : 'gemini-2.5-pro';
+const MODAI_DEFAULT_TASK = typeof window !== 'undefined'
+  ? process.env.NEXT_PUBLIC_MODAI_DEFAULT_TASK || 'gemini-2.5-flash'
+  : 'gemini-2.5-flash';
+
 export const defaultValues: SettingStore = {
-  provider: "google",
-  mode: "",
+  provider: CLOSED_SOURCE_MODE ? "modai" : "google",
+  mode: CLOSED_SOURCE_MODE ? "local" : "",
   apiKey: "",
   apiProxy: "",
   thinkingModel: "gemini-2.5-pro",
@@ -114,9 +128,9 @@ export const defaultValues: SettingStore = {
   openAIThinkingModel: "gpt-5",
   openAINetworkingModel: "gpt-5-mini",
   modaiApiKey: "",
-  modaiApiProxy: "",
-  modaiThinkingModel: "gemini-2.5-pro",
-  modaiNetworkingModel: "gemini-2.5-flash",
+  modaiApiProxy: MODAI_DEFAULT_API,
+  modaiThinkingModel: MODAI_DEFAULT_THINKING,
+  modaiNetworkingModel: MODAI_DEFAULT_TASK,
   anthropicApiKey: "",
   anthropicApiProxy: "",
   anthropicThinkingModel: "",

@@ -65,6 +65,74 @@ docker-compose up -d
 
 在浏览器中打开：**http://localhost:3333**
 
+## 🔒 闭源模式部署 (Closed Source Mode)
+
+闭源模式允许您构建一个精简版本，隐藏多余的配置选项，只保留 API 密钥输入：
+
+### 特性
+
+- ✅ 隐藏 Mode 选择器 (proxy/local)
+- ✅ 只显示 Mod AI 提供商
+- ✅ 隐藏 API URL 配置（在构建时预设）
+- ✅ 隐藏模型选择器（使用预设模型）
+- ✅ 用户界面极简，只需输入 API 密钥
+
+### 构建闭源版镜像
+
+**方式 1：使用 docker build 命令**
+
+```bash
+docker build \
+  --build-arg CLOSED_SOURCE_MODE=true \
+  --build-arg MODAI_API_BASE_URL=https://your-api-server.com \
+  --build-arg MODAI_DEFAULT_THINKING_MODEL=gemini-2.5-pro \
+  --build-arg MODAI_DEFAULT_TASK_MODEL=gemini-2.5-flash \
+  -t deep-research:closed \
+  .
+```
+
+**方式 2：使用 docker-compose.yml**
+
+编辑 `docker-compose.yml`，取消注释 build args 部分：
+
+```yaml
+services:
+  deep-research:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - CLOSED_SOURCE_MODE=true
+        - MODAI_API_BASE_URL=https://your-api-server.com
+        - MODAI_DEFAULT_THINKING_MODEL=gemini-2.5-pro
+        - MODAI_DEFAULT_TASK_MODEL=gemini-2.5-flash
+    image: deep-research:closed
+    # ... 其他配置
+```
+
+然后构建：
+
+```bash
+docker-compose build
+docker-compose up -d
+```
+
+### 构建参数说明
+
+| 参数 | 必填 | 默认值 | 说明 |
+|------|------|--------|------|
+| `CLOSED_SOURCE_MODE` | 是 | `false` | 启用闭源模式 |
+| `MODAI_API_BASE_URL` | 是 | 无 | 您的 API 服务器地址 |
+| `MODAI_DEFAULT_THINKING_MODEL` | 否 | `gemini-2.5-pro` | 默认思考模型 |
+| `MODAI_DEFAULT_TASK_MODEL` | 否 | `gemini-2.5-flash` | 默认任务模型 |
+
+### 安全提示
+
+- ✅ API 地址不会出现在源码中
+- ✅ 构建时通过环境变量传入
+- ✅ 适合闭源分发
+- ⚠️ 请妥善保管包含 API 地址的构建脚本
+
 ## 📝 常用命令
 
 ### 查看日志

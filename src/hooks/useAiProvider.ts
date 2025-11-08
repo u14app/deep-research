@@ -44,9 +44,11 @@ function useModelProvider() {
         break;
       case "modai":
         const { modaiApiKey = "", modaiApiProxy } = useSettingStore.getState();
+        // In closed source mode, use environment variable for API URL
+        const MODAI_ENV_API = process.env.NEXT_PUBLIC_MODAI_API_BASE_URL || '';
         if (mode === "local") {
           options.baseURL = completePath(
-            modaiApiProxy || MODAI_BASE_URL,
+            MODAI_ENV_API || modaiApiProxy || MODAI_BASE_URL,
             "/v1beta"
           );
           options.apiKey = multiApiKeyPolling(modaiApiKey);

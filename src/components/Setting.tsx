@@ -94,6 +94,12 @@ const DISABLED_SEARCH_PROVIDER =
   process.env.NEXT_PUBLIC_DISABLED_SEARCH_PROVIDER || "";
 const MODEL_LIST = process.env.NEXT_PUBLIC_MODEL_LIST || "";
 
+// Closed source mode configuration
+const CLOSED_SOURCE_MODE = process.env.NEXT_PUBLIC_CLOSED_SOURCE_MODE === 'true';
+const MODAI_DEFAULT_API = process.env.NEXT_PUBLIC_MODAI_API_BASE_URL || '';
+const MODAI_DEFAULT_THINKING = process.env.NEXT_PUBLIC_MODAI_DEFAULT_THINKING || 'gemini-2.5-pro';
+const MODAI_DEFAULT_TASK = process.env.NEXT_PUBLIC_MODAI_DEFAULT_TASK || 'gemini-2.5-flash';
+
 const formSchema = z.object({
   provider: z.string(),
   mode: z.string().optional(),
@@ -407,7 +413,7 @@ function Setting({ open, onClose }: SettingProps) {
                 </TabsTrigger>
               </TabsList>
               <TabsContent className="space-y-4  min-h-[250px]" value="llm">
-                <div className={BUILD_MODE === "export" ? "hidden" : ""}>
+                <div className={CLOSED_SOURCE_MODE || BUILD_MODE === "export" ? "hidden" : ""}>
                   <FormField
                     control={form.control}
                     name="mode"
@@ -465,19 +471,27 @@ function Setting({ open, onClose }: SettingProps) {
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent className="max-sm:max-h-72">
-                            {!isDisabledAIProvider("google") ? (
-                              <SelectItem value="google">
-                                Google AI Studio
-                              </SelectItem>
-                            ) : null}
-                            {!isDisabledAIProvider("modai") ? (
+                            {CLOSED_SOURCE_MODE ? (
                               <SelectItem value="modai">
                                 Mod AI Studio
                               </SelectItem>
-                            ) : null}
-                            {!isDisabledAIProvider("openai") ? (
-                              <SelectItem value="openai">OpenAI</SelectItem>
-                            ) : null}
+                            ) : (
+                              <>
+                                {!isDisabledAIProvider("google") ? (
+                                  <SelectItem value="google">
+                                    Google AI Studio
+                                  </SelectItem>
+                                ) : null}
+                                {!isDisabledAIProvider("modai") ? (
+                                  <SelectItem value="modai">
+                                    Mod AI Studio
+                                  </SelectItem>
+                                ) : null}
+                                {!isDisabledAIProvider("openai") ? (
+                                  <SelectItem value="openai">OpenAI</SelectItem>
+                                ) : null}
+                              </>
+                            )}
                           </SelectContent>
                         </Select>
                       </FormControl>
@@ -574,29 +588,31 @@ function Setting({ open, onClose }: SettingProps) {
                         </FormItem>
                       )}
                     />
-                    <FormField
-                      control={form.control}
-                      name="modaiApiProxy"
-                      render={({ field }) => (
-                        <FormItem className="from-item">
-                          <FormLabel className="from-label">
-                            {t("setting.apiUrlLabel")}
-                          </FormLabel>
-                          <FormControl className="form-field">
-                            <Input
-                              placeholder="https://your-newapi-server.com"
-                              {...field}
-                              onBlur={() =>
-                                updateSetting(
-                                  "modaiApiProxy",
-                                  form.getValues("modaiApiProxy")
-                                )
-                              }
-                            />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
+                    {!CLOSED_SOURCE_MODE && (
+                      <FormField
+                        control={form.control}
+                        name="modaiApiProxy"
+                        render={({ field }) => (
+                          <FormItem className="from-item">
+                            <FormLabel className="from-label">
+                              {t("setting.apiUrlLabel")}
+                            </FormLabel>
+                            <FormControl className="form-field">
+                              <Input
+                                placeholder="https://your-newapi-server.com"
+                                {...field}
+                                onBlur={() =>
+                                  updateSetting(
+                                    "modaiApiProxy",
+                                    form.getValues("modaiApiProxy")
+                                  )
+                                }
+                              />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                    )}
                   </div>
                   <div
                     className={cn("space-y-4", {
@@ -1474,62 +1490,66 @@ function Setting({ open, onClose }: SettingProps) {
                     hidden: provider !== "modai",
                   })}
                 >
-                  <FormField
-                    control={form.control}
-                    name="modaiThinkingModel"
-                    render={({ field }) => (
-                      <FormItem className="from-item">
-                        <FormLabel className="from-label">
-                          <HelpTip tip={t("setting.thinkingModelTip")}>
-                            {t("setting.thinkingModel")}
-                            <span className="ml-1 text-red-500 max-sm:hidden">
-                              *
-                            </span>
-                          </HelpTip>
-                        </FormLabel>
-                        <FormControl className="form-field">
-                          <Input
-                            placeholder="gemini-2.0-flash-thinking-exp"
-                            {...field}
-                            onBlur={() =>
-                              updateSetting(
-                                "modaiThinkingModel",
-                                form.getValues("modaiThinkingModel")
-                              )
-                            }
-                          />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="modaiNetworkingModel"
-                    render={({ field }) => (
-                      <FormItem className="from-item">
-                        <FormLabel className="from-label">
-                          <HelpTip tip={t("setting.networkingModelTip")}>
-                            {t("setting.networkingModel")}
-                            <span className="ml-1 text-red-500 max-sm:hidden">
-                              *
-                            </span>
-                          </HelpTip>
-                        </FormLabel>
-                        <FormControl className="form-field">
-                          <Input
-                            placeholder="gemini-2.0-flash-exp"
-                            {...field}
-                            onBlur={() =>
-                              updateSetting(
-                                "modaiNetworkingModel",
-                                form.getValues("modaiNetworkingModel")
-                              )
-                            }
-                          />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
+                  {!CLOSED_SOURCE_MODE && (
+                    <>
+                      <FormField
+                        control={form.control}
+                        name="modaiThinkingModel"
+                        render={({ field }) => (
+                          <FormItem className="from-item">
+                            <FormLabel className="from-label">
+                              <HelpTip tip={t("setting.thinkingModelTip")}>
+                                {t("setting.thinkingModel")}
+                                <span className="ml-1 text-red-500 max-sm:hidden">
+                                  *
+                                </span>
+                              </HelpTip>
+                            </FormLabel>
+                            <FormControl className="form-field">
+                              <Input
+                                placeholder="gemini-2.0-flash-thinking-exp"
+                                {...field}
+                                onBlur={() =>
+                                  updateSetting(
+                                    "modaiThinkingModel",
+                                    form.getValues("modaiThinkingModel")
+                                  )
+                                }
+                              />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="modaiNetworkingModel"
+                        render={({ field }) => (
+                          <FormItem className="from-item">
+                            <FormLabel className="from-label">
+                              <HelpTip tip={t("setting.networkingModelTip")}>
+                                {t("setting.networkingModel")}
+                                <span className="ml-1 text-red-500 max-sm:hidden">
+                                  *
+                                </span>
+                              </HelpTip>
+                            </FormLabel>
+                            <FormControl className="form-field">
+                              <Input
+                                placeholder="gemini-2.0-flash-exp"
+                                {...field}
+                                onBlur={() =>
+                                  updateSetting(
+                                    "modaiNetworkingModel",
+                                    form.getValues("modaiNetworkingModel")
+                                  )
+                                }
+                              />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                    </>
+                  )}
                 </div>
                 <div
                   className={cn("space-y-4", {

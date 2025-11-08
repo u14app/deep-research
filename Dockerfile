@@ -26,6 +26,18 @@ COPY . .
 # Uncomment the following line in case you want to disable telemetry during the build.
 # ENV NEXT_TELEMETRY_DISABLED 1
 
+# Build arguments for closed source mode (no defaults - must be provided at build time)
+ARG CLOSED_SOURCE_MODE=false
+ARG MODAI_API_BASE_URL
+ARG MODAI_DEFAULT_THINKING_MODEL=gemini-2.5-pro
+ARG MODAI_DEFAULT_TASK_MODEL=gemini-2.5-flash
+
+# Convert build args to environment variables for Next.js
+ENV NEXT_PUBLIC_CLOSED_SOURCE_MODE=$CLOSED_SOURCE_MODE
+ENV NEXT_PUBLIC_MODAI_API_BASE_URL=$MODAI_API_BASE_URL
+ENV NEXT_PUBLIC_MODAI_DEFAULT_THINKING=$MODAI_DEFAULT_THINKING_MODEL
+ENV NEXT_PUBLIC_MODAI_DEFAULT_TASK=$MODAI_DEFAULT_TASK_MODEL
+
 RUN pnpm run build:standalone
 
 # Production image, copy all the files and run next
