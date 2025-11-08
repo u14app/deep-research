@@ -49,10 +49,6 @@ docker-compose.yml
 *.tar.gz
 
 # Documentation
-README.md
-DOCKER.md
-LICENSE
-CHANGELOG.md
 docs/
 
 # Scripts
@@ -60,5 +56,7 @@ docker-*.sh
 
 # Misc
 *.md
+LICENSE
+CHANGELOG.md
 !package.json
 !pnpm-lock.yaml
