@@ -164,6 +164,18 @@ export class GeneQueryGenerator {
           interactionQueries[1],  // Protein complexes
         ];
       },
+      'interactions': () => {  // Support plural form from frontend
+        const interactionQueries = this.generateInteractionQueries();
+        return [
+          interactionQueries[0],  // Protein-protein interactions
+          interactionQueries[1],  // Protein complexes
+        ];
+      },
+      'therapeutic': () => {  // Therapeutic potential focus
+        const diseaseQueries = this.generateDiseaseQueries();
+        // Disease queries already include therapeutic targets (query #2)
+        return diseaseQueries.slice(0, 2);  // Include both disease and therapeutic queries
+      },
       'regulation': () => {
         const regulatoryQueries = this.generateRegulatoryQueries();
         return [

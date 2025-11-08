@@ -4,6 +4,227 @@
 
 ---
 
+## 2025-11-08 重大Bug修复：搜索重试逻辑与专业模式用户选择
+
+### 问题背景
+
+用户报告了两个严重问题：
+1. **搜索失败重试逻辑被破坏**：点击"Continue Research"时，不仅重试失败的任务，还会重新执行失败任务之后的所有未开始任务
+2. **专业模式用户选择不生效**：无论用户在复选框中选择什么研究重点（Focus），生成的 Research Plan 总是包含全部10个部分
+
+这两个问题严重影响了用户体验和功能正确性。
+
+### 问题1：搜索失败重试逻辑被二次破坏
+
+#### 根本原因分析
+
+虽然在 Commit `7759379` 中已经修复过一次（在 `SearchResult.tsx` 中正确区分 `failedTasks` 和 `unfinishedTasks`），但问题在于 `runSearchTask` 函数内部又重新过滤了任务：
+
+```typescript
+// src/hooks/useDeepResearch.ts:424-426 (问题代码)
+const tasksToProcess = queries.filter(task =>
+  task.state === "unprocessed" || task.state === "failed"
+);
+```
+
+**问题链条**：
+1. 用户点击"Continue Research"
+2. `SearchResult.tsx` 正确传入只包含 `failedTasks` 的数组
+3. 但 `runSearchTask` 内部又把 `unprocessed` 任务加回来
+4. 当某个任务失败时，`plimit.clearQueue()` 导致队列中剩余任务保持 `unprocessed` 状态
+5. 结果：失败任务之后的所有 `unprocessed` 任务也被执行
+
+#### 解决方案
+
+**核心原则**：信任调用者（Trust the caller）
+
+移除 `runSearchTask` 内部的过滤逻辑，直接使用调用者传入的任务列表：
+
+```typescript
+// src/hooks/useDeepResearch.ts:423-431 (修复后)
+// Trust the caller - do not re-filter tasks
+// The caller (SearchResult.tsx) already filters correctly:
+// - failedTasks for retry
+// - unfinishedTasks for continue
+// - specific queries for new searches
+console.log(`[runSearchTask] Processing ${queries.length} tasks directly from caller`);
+queries.forEach((task, idx) => {
+  console.log(`  Task ${idx + 1}: "${task.query}" [state: ${task.state}]`);
+});
+
+await Promise.all(
+  queries.map((item) => {  // 直接使用 queries，不再过滤
+    plimit(async () => {
+      // ...
+    });
+  })
+);
+```
+
+**为什么这样设计更好**：
+- **单一职责原则**：`runSearchTask` 只负责执行任务，不负责判断哪些任务该执行
+- **控制反转**：调用者（`SearchResult.tsx`）更了解业务逻辑，应该由它决定执行哪些任务
+- **减少重复逻辑**：避免在多个地方判断任务状态，降低出错概率
+
+### 问题2：专业模式用户选择不生效
+
+#### 根本原因分析
+
+**前端和后端的 focus ID 映射不一致**：
+
+前端 (`GeneInput.tsx`) 的 focus 选项 ID：
+```typescript
+['general', 'disease', 'structure', 'expression', 'interactions', 'evolution', 'therapeutic']
+//                                                    ^^^^^^^^^^^              ^^^^^^^^^^^
+//                                                    复数形式                  新增选项
+```
+
+后端 (`query-generator.ts`) 的 focusMap 键：
+```typescript
+['function', 'structure', 'expression', 'disease', 'interaction', 'regulation', 'pathway', 'evolution']
+//                                                  ^^^^^^^^^^^
+//                                                  单数形式（不匹配）
+//                                  缺少 'therapeutic' 支持
+```
+
+**影响链条**：
+1. 用户在前端选择 'interactions' → 后端 focusMap['interactions'] 不存在 → 忽略
+2. 用户选择 'therapeutic' → 后端完全没有这个选项 → 忽略
+3. 结果：`buildGeneReportPlanPrompt` 生成的 prompt 始终包含所有10个部分
+
+#### 解决方案
+
+**方案A：动态生成 Research Plan Prompt**
+
+创建 `buildGeneReportPlanPrompt()` 函数，根据用户选择动态生成 prompt：
+
+```typescript
+// src/hooks/useDeepResearch.ts:177-294
+function buildGeneReportPlanPrompt(query: string): string {
+  // 1. 解析用户选择
+  const focusMatch = query.match(/Focus:\s*([^,\n]+)/i);
+  const selectedFocus = focusMatch
+    ? focusMatch[1].split(',').map(f => f.trim().toLowerCase())
+    : [];
+
+  // 2. 定义 section mapping
+  const sectionMapping: Record<string, string[]> = {
+    'general': ['Gene Overview', 'Molecular Function', 'Protein Structure', ...],
+    'disease': ['Disease Associations', 'Therapeutic Implications'],
+    'structure': ['Protein Structure', 'Molecular Function'],
+    'expression': ['Expression Patterns', 'Regulatory Mechanisms'],
+    'interactions': ['Protein Interactions'],  // 支持复数形式
+    'evolution': ['Evolutionary Conservation'],
+    'therapeutic': ['Therapeutic Implications', 'Disease Associations'],  // 新增
+  };
+
+  // 3. 根据选择构建 sections
+  let sections = new Set<string>();
+  selectedFocus.forEach(focus => {
+    if (sectionMapping[focus]) {
+      sectionMapping[focus].forEach(s => sections.add(s));
+    }
+  });
+
+  // 4. 如果选择 general 或无选择，使用完整列表
+  if (sections.size === 0 || selectedFocus.includes('general')) {
+    sections = new Set([...所有10个部分]);
+  }
+
+  // 5. 生成动态 prompt
+  return `Generate a focused research plan...
+${orderedSections.map((s, i) => `${i+1}. **${s}** - ${descriptions[s]}`).join('\n')}
+...`;
+}
+```
+
+**方案B：修复 query-generator.ts 的 focusMap**
+
+添加对 'interactions' (复数) 和 'therapeutic' 的支持：
+
+```typescript
+// src/utils/gene-research/query-generator.ts:167-178
+'interactions': () => {  // 支持前端的复数形式
+  const interactionQueries = this.generateInteractionQueries();
+  return [
+    interactionQueries[0],  // Protein-protein interactions
+    interactionQueries[1],  // Protein complexes
+  ];
+},
+'therapeutic': () => {  // 新增 therapeutic 支持
+  const diseaseQueries = this.generateDiseaseQueries();
+  // Disease queries 已包含 therapeutic targets (第2个查询)
+  return diseaseQueries.slice(0, 2);
+},
+```
+
+### 技术细节
+
+#### 修改的文件
+
+**核心修复**：
+1. `src/hooks/useDeepResearch.ts`
+   - 移除 `runSearchTask` 内部的任务过滤逻辑 (-3行)
+   - 添加 `buildGeneReportPlanPrompt` 动态 prompt 生成函数 (+118行)
+   - 修改 `getModeAwareReportPlanPrompt` 使用新函数 (+1行)
+   - 移除未使用的 `geneReportPlanPrompt` 导入 (-1行)
+
+2. `src/utils/gene-research/query-generator.ts`
+   - 添加 'interactions' (复数) 支持 (+7行)
+   - 添加 'therapeutic' focus 支持 (+5行)
+
+**日志增强**：
+- 添加详细的任务执行日志
+- 添加用户选择解析日志
+- 添加 section 生成日志
+
+### 实现对比
+
+| 方面 | 修复前 | 修复后 |
+|------|--------|--------|
+| **搜索重试** | 失败任务+所有后续未开始任务 | 仅失败任务 ✅ |
+| **专业模式选择** | 固定10个部分 | 根据用户选择动态生成 ✅ |
+| **Focus 映射** | 'interactions'/'therapeutic' 不支持 | 完全支持 ✅ |
+| **代码责任** | `runSearchTask` 混合业务逻辑 | 职责单一，信任调用者 ✅ |
+| **可维护性** | 多处判断，容易出错 | 集中管理，逻辑清晰 ✅ |
+
+### 用户选择示例
+
+**示例1：只选择 Disease Association**
+- 输入：`Focus: disease`
+- 生成 Plan 包含：Disease Associations, Therapeutic Implications, Research Gaps (3个部分)
+- 生成查询：2个疾病相关查询
+
+**示例2：选择 Structure + Expression**
+- 输入：`Focus: structure, expression`
+- 生成 Plan 包含：Protein Structure, Molecular Function, Expression Patterns, Regulatory Mechanisms, Research Gaps (5个部分)
+- 生成查询：2个结构查询 + 2个表达查询
+
+**示例3：选择 General (默认)**
+- 输入：`Focus: general`
+- 生成 Plan 包含：所有10个部分
+- 生成查询：平衡的7个查询（涵盖各个方面）
+
+### 测试验证
+
+✅ TypeScript 编译成功
+✅ Linting 通过
+✅ Build 成功 (`pnpm run build:standalone`)
+✅ 无运行时错误
+
+### 代码质量改进
+
+1. **单一职责原则**：每个函数只做一件事
+2. **开闭原则**：通过映射表扩展功能，无需修改核心逻辑
+3. **信任调用者**：减少防御性编程，提高代码清晰度
+4. **详细日志**：方便调试和问题追踪
+
+### Git 提交
+
+相关提交将包括完整的修复说明和测试验证结果。
+
+---
+
 ## 2025-11-08 流式文本性能优化与用户体验改进
 
 ### 问题背景

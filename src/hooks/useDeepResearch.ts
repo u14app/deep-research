@@ -36,7 +36,6 @@ import {
 import {
   geneResearchSystemInstruction,
   geneResearchQuestionPrompt,
-  geneReportPlanPrompt,
   geneSerpQueriesPrompt,
 } from "@/constants/gene-research-prompts";
 import { createGeneQueryGenerator } from "@/utils/gene-research/query-generator";
@@ -174,10 +173,130 @@ function useDeepResearch() {
     return generateQuestionsPrompt(query);
   }
 
+  function buildGeneReportPlanPrompt(query: string): string {
+    // Parse user selections from query
+    const focusMatch = query.match(/Focus:\s*([^,\n]+)/i);
+    const aspectsMatch = query.match(/Specific Aspects:\s*([^,\n]+)/i);
+
+    const selectedFocus = focusMatch
+      ? focusMatch[1].split(',').map(f => f.trim().toLowerCase())
+      : [];
+    const selectedAspects = aspectsMatch
+      ? aspectsMatch[1].split(',').map(a => a.trim().toLowerCase())
+      : [];
+
+    console.log('[Professional Mode] User selected focus:', selectedFocus);
+    console.log('[Professional Mode] User selected aspects:', selectedAspects);
+
+    // Define section mapping based on research focus
+    // Map frontend focus IDs to research plan sections
+    const sectionMapping: Record<string, string[]> = {
+      'general': ['Gene Overview', 'Molecular Function', 'Protein Structure', 'Regulatory Mechanisms', 'Expression Patterns'],
+      'disease': ['Disease Associations', 'Therapeutic Implications'],
+      'structure': ['Protein Structure', 'Molecular Function'],
+      'expression': ['Expression Patterns', 'Regulatory Mechanisms'],
+      'interactions': ['Protein Interactions'],  // Frontend uses 'interactions' (plural)
+      'evolution': ['Evolutionary Conservation'],
+      'therapeutic': ['Therapeutic Implications', 'Disease Associations'],
+    };
+
+    // Build section set based on user selections
+    let sections = new Set<string>();
+
+    selectedFocus.forEach(focus => {
+      if (sectionMapping[focus]) {
+        sectionMapping[focus].forEach(s => sections.add(s));
+      }
+    });
+
+    // If 'general' is selected or no specific focus, include all core sections
+    if (sections.size === 0 || selectedFocus.includes('general')) {
+      sections = new Set([
+        'Gene Overview',
+        'Molecular Function',
+        'Protein Structure',
+        'Regulatory Mechanisms',
+        'Expression Patterns',
+        'Protein Interactions',
+        'Evolutionary Conservation',
+        'Disease Associations',
+        'Therapeutic Implications',
+        'Research Gaps'
+      ]);
+    } else {
+      // Always include Research Gaps for non-general focused research
+      sections.add('Research Gaps');
+    }
+
+    // Convert to ordered list
+    const sectionOrder = [
+      'Gene Overview',
+      'Molecular Function',
+      'Protein Structure',
+      'Regulatory Mechanisms',
+      'Expression Patterns',
+      'Protein Interactions',
+      'Evolutionary Conservation',
+      'Disease Associations',
+      'Therapeutic Implications',
+      'Research Gaps'
+    ];
+
+    const orderedSections = sectionOrder.filter(s => sections.has(s));
+
+    // Build section descriptions
+    const sectionDescriptions: Record<string, string> = {
+      'Gene Overview': 'Basic gene information, nomenclature, and genomic context',
+      'Molecular Function': 'Catalytic activity, protein domains, and biochemical properties',
+      'Protein Structure': '3D structure, functional domains, and active sites',
+      'Regulatory Mechanisms': 'Transcriptional, post-transcriptional, and post-translational regulation',
+      'Expression Patterns': 'Tissue-specific expression, developmental regulation, and environmental responses',
+      'Protein Interactions': 'Protein-protein interactions, complexes, and networks',
+      'Evolutionary Conservation': 'Orthologs, paralogs, and evolutionary relationships',
+      'Disease Associations': 'Mutations, polymorphisms, and disease phenotypes',
+      'Therapeutic Implications': 'Drug targets, therapeutic strategies, and clinical relevance',
+      'Research Gaps': 'Current limitations and future research directions'
+    };
+
+    const sectionList = orderedSections
+      .map((s, i) => `${i + 1}. **${s}** - ${sectionDescriptions[s]}`)
+      .join('\n');
+
+    console.log(`[Professional Mode] Generated ${orderedSections.length} sections for research plan`);
+
+    return `Given the following gene research query from the user:
+<QUERY>
+${query}
+</QUERY>
+
+Generate a focused research plan for gene function analysis. Based on the user's selected focus areas, your plan should include these essential sections:
+
+${sectionList}
+
+**IMPORTANT: Do NOT include the following sections in your research plan:**
+- References (this is a research plan, not a final report)
+- Data Availability & Reproducibility Bundle
+- Code & Protocols
+- Strain & Plasmid Requests
+- Materials and Methods
+- Supplementary Information
+- Author Contributions
+- Funding Information
+- Competing Interests
+- Ethics Statements
+- Acknowledgments
+- Appendices
+
+**CRITICAL: This is a RESEARCH PLAN (what to research), NOT a final report format.**
+A research plan should only contain TOPICS and RESEARCH QUESTIONS, not report structure elements like References, Acknowledgments, etc.
+
+Each section should have a clear research goal and specific questions to investigate, focusing exclusively on gene function and molecular mechanisms relevant to the user's selected focus areas.`;
+  }
+
   function getModeAwareReportPlanPrompt(query: string): string {
     const { mode } = useModeStore.getState();
     if (mode === 'professional') {
-      return geneReportPlanPrompt.replace('{query}', query);
+      return buildGeneReportPlanPrompt(query);
     }
     return writeReportPlanPrompt(query);
   }
@@ -420,15 +539,18 @@ function useDeepResearch() {
     const plimit = Plimit(parallelSearch);
     const thinkTagStreamProcessor = new ThinkTagStreamProcessor();
 
-    // Filter out already completed tasks - only process unprocessed or failed tasks
-    const tasksToProcess = queries.filter(task =>
-      task.state === "unprocessed" || task.state === "failed"
-    );
-
-    console.log(`[runSearchTask] Total tasks: ${queries.length}, To process: ${tasksToProcess.length}, Skipped (completed): ${queries.length - tasksToProcess.length}`);
+    // Trust the caller - do not re-filter tasks
+    // The caller (SearchResult.tsx) already filters correctly:
+    // - failedTasks for retry
+    // - unfinishedTasks for continue
+    // - specific queries for new searches
+    console.log(`[runSearchTask] Processing ${queries.length} tasks directly from caller`);
+    queries.forEach((task, idx) => {
+      console.log(`  Task ${idx + 1}: "${task.query}" [state: ${task.state}]`);
+    });
 
     await Promise.all(
-      tasksToProcess.map((item) => {
+      queries.map((item) => {
         plimit(async () => {
           let content = "";
           let reasoning = "";
