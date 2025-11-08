@@ -94,11 +94,8 @@ const DISABLED_SEARCH_PROVIDER =
   process.env.NEXT_PUBLIC_DISABLED_SEARCH_PROVIDER || "";
 const MODEL_LIST = process.env.NEXT_PUBLIC_MODEL_LIST || "";
 
-// Closed source mode configuration
+// Distribution mode configuration (pre-configured deployment)
 const CLOSED_SOURCE_MODE = process.env.NEXT_PUBLIC_CLOSED_SOURCE_MODE === 'true';
-const MODAI_DEFAULT_API = process.env.NEXT_PUBLIC_MODAI_API_BASE_URL || '';
-const MODAI_DEFAULT_THINKING = process.env.NEXT_PUBLIC_MODAI_DEFAULT_THINKING || 'gemini-2.5-pro';
-const MODAI_DEFAULT_TASK = process.env.NEXT_PUBLIC_MODAI_DEFAULT_TASK || 'gemini-2.5-flash';
 
 const formSchema = z.object({
   provider: z.string(),

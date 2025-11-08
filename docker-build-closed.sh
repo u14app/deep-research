@@ -32,28 +32,54 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # ============================================
-# 配置区域 - 根据需要修改
+# 配置区域 - 交互式输入
 # ============================================
 
 IMAGE_NAME="deep-research"
 IMAGE_TAG="closed"
 FULL_IMAGE="${IMAGE_NAME}:${IMAGE_TAG}"
 
-# 闭源版配置
-MODAI_API_BASE_URL="https://off.092420.xyz"
-MODAI_DEFAULT_THINKING_MODEL="gemini-2.5-pro"
-MODAI_DEFAULT_TASK_MODEL="gemini-2.5-flash"
+echo -e "${BLUE}=========================================="
+echo "  分发版配置"
+echo "==========================================${NC}"
+echo ""
+echo "请输入以下配置信息（直接回车使用默认值）："
+echo ""
+
+# API 地址配置
+echo -e "${YELLOW}[1/3] API 服务器地址${NC}"
+echo "  说明: 您的 NewAPI 或其他兼容服务器地址"
+read -p "  请输入 (默认: https://newapi.com): " input_api_url
+MODAI_API_BASE_URL="${input_api_url:-https://newapi.com}"
+echo -e "${GREEN}  ✓ 已设置: ${MODAI_API_BASE_URL}${NC}"
+echo ""
+
+# 思考模型配置
+echo -e "${YELLOW}[2/3] 思考模型${NC}"
+echo "  说明: 用于复杂推理和分析的模型"
+read -p "  请输入 (默认: gemini-2.5-pro): " input_thinking_model
+MODAI_DEFAULT_THINKING_MODEL="${input_thinking_model:-gemini-2.5-pro}"
+echo -e "${GREEN}  ✓ 已设置: ${MODAI_DEFAULT_THINKING_MODEL}${NC}"
+echo ""
+
+# 任务模型配置
+echo -e "${YELLOW}[3/3] 任务模型${NC}"
+echo "  说明: 用于快速执行任务的模型"
+read -p "  请输入 (默认: gemini-2.5-flash): " input_task_model
+MODAI_DEFAULT_TASK_MODEL="${input_task_model:-gemini-2.5-flash}"
+echo -e "${GREEN}  ✓ 已设置: ${MODAI_DEFAULT_TASK_MODEL}${NC}"
+echo ""
 
 # ============================================
 
-echo -e "${BLUE}配置信息:${NC}"
+echo -e "${BLUE}配置摘要:${NC}"
 echo "----------------------------------------"
 echo "  镜像名称: ${FULL_IMAGE}"
 echo "  API 地址: ${MODAI_API_BASE_URL}"
 echo "  思考模型: ${MODAI_DEFAULT_THINKING_MODEL}"
 echo "  任务模型: ${MODAI_DEFAULT_TASK_MODEL}"
 echo ""
-echo -e "${RED}警告: 此脚本包含敏感配置，请勿分享！${NC}"
+echo -e "${RED}⚠ 警告: API 地址将写入镜像，请确认后再分发！${NC}"
 echo ""
 
 read -p "确认开始构建？(y/N): " -n 1 -r

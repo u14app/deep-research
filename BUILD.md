@@ -66,7 +66,7 @@ docker builder prune -f
 docker build \
   --no-cache \
   --build-arg CLOSED_SOURCE_MODE=true \
-  --build-arg MODAI_API_BASE_URL=https://off.092420.xyz \
+  --build-arg MODAI_API_BASE_URL=https://newapi.com \
   --build-arg MODAI_DEFAULT_THINKING_MODEL=gemini-2.5-pro \
   --build-arg MODAI_DEFAULT_TASK_MODEL=gemini-2.5-flash \
   --tag deep-research:closed \
@@ -82,8 +82,8 @@ docker images | grep deep-research
 
 | 参数 | 说明 | 示例 |
 |------|------|------|
-| `CLOSED_SOURCE_MODE` | 启用闭源模式 | `true` 或 `false` |
-| `MODAI_API_BASE_URL` | API 服务器地址 | `https://off.092420.xyz` |
+| `CLOSED_SOURCE_MODE` | 启用分发模式 | `true` 或 `false` |
+| `MODAI_API_BASE_URL` | API 服务器地址 | `https://newapi.com` |
 
 ### 可选参数（分发版）
 
@@ -130,7 +130,7 @@ services:
       dockerfile: Dockerfile
       args:
         - CLOSED_SOURCE_MODE=true
-        - MODAI_API_BASE_URL=https://off.092420.xyz
+        - MODAI_API_BASE_URL=https://newapi.com
         - MODAI_DEFAULT_THINKING_MODEL=gemini-2.5-pro
         - MODAI_DEFAULT_TASK_MODEL=gemini-2.5-flash
     image: deep-research:closed

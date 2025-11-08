@@ -26,11 +26,11 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # ============================================
-# 闭源版配置 - 根据需要修改
+# 分发版默认配置
 # ============================================
-MODAI_API_BASE_URL="https://off.092420.xyz"
-MODAI_DEFAULT_THINKING_MODEL="gemini-2.5-pro"
-MODAI_DEFAULT_TASK_MODEL="gemini-2.5-flash"
+DEFAULT_MODAI_API_BASE_URL="https://newapi.com"
+DEFAULT_MODAI_THINKING_MODEL="gemini-2.5-pro"
+DEFAULT_MODAI_TASK_MODEL="gemini-2.5-flash"
 # ============================================
 
 function show_banner() {
@@ -111,17 +111,41 @@ function build_closed() {
     local full_image="${image_name}:${image_tag}"
 
     show_banner
-    echo -e "${BLUE}构建类型: 闭源版 (Closed Source)${NC}"
+    echo -e "${BLUE}构建类型: 分发版 (Distribution Mode)${NC}"
     echo ""
-    echo -e "${YELLOW}配置信息:${NC}"
+    echo "请输入配置信息（直接回车使用默认值）："
+    echo ""
+
+    # API 地址配置
+    echo -e "${YELLOW}[1/3] API 服务器地址${NC}"
+    read -p "  请输入 (默认: ${DEFAULT_MODAI_API_BASE_URL}): " input_api_url
+    local MODAI_API_BASE_URL="${input_api_url:-$DEFAULT_MODAI_API_BASE_URL}"
+    echo -e "${GREEN}  ✓ 已设置: ${MODAI_API_BASE_URL}${NC}"
+    echo ""
+
+    # 思考模型配置
+    echo -e "${YELLOW}[2/3] 思考模型${NC}"
+    read -p "  请输入 (默认: ${DEFAULT_MODAI_THINKING_MODEL}): " input_thinking_model
+    local MODAI_DEFAULT_THINKING_MODEL="${input_thinking_model:-$DEFAULT_MODAI_THINKING_MODEL}"
+    echo -e "${GREEN}  ✓ 已设置: ${MODAI_DEFAULT_THINKING_MODEL}${NC}"
+    echo ""
+
+    # 任务模型配置
+    echo -e "${YELLOW}[3/3] 任务模型${NC}"
+    read -p "  请输入 (默认: ${DEFAULT_MODAI_TASK_MODEL}): " input_task_model
+    local MODAI_DEFAULT_TASK_MODEL="${input_task_model:-$DEFAULT_MODAI_TASK_MODEL}"
+    echo -e "${GREEN}  ✓ 已设置: ${MODAI_DEFAULT_TASK_MODEL}${NC}"
+    echo ""
+
+    echo -e "${YELLOW}配置摘要:${NC}"
     echo "  API 地址: ${MODAI_API_BASE_URL}"
     echo "  思考模型: ${MODAI_DEFAULT_THINKING_MODEL}"
     echo "  任务模型: ${MODAI_DEFAULT_TASK_MODEL}"
     echo ""
-    echo -e "${RED}⚠ 警告: 此配置将写入镜像，请勿分发包含敏感信息的镜像${NC}"
+    echo -e "${RED}⚠ 警告: API 地址将写入镜像，请确认后再分发！${NC}"
     echo ""
 
-    read -p "确认构建闭源版？(y/N): " -n 1 -r
+    read -p "确认构建分发版？(y/N): " -n 1 -r
     echo
     if [[ ! $REPLY =~ ^[Yy]$ ]]; then
         echo "已取消构建"
@@ -169,10 +193,11 @@ function interactive_menu() {
     echo "     - 支持所有 AI 提供商"
     echo "     - 用户可配置所有选项"
     echo ""
-    echo "  2) 闭源版 (Closed Source)"
+    echo "  2) 分发版 (Distribution Mode)"
     echo "     - 精简UI"
     echo "     - 只支持 Modai"
     echo "     - API地址预配置"
+    echo "     - 交互式配置"
     echo ""
     echo "  3) 同时构建两个版本"
     echo ""
