@@ -281,6 +281,9 @@ function useDeepResearch() {
     });
     let content = "";
     let reasoning = "";
+    let lastUpdateTime = 0;
+    const UPDATE_INTERVAL = 100; // Update UI every 100ms instead of every character
+
     taskStore.setQuestion(question);
     for await (const part of result.fullStream) {
       if (part.type === "text-delta") {
@@ -288,7 +291,12 @@ function useDeepResearch() {
           part.textDelta,
           (data) => {
             content += data;
-            taskStore.updateQuestions(content);
+            // Throttle updates to reduce re-renders
+            const now = Date.now();
+            if (now - lastUpdateTime >= UPDATE_INTERVAL) {
+              taskStore.updateQuestions(content);
+              lastUpdateTime = now;
+            }
           },
           (data) => {
             reasoning += data;
@@ -298,6 +306,8 @@ function useDeepResearch() {
         reasoning += part.textDelta;
       }
     }
+    // Final update to ensure we have the complete content
+    taskStore.updateQuestions(content);
     if (reasoning) console.log(reasoning);
   }
 
@@ -318,13 +328,21 @@ function useDeepResearch() {
     });
     let content = "";
     let reasoning = "";
+    let lastUpdateTime = 0;
+    const UPDATE_INTERVAL = 100; // Update UI every 100ms instead of every character
+
     for await (const part of result.fullStream) {
       if (part.type === "text-delta") {
         thinkTagStreamProcessor.processChunk(
           part.textDelta,
           (data) => {
             content += data;
-            taskStore.updateReportPlan(content);
+            // Throttle updates to reduce re-renders
+            const now = Date.now();
+            if (now - lastUpdateTime >= UPDATE_INTERVAL) {
+              taskStore.updateReportPlan(content);
+              lastUpdateTime = now;
+            }
           },
           (data) => {
             reasoning += data;
@@ -334,6 +352,8 @@ function useDeepResearch() {
         reasoning += part.textDelta;
       }
     }
+    // Final update to ensure we have the complete content
+    taskStore.updateReportPlan(content);
     if (reasoning) console.log(reasoning);
     return content;
   }
@@ -952,13 +972,21 @@ function useDeepResearch() {
     });
     let content = "";
     let reasoning = "";
+    let lastUpdateTime = 0;
+    const UPDATE_INTERVAL = 100; // Update UI every 100ms instead of every character
+
     for await (const part of result.fullStream) {
       if (part.type === "text-delta") {
         thinkTagStreamProcessor.processChunk(
           part.textDelta,
           (data) => {
             content += data;
-            updateFinalReport(content);
+            // Throttle updates to reduce re-renders
+            const now = Date.now();
+            if (now - lastUpdateTime >= UPDATE_INTERVAL) {
+              updateFinalReport(content);
+              lastUpdateTime = now;
+            }
           },
           (data) => {
             reasoning += data;
@@ -968,6 +996,8 @@ function useDeepResearch() {
         reasoning += part.textDelta;
       }
     }
+    // Final update to ensure we have the complete content
+    updateFinalReport(content);
     if (reasoning) console.log(reasoning);
     if (sources.length > 0) {
       content +=
