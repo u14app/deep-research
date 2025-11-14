@@ -1,5 +1,7 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { persist, type StorageValue } from "zustand/middleware";
+import { researchStore } from "@/utils/storage";
+import { pick } from "radash";
 
 export interface SettingStore {
   provider: string;
@@ -175,6 +177,26 @@ export const useSettingStore = create(
       update: (values) => set(values),
       reset: () => set(defaultValues),
     }),
-    { name: "setting" }
+    {
+      name: "setting",
+      version: 1,
+      storage: {
+        getItem: async (key: string) => {
+          return await researchStore.getItem<
+            StorageValue<SettingStore & SettingActions>
+          >(key);
+        },
+        setItem: async (
+          key: string,
+          store: StorageValue<SettingStore & SettingActions>
+        ) => {
+          return await researchStore.setItem(key, {
+            state: pick(store.state, Object.keys(defaultValues) as (keyof SettingStore)[]),
+            version: store.version,
+          });
+        },
+        removeItem: async (key: string) => await researchStore.removeItem(key),
+      },
+    }
   )
 );
