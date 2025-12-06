@@ -1,7 +1,7 @@
 {
   "name": "deep-research",
   "description": "Use any LLMs (Large Language Models) for Deep Research. Support SSE API and MCP server.",
-  "version": "0.10.1",
+  "version": "0.10.2",
   "license": "MIT",
   "repository": {
     "url": "https://github.com/u14app/deep-research"
@@ -60,7 +60,7 @@
     "marked": "^15.0.12",
     "mermaid": "^11.6.0",
     "nanoid": "^5.1.5",
-    "next": "^15.3.1",
+    "next": "^15.5.7",
     "next-themes": "^0.4.4",
     "ollama-ai-provider": "^1.2.0",
     "p-limit": "^6.2.0",
