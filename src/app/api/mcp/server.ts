@@ -123,6 +123,12 @@ export function initMcpServer() {
           "Whether to include citation links in search results and final reports."
         ),
     },
+    {
+      title: "Deep Research",
+      readOnlyHint: true,
+      destructiveHint: false,
+      openWorldHint: true, // Uses external search and AI APIs
+    },
     async (
       { query, language, maxResult, enableCitationImage, enableReferences },
       { signal }
@@ -167,6 +173,12 @@ export function initMcpServer() {
       query: z.string().describe("The topic for deep research."),
       language: z.string().optional().describe("The response Language."),
     },
+    {
+      title: "Write Research Plan",
+      readOnlyHint: true,
+      destructiveHint: false,
+      openWorldHint: true, // Uses external AI API
+    },
     async ({ query, language }, { signal }) => {
       signal.addEventListener("abort", () => {
         throw new Error("The client closed unexpectedly!");
@@ -202,6 +214,12 @@ export function initMcpServer() {
     {
       plan: z.string().describe("Research plan for deep research."),
       language: z.string().optional().describe("The response Language."),
+    },
+    {
+      title: "Generate SERP Query",
+      readOnlyHint: true,
+      destructiveHint: false,
+      openWorldHint: true, // Uses external AI API
     },
     async ({ plan, language }, { signal }) => {
       signal.addEventListener("abort", () => {
@@ -255,6 +273,12 @@ export function initMcpServer() {
         .describe(
           "Whether to include citation links in search results and final reports."
         ),
+    },
+    {
+      title: "Search Task",
+      readOnlyHint: true,
+      destructiveHint: false,
+      openWorldHint: true, // Uses external search API
     },
     async (
       { tasks, language, maxResult, enableReferences = true },
@@ -357,6 +381,12 @@ export function initMcpServer() {
         .describe(
           "Whether to include citation links in search results and final reports."
         ),
+    },
+    {
+      title: "Write Final Report",
+      readOnlyHint: true,
+      destructiveHint: false,
+      openWorldHint: true, // Uses external AI API
     },
     async (
       {
