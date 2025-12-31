@@ -1,6 +1,7 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { persist, type StorageValue } from "zustand/middleware";
 import { pick } from "radash";
+import { researchStore } from "@/utils/storage";
 
 export interface TaskStore {
   id: string;
@@ -117,6 +118,26 @@ export const useTaskStore = create(
       },
       restore: (taskStore) => set(() => ({ ...taskStore })),
     }),
-    { name: "research" }
+    {
+      name: "research",
+      version: 1,
+      storage: {
+        getItem: async (key: string) => {
+          return await researchStore.getItem<
+            StorageValue<TaskStore & TaskActions>
+          >(key);
+        },
+        setItem: async (
+          key: string,
+          store: StorageValue<TaskStore & TaskActions>
+        ) => {
+          return await researchStore.setItem(key, {
+            state: pick(store.state, Object.keys(defaultValues) as (keyof TaskStore)[]),
+            version: store.version,
+          });
+        },
+        removeItem: async (key: string) => await researchStore.removeItem(key),
+      },
+    }
   )
 );
