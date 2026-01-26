@@ -13,4 +13,5 @@ export const TAVILY_BASE_URL = "https://api.tavily.com";
 export const FIRECRAWL_BASE_URL = "https://api.firecrawl.dev";
 export const EXA_BASE_URL = "https://api.exa.ai";
 export const BOCHA_BASE_URL = "https://api.bochaai.com";
+export const BRAVE_BASE_URL = "https://api.search.brave.com/res";
 export const SEARXNG_BASE_URL = "http://localhost:8080";

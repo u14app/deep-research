@@ -65,6 +65,7 @@ import {
   FIRECRAWL_BASE_URL,
   EXA_BASE_URL,
   BOCHA_BASE_URL,
+  BRAVE_BASE_URL,
   SEARXNG_BASE_URL,
 } from "@/constants/urls";
 import locales from "@/constants/locales";
@@ -160,6 +161,8 @@ const formSchema = z.object({
   exaScope: z.string().optional(),
   bochaApiKey: z.string().optional(),
   bochaApiProxy: z.string().optional(),
+  braveApiKey: z.string().optional(),
+  braveApiProxy: z.string().optional(),
   searxngApiProxy: z.string().optional(),
   searxngScope: z.string().optional(),
   parallelSearch: z.number().min(1).max(5),
@@ -273,23 +276,23 @@ function Setting({ open, onClose }: SettingProps) {
           : [];
       return disabledAIProviders.includes(provider);
     },
-    [mode]
+    [mode],
   );
 
   const isDisabledAIModel = useCallback(
     (model: string) => {
       if (mode === "local") return false;
       const { availableModelList, disabledModelList } = getCustomModelList(
-        MODEL_LIST.length > 0 ? MODEL_LIST.split(",") : []
+        MODEL_LIST.length > 0 ? MODEL_LIST.split(",") : [],
       );
       const isAvailableModel = availableModelList.some(
-        (availableModel) => availableModel === model
+        (availableModel) => availableModel === model,
       );
       if (isAvailableModel) return false;
       if (disabledModelList.includes("all")) return true;
       return disabledModelList.some((disabledModel) => disabledModel === model);
     },
-    [mode]
+    [mode],
   );
 
   const isDisabledSearchProvider = useCallback(
@@ -300,7 +303,7 @@ function Setting({ open, onClose }: SettingProps) {
           : [];
       return disabledSearchProviders.includes(provider);
     },
-    [mode]
+    [mode],
   );
 
   const installPWA = async () => {
@@ -542,7 +545,7 @@ function Setting({ open, onClose }: SettingProps) {
                               onBlur={() =>
                                 updateSetting(
                                   "apiKey",
-                                  form.getValues("apiKey")
+                                  form.getValues("apiKey"),
                                 )
                               }
                             />
@@ -565,7 +568,7 @@ function Setting({ open, onClose }: SettingProps) {
                               onBlur={() =>
                                 updateSetting(
                                   "apiProxy",
-                                  form.getValues("apiProxy")
+                                  form.getValues("apiProxy"),
                                 )
                               }
                             />
@@ -597,7 +600,7 @@ function Setting({ open, onClose }: SettingProps) {
                               onBlur={() =>
                                 updateSetting(
                                   "googleVertexProject",
-                                  form.getValues("googleVertexProject")
+                                  form.getValues("googleVertexProject"),
                                 )
                               }
                             />
@@ -623,7 +626,7 @@ function Setting({ open, onClose }: SettingProps) {
                               onBlur={() =>
                                 updateSetting(
                                   "googleVertexLocation",
-                                  form.getValues("googleVertexLocation")
+                                  form.getValues("googleVertexLocation"),
                                 )
                               }
                             />
@@ -646,7 +649,7 @@ function Setting({ open, onClose }: SettingProps) {
                               onBlur={() =>
                                 updateSetting(
                                   "googleClientEmail",
-                                  form.getValues("googleClientEmail")
+                                  form.getValues("googleClientEmail"),
                                 )
                               }
                             />
@@ -670,7 +673,7 @@ function Setting({ open, onClose }: SettingProps) {
                               onBlur={() =>
                                 updateSetting(
                                   "googlePrivateKey",
-                                  form.getValues("googlePrivateKey")
+                                  form.getValues("googlePrivateKey"),
                                 )
                               }
                             />
@@ -693,7 +696,7 @@ function Setting({ open, onClose }: SettingProps) {
                               onBlur={() =>
                                 updateSetting(
                                   "googlePrivateKeyId",
-                                  form.getValues("googlePrivateKeyId")
+                                  form.getValues("googlePrivateKeyId"),
                                 )
                               }
                             />
@@ -726,7 +729,7 @@ function Setting({ open, onClose }: SettingProps) {
                               onBlur={() =>
                                 updateSetting(
                                   "openRouterApiKey",
-                                  form.getValues("openRouterApiKey")
+                                  form.getValues("openRouterApiKey"),
                                 )
                               }
                             />
@@ -749,7 +752,7 @@ function Setting({ open, onClose }: SettingProps) {
                               onBlur={() =>
                                 updateSetting(
                                   "openRouterApiProxy",
-                                  form.getValues("openRouterApiProxy")
+                                  form.getValues("openRouterApiProxy"),
                                 )
                               }
                             />
@@ -782,7 +785,7 @@ function Setting({ open, onClose }: SettingProps) {
                               onBlur={() =>
                                 updateSetting(
                                   "openAIApiKey",
-                                  form.getValues("openAIApiKey")
+                                  form.getValues("openAIApiKey"),
                                 )
                               }
                             />
@@ -805,7 +808,7 @@ function Setting({ open, onClose }: SettingProps) {
                               onBlur={() =>
                                 updateSetting(
                                   "openAIApiProxy",
-                                  form.getValues("openAIApiProxy")
+                                  form.getValues("openAIApiProxy"),
                                 )
                               }
                             />
@@ -838,7 +841,7 @@ function Setting({ open, onClose }: SettingProps) {
                               onBlur={() =>
                                 updateSetting(
                                   "anthropicApiKey",
-                                  form.getValues("anthropicApiKey")
+                                  form.getValues("anthropicApiKey"),
                                 )
                               }
                             />
@@ -861,7 +864,7 @@ function Setting({ open, onClose }: SettingProps) {
                               onBlur={() =>
                                 updateSetting(
                                   "anthropicApiProxy",
-                                  form.getValues("anthropicApiProxy")
+                                  form.getValues("anthropicApiProxy"),
                                 )
                               }
                             />
@@ -894,7 +897,7 @@ function Setting({ open, onClose }: SettingProps) {
                               onBlur={() =>
                                 updateSetting(
                                   "deepseekApiKey",
-                                  form.getValues("deepseekApiKey")
+                                  form.getValues("deepseekApiKey"),
                                 )
                               }
                             />
@@ -917,7 +920,7 @@ function Setting({ open, onClose }: SettingProps) {
                               onBlur={() =>
                                 updateSetting(
                                   "deepseekApiProxy",
-                                  form.getValues("deepseekApiProxy")
+                                  form.getValues("deepseekApiProxy"),
                                 )
                               }
                             />
@@ -950,7 +953,7 @@ function Setting({ open, onClose }: SettingProps) {
                               onBlur={() =>
                                 updateSetting(
                                   "xAIApiKey",
-                                  form.getValues("xAIApiKey")
+                                  form.getValues("xAIApiKey"),
                                 )
                               }
                             />
@@ -973,7 +976,7 @@ function Setting({ open, onClose }: SettingProps) {
                               onBlur={() =>
                                 updateSetting(
                                   "xAIApiProxy",
-                                  form.getValues("xAIApiProxy")
+                                  form.getValues("xAIApiProxy"),
                                 )
                               }
                             />
@@ -1006,7 +1009,7 @@ function Setting({ open, onClose }: SettingProps) {
                               onBlur={() =>
                                 updateSetting(
                                   "mistralApiKey",
-                                  form.getValues("mistralApiKey")
+                                  form.getValues("mistralApiKey"),
                                 )
                               }
                             />
@@ -1029,7 +1032,7 @@ function Setting({ open, onClose }: SettingProps) {
                               onBlur={() =>
                                 updateSetting(
                                   "mistralApiProxy",
-                                  form.getValues("mistralApiProxy")
+                                  form.getValues("mistralApiProxy"),
                                 )
                               }
                             />
@@ -1062,7 +1065,7 @@ function Setting({ open, onClose }: SettingProps) {
                               onBlur={() =>
                                 updateSetting(
                                   "azureApiKey",
-                                  form.getValues("azureApiKey")
+                                  form.getValues("azureApiKey"),
                                 )
                               }
                             />
@@ -1088,7 +1091,7 @@ function Setting({ open, onClose }: SettingProps) {
                               onBlur={() =>
                                 updateSetting(
                                   "azureResourceName",
-                                  form.getValues("azureResourceName")
+                                  form.getValues("azureResourceName"),
                                 )
                               }
                             />
@@ -1111,7 +1114,7 @@ function Setting({ open, onClose }: SettingProps) {
                               onBlur={() =>
                                 updateSetting(
                                   "azureApiVersion",
-                                  form.getValues("azureApiVersion")
+                                  form.getValues("azureApiVersion"),
                                 )
                               }
                             />
@@ -1144,7 +1147,7 @@ function Setting({ open, onClose }: SettingProps) {
                               onBlur={() =>
                                 updateSetting(
                                   "openAICompatibleApiKey",
-                                  form.getValues("openAICompatibleApiKey")
+                                  form.getValues("openAICompatibleApiKey"),
                                 )
                               }
                             />
@@ -1167,7 +1170,7 @@ function Setting({ open, onClose }: SettingProps) {
                               onBlur={() =>
                                 updateSetting(
                                   "openAICompatibleApiProxy",
-                                  form.getValues("openAICompatibleApiProxy")
+                                  form.getValues("openAICompatibleApiProxy"),
                                 )
                               }
                             />
@@ -1196,7 +1199,7 @@ function Setting({ open, onClose }: SettingProps) {
                               onBlur={() =>
                                 updateSetting(
                                   "pollinationsApiProxy",
-                                  form.getValues("pollinationsApiProxy")
+                                  form.getValues("pollinationsApiProxy"),
                                 )
                               }
                             />
@@ -1225,7 +1228,7 @@ function Setting({ open, onClose }: SettingProps) {
                               onBlur={() =>
                                 updateSetting(
                                   "ollamaApiProxy",
-                                  form.getValues("ollamaApiProxy")
+                                  form.getValues("ollamaApiProxy"),
                                 )
                               }
                             />
@@ -1261,7 +1264,7 @@ function Setting({ open, onClose }: SettingProps) {
                             onBlur={() =>
                               updateSetting(
                                 "accessPassword",
-                                form.getValues("accessPassword")
+                                form.getValues("accessPassword"),
                               )
                             }
                           />
@@ -1301,7 +1304,7 @@ function Setting({ open, onClose }: SettingProps) {
                               >
                                 <SelectValue
                                   placeholder={t(
-                                    "setting.modelListLoadingPlaceholder"
+                                    "setting.modelListLoadingPlaceholder",
                                   )}
                                 />
                               </SelectTrigger>
@@ -1385,7 +1388,7 @@ function Setting({ open, onClose }: SettingProps) {
                               >
                                 <SelectValue
                                   placeholder={t(
-                                    "setting.modelListLoadingPlaceholder"
+                                    "setting.modelListLoadingPlaceholder",
                                   )}
                                 />
                               </SelectTrigger>
@@ -1475,7 +1478,7 @@ function Setting({ open, onClose }: SettingProps) {
                               >
                                 <SelectValue
                                   placeholder={t(
-                                    "setting.modelListLoadingPlaceholder"
+                                    "setting.modelListLoadingPlaceholder",
                                   )}
                                 />
                               </SelectTrigger>
@@ -1559,7 +1562,7 @@ function Setting({ open, onClose }: SettingProps) {
                               >
                                 <SelectValue
                                   placeholder={t(
-                                    "setting.modelListLoadingPlaceholder"
+                                    "setting.modelListLoadingPlaceholder",
                                   )}
                                 />
                               </SelectTrigger>
@@ -1705,7 +1708,7 @@ function Setting({ open, onClose }: SettingProps) {
                               >
                                 <SelectValue
                                   placeholder={t(
-                                    "setting.modelListLoadingPlaceholder"
+                                    "setting.modelListLoadingPlaceholder",
                                   )}
                                 />
                               </SelectTrigger>
@@ -1789,7 +1792,7 @@ function Setting({ open, onClose }: SettingProps) {
                               >
                                 <SelectValue
                                   placeholder={t(
-                                    "setting.modelListLoadingPlaceholder"
+                                    "setting.modelListLoadingPlaceholder",
                                   )}
                                 />
                               </SelectTrigger>
@@ -1879,7 +1882,7 @@ function Setting({ open, onClose }: SettingProps) {
                               >
                                 <SelectValue
                                   placeholder={t(
-                                    "setting.modelListLoadingPlaceholder"
+                                    "setting.modelListLoadingPlaceholder",
                                   )}
                                 />
                               </SelectTrigger>
@@ -1944,7 +1947,7 @@ function Setting({ open, onClose }: SettingProps) {
                               >
                                 <SelectValue
                                   placeholder={t(
-                                    "setting.modelListLoadingPlaceholder"
+                                    "setting.modelListLoadingPlaceholder",
                                   )}
                                 />
                               </SelectTrigger>
@@ -2015,7 +2018,7 @@ function Setting({ open, onClose }: SettingProps) {
                               >
                                 <SelectValue
                                   placeholder={t(
-                                    "setting.modelListLoadingPlaceholder"
+                                    "setting.modelListLoadingPlaceholder",
                                   )}
                                 />
                               </SelectTrigger>
@@ -2099,7 +2102,7 @@ function Setting({ open, onClose }: SettingProps) {
                               >
                                 <SelectValue
                                   placeholder={t(
-                                    "setting.modelListLoadingPlaceholder"
+                                    "setting.modelListLoadingPlaceholder",
                                   )}
                                 />
                               </SelectTrigger>
@@ -2189,7 +2192,7 @@ function Setting({ open, onClose }: SettingProps) {
                               >
                                 <SelectValue
                                   placeholder={t(
-                                    "setting.modelListLoadingPlaceholder"
+                                    "setting.modelListLoadingPlaceholder",
                                   )}
                                 />
                               </SelectTrigger>
@@ -2254,7 +2257,7 @@ function Setting({ open, onClose }: SettingProps) {
                               >
                                 <SelectValue
                                   placeholder={t(
-                                    "setting.modelListLoadingPlaceholder"
+                                    "setting.modelListLoadingPlaceholder",
                                   )}
                                 />
                               </SelectTrigger>
@@ -2325,7 +2328,7 @@ function Setting({ open, onClose }: SettingProps) {
                               >
                                 <SelectValue
                                   placeholder={t(
-                                    "setting.modelListLoadingPlaceholder"
+                                    "setting.modelListLoadingPlaceholder",
                                   )}
                                 />
                               </SelectTrigger>
@@ -2409,7 +2412,7 @@ function Setting({ open, onClose }: SettingProps) {
                               >
                                 <SelectValue
                                   placeholder={t(
-                                    "setting.modelListLoadingPlaceholder"
+                                    "setting.modelListLoadingPlaceholder",
                                   )}
                                 />
                               </SelectTrigger>
@@ -2561,7 +2564,7 @@ function Setting({ open, onClose }: SettingProps) {
                                 <SelectTrigger>
                                   <SelectValue
                                     placeholder={t(
-                                      "setting.modelListLoadingPlaceholder"
+                                      "setting.modelListLoadingPlaceholder",
                                     )}
                                   />
                                 </SelectTrigger>
@@ -2626,7 +2629,7 @@ function Setting({ open, onClose }: SettingProps) {
                                 <SelectTrigger>
                                   <SelectValue
                                     placeholder={t(
-                                      "setting.modelListLoadingPlaceholder"
+                                      "setting.modelListLoadingPlaceholder",
                                     )}
                                   />
                                 </SelectTrigger>
@@ -2689,7 +2692,7 @@ function Setting({ open, onClose }: SettingProps) {
                               >
                                 <SelectValue
                                   placeholder={t(
-                                    "setting.modelListLoadingPlaceholder"
+                                    "setting.modelListLoadingPlaceholder",
                                   )}
                                 />
                               </SelectTrigger>
@@ -2773,7 +2776,7 @@ function Setting({ open, onClose }: SettingProps) {
                               >
                                 <SelectValue
                                   placeholder={t(
-                                    "setting.modelListLoadingPlaceholder"
+                                    "setting.modelListLoadingPlaceholder",
                                   )}
                                 />
                               </SelectTrigger>
@@ -2871,7 +2874,7 @@ function Setting({ open, onClose }: SettingProps) {
                                 <SelectTrigger>
                                   <SelectValue
                                     placeholder={t(
-                                      "setting.modelListLoadingPlaceholder"
+                                      "setting.modelListLoadingPlaceholder",
                                     )}
                                   />
                                 </SelectTrigger>
@@ -2936,7 +2939,7 @@ function Setting({ open, onClose }: SettingProps) {
                                 <SelectTrigger>
                                   <SelectValue
                                     placeholder={t(
-                                      "setting.modelListLoadingPlaceholder"
+                                      "setting.modelListLoadingPlaceholder",
                                     )}
                                   />
                                 </SelectTrigger>
@@ -3038,6 +3041,10 @@ function Setting({ open, onClose }: SettingProps) {
                             {!isDisabledSearchProvider("exa") &&
                             mode === "proxy" ? (
                               <SelectItem value="exa">Exa</SelectItem>
+                            ) : null}
+                            {!isDisabledSearchProvider("brave") &&
+                            mode === "proxy" ? (
+                              <SelectItem value="brave">Brave</SelectItem>
                             ) : null}
                             {!isDisabledSearchProvider("bocha") ? (
                               <SelectItem value="bocha">
@@ -3306,6 +3313,52 @@ function Setting({ open, onClose }: SettingProps) {
                           <FormControl className="form-field">
                             <Input
                               placeholder={BOCHA_BASE_URL}
+                              disabled={form.getValues("enableSearch") === "0"}
+                              {...field}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <div
+                    className={cn("space-y-4", {
+                      hidden: searchProvider !== "brave",
+                    })}
+                  >
+                    <FormField
+                      control={form.control}
+                      name="braveApiKey"
+                      render={({ field }) => (
+                        <FormItem className="from-item">
+                          <FormLabel className="from-label">
+                            {t("setting.apiKeyLabel")}
+                            <span className="ml-1 text-red-500 max-sm:hidden">
+                              *
+                            </span>
+                          </FormLabel>
+                          <FormControl className="form-field">
+                            <Password
+                              type="text"
+                              placeholder={t("setting.searchApiKeyPlaceholder")}
+                              disabled={form.getValues("enableSearch") === "0"}
+                              {...field}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="braveApiProxy"
+                      render={({ field }) => (
+                        <FormItem className="from-item">
+                          <FormLabel className="from-label">
+                            {t("setting.apiUrlLabel")}
+                          </FormLabel>
+                          <FormControl className="form-field">
+                            <Input
+                              placeholder={BRAVE_BASE_URL}
                               disabled={form.getValues("enableSearch") === "0"}
                               {...field}
                             />

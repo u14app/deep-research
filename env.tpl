@@ -88,6 +88,11 @@ BOCHA_API_KEY=
 # (Optional) Server-side Bocha API Proxy URL. Default, `https://api.bochaai.com`
 BOCHA_API_BASE_URL=
 
+# (Optional) Server-side Brave API Key (Required for server API calls)
+BRAVE_API_KEY=
+# (Optional) Server-side Brave API Proxy URL. Default, `https://api.search.brave.com/res`
+BRAVE_API_BASE_URL=
+
 # (Optional) Server-side Searxng API Proxy URL. Default, `http://0.0.0.0:8080`
 SEARXNG_API_BASE_URL=
 

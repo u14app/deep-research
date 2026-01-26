@@ -67,6 +67,8 @@ export interface SettingStore {
   exaScope: string;
   bochaApiKey: string;
   bochaApiProxy: string;
+  braveApiKey: string;
+  braveApiProxy: string;
   searxngApiProxy: string;
   searxngScope: string;
   parallelSearch: number;
@@ -153,6 +155,8 @@ export const defaultValues: SettingStore = {
   exaScope: "research paper",
   bochaApiKey: "",
   bochaApiProxy: "",
+  braveApiKey: "",
+  braveApiProxy: "",
   searxngApiProxy: "",
   searxngScope: "all",
   parallelSearch: 1,
@@ -175,6 +179,6 @@ export const useSettingStore = create(
       update: (values) => set(values),
       reset: () => set(defaultValues),
     }),
-    { name: "setting" }
-  )
+    { name: "setting" },
+  ),
 );

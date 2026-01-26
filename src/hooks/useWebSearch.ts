@@ -57,6 +57,15 @@ function useWebSearch() {
           options.baseURL = location.origin + "/api/search/bocha";
         }
         break;
+      case "brave":
+        const { braveApiKey, braveApiProxy } = useSettingStore.getState();
+        if (mode === "local") {
+          options.baseURL = braveApiProxy;
+          options.apiKey = multiApiKeyPolling(braveApiKey);
+        } else {
+          options.baseURL = location.origin + "/api/search/brave";
+        }
+        break;
       case "searxng":
         const { searxngApiProxy, searxngScope } = useSettingStore.getState();
         if (mode === "local") {
