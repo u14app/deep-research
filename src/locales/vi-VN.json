@@ -4,6 +4,24 @@
   "openSource": "Mã Nguồn Mở",
   "copyright": "Tạo với ❤️ bởi nhóm {{name}}",
   "searchPlaceholder": "Vui lòng nhập từ khóa",
+  "header": {
+    "session": {
+      "export": "Xuất phiên",
+      "import": "Nhập phiên",
+      "exportSuccess": "Đã xuất phiên hiện tại.",
+      "importSuccess": "Nhập phiên thành công.",
+      "importFailed": "Không thể nhập phiên."
+    },
+    "shortcuts": {
+      "title": "Phím tắt nâng cao",
+      "openSetting": "Mở cài đặt",
+      "openHistory": "Mở lịch sử",
+      "openKnowledge": "Mở cơ sở tri thức",
+      "exportSession": "Xuất phiên hiện tại",
+      "importSession": "Nhập ảnh chụp phiên",
+      "toggleHelp": "Bật/Tắt trợ giúp phím tắt"
+    }
+  },
   "research": {
     "common": {
       "startThinking": "Bắt đầu suy nghĩ",
@@ -69,6 +87,16 @@
       "statusFailed": "Thất bại",
       "retryFailed": "Chạy lại mục lỗi",
       "removeFailed": "Xóa mục lỗi",
+      "sortDefault": "Sắp xếp: mặc định",
+      "sortQueryAsc": "Sắp xếp: truy vấn (A-Z)",
+      "sortStatus": "Sắp xếp: trạng thái",
+      "sortSourcesDesc": "Sắp xếp: nhiều nguồn nhất",
+      "expandAll": "Mở rộng tất cả",
+      "collapseAll": "Thu gọn tất cả",
+      "exportFilteredMarkdown": "Xuất Markdown đã lọc",
+      "exportFilteredJSON": "Xuất JSON đã lọc",
+      "exportEmpty": "Không có nhiệm vụ đã lọc để xuất.",
+      "exportSuccess": "Đã xuất các nhiệm vụ đã lọc.",
       "showingTasks": "Hiển thị {{shown}} / {{total}} nhiệm vụ",
       "noFilteredTasks": "Không có nhiệm vụ phù hợp với bộ lọc hiện tại."
     },

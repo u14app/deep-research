@@ -14,6 +14,8 @@ import {
   Trash,
   RotateCcw,
   NotebookText,
+  ChevronsDown,
+  ChevronsUp,
 } from "lucide-react";
 import { Button } from "@/components/Internal/Button";
 import {
@@ -55,6 +57,23 @@ const formSchema = z.object({
   suggestion: z.string().optional(),
 });
 type TaskFilter = "all" | SearchTask["state"];
+type TaskSort = "default" | "queryAsc" | "status" | "sourcesDesc";
+
+interface SearchTaskView extends SearchTask {
+  taskId: string;
+}
+
+const taskStateSortWeight: Record<SearchTask["state"], number> = {
+  processing: 0,
+  unprocessed: 1,
+  failed: 2,
+  completed: 3,
+};
+
+function getTaskExportName(type: "json" | "md"): string {
+  const timestamp = new Date().toISOString().replaceAll(":", "-");
+  return `filtered-tasks-${timestamp}.${type}`;
+}
 
 function addQuoteBeforeAllLine(text: string = "") {
   return text
@@ -86,6 +105,8 @@ function SearchResult() {
   const [isThinking, setIsThinking] = useState<boolean>(false);
   const [taskQuery, setTaskQuery] = useState<string>("");
   const [taskFilter, setTaskFilter] = useState<TaskFilter>("all");
+  const [taskSort, setTaskSort] = useState<TaskSort>("default");
+  const [expandedTaskIds, setExpandedTaskIds] = useState<string[]>([]);
   const unfinishedTasks = useMemo(() => {
     return taskStore.tasks.filter((item) => item.state !== "completed");
   }, [taskStore.tasks]);
@@ -95,17 +116,45 @@ function SearchResult() {
   const taskFinished = useMemo(() => {
     return taskStore.tasks.length > 0 && unfinishedTasks.length === 0;
   }, [taskStore.tasks, unfinishedTasks]);
-  const filteredTasks = useMemo(() => {
+  const filteredTasks = useMemo<SearchTaskView[]>(() => {
     const search = taskQuery.trim().toLowerCase();
-    return taskStore.tasks.filter((task) => {
-      const matchesFilter = taskFilter === "all" || task.state === taskFilter;
-      const matchesSearch =
-        search.length === 0 ||
-        task.query.toLowerCase().includes(search) ||
-        task.researchGoal.toLowerCase().includes(search);
-      return matchesFilter && matchesSearch;
-    });
-  }, [taskFilter, taskQuery, taskStore.tasks]);
+    const result = taskStore.tasks
+      .map((task, idx) => ({
+        ...task,
+        taskId: `${idx}-${task.query}-${task.researchGoal}`,
+      }))
+      .filter((task) => {
+        const matchesFilter =
+          taskFilter === "all" || task.state === taskFilter;
+        const matchesSearch =
+          search.length === 0 ||
+          task.query.toLowerCase().includes(search) ||
+          task.researchGoal.toLowerCase().includes(search);
+        return matchesFilter && matchesSearch;
+      });
+
+    if (taskSort === "queryAsc") {
+      result.sort((a, b) => a.query.localeCompare(b.query));
+    } else if (taskSort === "status") {
+      result.sort((a, b) => {
+        const diff =
+          taskStateSortWeight[a.state] - taskStateSortWeight[b.state];
+        if (diff !== 0) return diff;
+        return a.query.localeCompare(b.query);
+      });
+    } else if (taskSort === "sourcesDesc") {
+      result.sort((a, b) => {
+        const sourceDiff = (b.sources?.length || 0) - (a.sources?.length || 0);
+        if (sourceDiff !== 0) return sourceDiff;
+        return a.query.localeCompare(b.query);
+      });
+    }
+
+    return result;
+  }, [taskFilter, taskQuery, taskSort, taskStore.tasks]);
+  const filteredTaskIds = useMemo(() => {
+    return filteredTasks.map((task) => task.taskId);
+  }, [filteredTasks]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -225,9 +274,65 @@ function SearchResult() {
     });
   }
 
+  function expandAllFilteredTasks() {
+    setExpandedTaskIds(filteredTaskIds);
+  }
+
+  function collapseAllFilteredTasks() {
+    setExpandedTaskIds([]);
+  }
+
+  function exportFilteredTasksAsJSON() {
+    if (filteredTasks.length === 0) {
+      toast.error(t("research.searchResult.exportEmpty"));
+      return;
+    }
+    const exportData = filteredTasks.map((task) => ({
+      state: task.state,
+      query: task.query,
+      researchGoal: task.researchGoal,
+      learning: task.learning,
+      sources: task.sources,
+      images: task.images,
+    }));
+    downloadFile(
+      JSON.stringify(exportData, null, 2),
+      getTaskExportName("json"),
+      "application/json;charset=utf-8"
+    );
+    toast.message(t("research.searchResult.exportSuccess"));
+  }
+
+  function exportFilteredTasksAsMarkdown() {
+    if (filteredTasks.length === 0) {
+      toast.error(t("research.searchResult.exportEmpty"));
+      return;
+    }
+    const markdownContent = filteredTasks
+      .map((task, idx) => {
+        return [
+          `# ${idx + 1}. ${task.query}`,
+          getSearchResultContent(task),
+        ].join("\n\n");
+      })
+      .join("\n\n---\n\n");
+    downloadFile(
+      markdownContent,
+      getTaskExportName("md"),
+      "text/markdown;charset=utf-8"
+    );
+    toast.message(t("research.searchResult.exportSuccess"));
+  }
+
   useEffect(() => {
     form.setValue("suggestion", taskStore.suggestion);
   }, [taskStore.suggestion, form]);
+
+  useEffect(() => {
+    setExpandedTaskIds((previous) => {
+      return previous.filter((id) => filteredTaskIds.includes(id));
+    });
+  }, [filteredTaskIds]);
 
   return (
     <section className="p-4 border rounded-md mt-4 print:hidden">
@@ -238,7 +343,7 @@ function SearchResult() {
         <div>{t("research.searchResult.emptyTip")}</div>
       ) : (
         <div>
-          <div className="grid gap-2 lg:grid-cols-[1fr_200px]">
+          <div className="grid gap-2 lg:grid-cols-[1fr_180px_220px]">
             <Input
               value={taskQuery}
               onChange={(ev) => setTaskQuery(ev.target.value)}
@@ -269,8 +374,30 @@ function SearchResult() {
                 </SelectItem>
               </SelectContent>
             </Select>
+            <Select
+              value={taskSort}
+              onValueChange={(value) => setTaskSort(value as TaskSort)}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="default">
+                  {t("research.searchResult.sortDefault")}
+                </SelectItem>
+                <SelectItem value="queryAsc">
+                  {t("research.searchResult.sortQueryAsc")}
+                </SelectItem>
+                <SelectItem value="status">
+                  {t("research.searchResult.sortStatus")}
+                </SelectItem>
+                <SelectItem value="sourcesDesc">
+                  {t("research.searchResult.sortSourcesDesc")}
+                </SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-          <div className="flex gap-2 mt-2">
+          <div className="flex flex-wrap gap-2 mt-2">
             <Button
               type="button"
               variant="outline"
@@ -291,6 +418,46 @@ function SearchResult() {
               <Trash />
               <span>{t("research.searchResult.removeFailed")}</span>
             </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={filteredTasks.length === 0}
+              onClick={() => expandAllFilteredTasks()}
+            >
+              <ChevronsDown />
+              <span>{t("research.searchResult.expandAll")}</span>
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={expandedTaskIds.length === 0}
+              onClick={() => collapseAllFilteredTasks()}
+            >
+              <ChevronsUp />
+              <span>{t("research.searchResult.collapseAll")}</span>
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={filteredTasks.length === 0}
+              onClick={() => exportFilteredTasksAsMarkdown()}
+            >
+              <Download />
+              <span>{t("research.searchResult.exportFilteredMarkdown")}</span>
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={filteredTasks.length === 0}
+              onClick={() => exportFilteredTasksAsJSON()}
+            >
+              <Download />
+              <span>{t("research.searchResult.exportFilteredJSON")}</span>
+            </Button>
           </div>
           <p className="text-xs text-muted-foreground mt-2">
             {t("research.searchResult.showingTasks", {
@@ -303,13 +470,15 @@ function SearchResult() {
               {t("research.searchResult.noFilteredTasks")}
             </p>
           ) : (
-            <Accordion className="mb-4" type="multiple">
-              {filteredTasks.map((item, idx) => {
+            <Accordion
+              className="mb-4"
+              type="multiple"
+              value={expandedTaskIds}
+              onValueChange={setExpandedTaskIds}
+            >
+              {filteredTasks.map((item) => {
                 return (
-                  <AccordionItem
-                    key={`${item.query}-${idx}`}
-                    value={`${item.query}-${idx}`}
-                  >
+                  <AccordionItem key={item.taskId} value={item.taskId}>
                     <AccordionTrigger>
                       <div className="flex">
                         <TaskState state={item.state} />

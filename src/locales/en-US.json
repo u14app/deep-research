@@ -4,6 +4,24 @@
   "openSource": "Open Source",
   "copyright": "Created with ❤️ by {{name}} team",
   "searchPlaceholder": "Please enter keywords",
+  "header": {
+    "session": {
+      "export": "Export Session",
+      "import": "Import Session",
+      "exportSuccess": "Current session exported.",
+      "importSuccess": "Session imported successfully.",
+      "importFailed": "Failed to import session snapshot."
+    },
+    "shortcuts": {
+      "title": "Power Shortcuts",
+      "openSetting": "Open settings",
+      "openHistory": "Open history",
+      "openKnowledge": "Open knowledge base",
+      "exportSession": "Export current session",
+      "importSession": "Import session snapshot",
+      "toggleHelp": "Toggle shortcut help"
+    }
+  },
   "research": {
     "common": {
       "startThinking": "Start Thinking",
@@ -69,6 +87,16 @@
       "statusFailed": "Failed",
       "retryFailed": "Retry failed",
       "removeFailed": "Remove failed",
+      "sortDefault": "Sort: default",
+      "sortQueryAsc": "Sort: query (A-Z)",
+      "sortStatus": "Sort: status",
+      "sortSourcesDesc": "Sort: most sources",
+      "expandAll": "Expand all",
+      "collapseAll": "Collapse all",
+      "exportFilteredMarkdown": "Export filtered Markdown",
+      "exportFilteredJSON": "Export filtered JSON",
+      "exportEmpty": "No filtered tasks to export.",
+      "exportSuccess": "Filtered tasks exported.",
       "showingTasks": "Showing {{shown}} of {{total}} tasks",
       "noFilteredTasks": "No tasks match the current filters."
     },

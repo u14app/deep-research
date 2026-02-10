@@ -4,6 +4,24 @@
   "openSource": "Código Abierto",
   "copyright": "Creado con ❤️ por el equipo de {{name}}",
   "searchPlaceholder": "Por favor, introduce palabras clave",
+  "header": {
+    "session": {
+      "export": "Exportar sesión",
+      "import": "Importar sesión",
+      "exportSuccess": "Sesión actual exportada.",
+      "importSuccess": "Sesión importada correctamente.",
+      "importFailed": "No se pudo importar la sesión."
+    },
+    "shortcuts": {
+      "title": "Atajos avanzados",
+      "openSetting": "Abrir ajustes",
+      "openHistory": "Abrir historial",
+      "openKnowledge": "Abrir base de conocimiento",
+      "exportSession": "Exportar sesión actual",
+      "importSession": "Importar sesión",
+      "toggleHelp": "Mostrar/Ocultar ayuda de atajos"
+    }
+  },
   "research": {
     "common": {
       "startThinking": "Empezar a Pensar",
@@ -69,6 +87,16 @@
       "statusFailed": "Fallido",
       "retryFailed": "Reintentar fallidos",
       "removeFailed": "Eliminar fallidos",
+      "sortDefault": "Ordenar: predeterminado",
+      "sortQueryAsc": "Ordenar: consulta (A-Z)",
+      "sortStatus": "Ordenar: estado",
+      "sortSourcesDesc": "Ordenar: más fuentes",
+      "expandAll": "Expandir todo",
+      "collapseAll": "Colapsar todo",
+      "exportFilteredMarkdown": "Exportar Markdown filtrado",
+      "exportFilteredJSON": "Exportar JSON filtrado",
+      "exportEmpty": "No hay tareas filtradas para exportar.",
+      "exportSuccess": "Tareas filtradas exportadas.",
       "showingTasks": "Mostrando {{shown}} de {{total}} tareas",
       "noFilteredTasks": "Ninguna tarea coincide con los filtros actuales."
     },
