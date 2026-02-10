@@ -26,12 +26,14 @@ function StepIcon({ state }: { state: StepState }) {
 
 function WorkflowProgress() {
   const { t } = useTranslation();
-  const { question, questions, reportPlan, tasks, finalReport } = useTaskStore();
+  const { question, questions, reportPlan, tasks, finalReport } =
+    useTaskStore();
 
   const completedTaskCount = useMemo(() => {
     return tasks.filter((task) => task.state === "completed").length;
   }, [tasks]);
-  const collectionDone = tasks.length > 0 && completedTaskCount === tasks.length;
+  const collectionDone =
+    tasks.length > 0 && completedTaskCount === tasks.length;
 
   const steps = useMemo(() => {
     const rawSteps: Omit<WorkflowStep, "state">[] = [
@@ -114,7 +116,7 @@ function WorkflowProgress() {
           style={{ width: `${progress}%` }}
         ></div>
       </div>
-      <div className="mt-3 grid gap-2 max-sm:grid-cols-1 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="mt-3 grid gap-2 max-sm:hidden sm:grid-cols-2 lg:grid-cols-5">
         {steps.map((step) => (
           <div
             key={step.id}
@@ -128,7 +130,7 @@ function WorkflowProgress() {
                 : "",
               step.state === "pending"
                 ? "border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900/40"
-                : ""
+                : "",
             )}
           >
             <div className="flex items-center gap-2">

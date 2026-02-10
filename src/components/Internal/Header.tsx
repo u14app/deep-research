@@ -3,15 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import { toast } from "sonner";
-import {
-  Settings,
-  Github,
-  History,
-  BookText,
-  Keyboard,
-  Download,
-  Upload,
-} from "lucide-react";
+import { Settings, Github, History, BookText, Keyboard } from "lucide-react";
 import { Button } from "@/components/Internal/Button";
 import {
   Dialog,
@@ -75,7 +67,7 @@ const taskSnapshotSchema = z.object({
 });
 
 function normalizeTaskSnapshot(
-  snapshot: z.infer<typeof taskSnapshotSchema>
+  snapshot: z.infer<typeof taskSnapshotSchema>,
 ): TaskStore {
   return {
     id: snapshot.id ?? "",
@@ -133,7 +125,7 @@ function Header() {
     downloadFile(
       JSON.stringify(snapshot, null, 2),
       `${getSafeSnapshotFilename(baseName)}.session.json`,
-      "application/json;charset=utf-8"
+      "application/json;charset=utf-8",
     );
     toast.message(t("header.session.exportSuccess"));
   }, [t]);
@@ -160,7 +152,7 @@ function Header() {
         toast.error(t("header.session.importFailed"));
       }
     },
-    [t]
+    [t],
   );
 
   const openSnapshotImport = useCallback(() => {
@@ -194,7 +186,7 @@ function Header() {
         description: t("header.shortcuts.toggleHelp"),
       },
     ],
-    [t]
+    [t],
   );
 
   useEffect(() => {
@@ -275,24 +267,6 @@ function Header() {
               <Github className="h-5 w-5" />
             </Button>
           </a>
-          <Button
-            className="h-8 w-8"
-            variant="ghost"
-            size="icon"
-            title={t("header.session.export")}
-            onClick={() => exportSnapshot()}
-          >
-            <Download className="h-5 w-5" />
-          </Button>
-          <Button
-            className="h-8 w-8"
-            variant="ghost"
-            size="icon"
-            title={t("header.session.import")}
-            onClick={() => openSnapshotImport()}
-          >
-            <Upload className="h-5 w-5" />
-          </Button>
           <Button
             className="h-8 w-8"
             variant="ghost"
