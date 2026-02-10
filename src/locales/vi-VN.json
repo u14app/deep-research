@@ -29,12 +29,22 @@
       "save": "Lưu",
       "copy": "Sao chép",
       "export": "Xuất",
-      "delete": "Xóa"
+      "delete": "Xóa",
+      "submitShortcut": "Phím tắt: Ctrl/Cmd + Enter"
     },
     "topic": {
       "title": "1. Chủ Đề Nghiên Cứu",
       "topicLabel": "1.1 Chủ đề nghiên cứu",
-      "topicPlaceholder": "Bất kỳ câu hỏi nào bạn muốn biết..."
+      "topicPlaceholder": "Bất kỳ câu hỏi nào bạn muốn biết...",
+      "presetsLabel": "Mẫu nhanh",
+      "presets": {
+        "marketLabel": "Bản đồ thị trường",
+        "marketPrompt": "Phân tích bức tranh thị trường hiện tại cho [chủ đề của bạn]. So sánh các nhà cung cấp lớn, mô hình giá, xu hướng thị phần và rủi ro chính trong 12 tháng tới.",
+        "technicalLabel": "Phân tích kỹ thuật",
+        "technicalPrompt": "Thực hiện phân tích kỹ thuật chuyên sâu về [chủ đề của bạn]. Trình bày các lựa chọn kiến trúc, đánh đổi triển khai, giới hạn hiệu năng và chiến lược rollout đề xuất.",
+        "comparisonLabel": "So sánh phương án",
+        "comparisonPrompt": "So sánh các giải pháp hàng đầu cho [chủ đề của bạn]. Tạo ma trận quyết định bao gồm tính năng, chi phí, độ khó tích hợp, bảo mật/tuân thủ và khả năng bảo trì dài hạn."
+      }
     },
     "feedback": {
       "title": "2. Đặt Câu Hỏi",
@@ -50,7 +60,17 @@
       "suggestionLabel": "Gợi ý nghiên cứu (không bắt buộc)",
       "suggestionPlaceholder": "Có muốn thêm hoặc điều chỉnh hướng nghiên cứu không...",
       "references": "Tài liệu tham khảo",
-      "relatedImages": "Hình ảnh liên quan"
+      "relatedImages": "Hình ảnh liên quan",
+      "taskSearchPlaceholder": "Tìm nhiệm vụ theo chủ đề hoặc mục tiêu...",
+      "statusFilterAll": "Tất cả trạng thái",
+      "statusUnprocessed": "Chưa xử lý",
+      "statusProcessing": "Đang xử lý",
+      "statusCompleted": "Hoàn thành",
+      "statusFailed": "Thất bại",
+      "retryFailed": "Chạy lại mục lỗi",
+      "removeFailed": "Xóa mục lỗi",
+      "showingTasks": "Hiển thị {{shown}} / {{total}} nhiệm vụ",
+      "noFilteredTasks": "Không có nhiệm vụ phù hợp với bộ lọc hiện tại."
     },
     "finalReport": {
       "title": "4. Báo Cáo Cuối Cùng",
@@ -59,6 +79,19 @@
       "localResearchedInfor": "Đã nghiên cứu {{total}} tài nguyên cục bộ",
       "writingRequirementLabel": "Yêu cầu viết (không bắt buộc)",
       "writingRequirementPlaceholder": "Bạn có thể nêu bất kỳ yêu cầu nào liên quan đến việc viết báo cáo."
+    },
+    "workflow": {
+      "title": "Quy trình nghiên cứu",
+      "summary": "Hoàn thành {{progress}}% ({{completed}}/{{total}} giai đoạn)",
+      "topic": "Chủ đề",
+      "questions": "Câu hỏi",
+      "plan": "Kế hoạch",
+      "collection": "Thu thập",
+      "report": "Báo cáo cuối",
+      "collectionDetail": "Hoàn thành {{completed}}/{{total}} nhiệm vụ",
+      "done": "Hoàn thành",
+      "active": "Đang thực hiện",
+      "pending": "Chưa bắt đầu"
     }
   },
   "history": {

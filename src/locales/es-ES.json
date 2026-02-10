@@ -29,12 +29,22 @@
       "save": "Guardar",
       "copy": "Copiar",
       "export": "Exportar",
-      "delete": "Eliminar"
+      "delete": "Eliminar",
+      "submitShortcut": "Atajo: Ctrl/Cmd + Enter"
     },
     "topic": {
       "title": "1. Definición de la investigación",
       "topicLabel": "1.1 Temas de investigación",
-      "topicPlaceholder": "Detalla el tema o temas de la investigación..."
+      "topicPlaceholder": "Detalla el tema o temas de la investigación...",
+      "presetsLabel": "Plantillas rápidas",
+      "presets": {
+        "marketLabel": "Mapa de mercado",
+        "marketPrompt": "Mapea el panorama actual del mercado para [tu tema]. Compara proveedores principales, modelos de precios, tendencias de cuota y riesgos clave para los próximos 12 meses.",
+        "technicalLabel": "Análisis técnico",
+        "technicalPrompt": "Realiza un análisis técnico profundo sobre [tu tema]. Explica opciones de arquitectura, trade-offs de implementación, límites de rendimiento y estrategia de despliegue recomendada.",
+        "comparisonLabel": "Comparar opciones",
+        "comparisonPrompt": "Compara las principales soluciones para [tu tema]. Crea una matriz de decisión que cubra funcionalidades, costo, esfuerzo de integración, seguridad/cumplimiento y mantenibilidad a largo plazo."
+      }
     },
     "feedback": {
       "title": "2. Formulación de preguntas",
@@ -50,7 +60,17 @@
       "suggestionLabel": "Sugerencias de investigación (Opcional)",
       "suggestionPlaceholder": "Indica si deseas añadir nuevos temas o ajustar la dirección de la investigación...",
       "references": "Referencias",
-      "relatedImages": "Imágenes relacionadas"
+      "relatedImages": "Imágenes relacionadas",
+      "taskSearchPlaceholder": "Buscar tareas por tema u objetivo...",
+      "statusFilterAll": "Todos los estados",
+      "statusUnprocessed": "Sin procesar",
+      "statusProcessing": "Procesando",
+      "statusCompleted": "Completado",
+      "statusFailed": "Fallido",
+      "retryFailed": "Reintentar fallidos",
+      "removeFailed": "Eliminar fallidos",
+      "showingTasks": "Mostrando {{shown}} de {{total}} tareas",
+      "noFilteredTasks": "Ninguna tarea coincide con los filtros actuales."
     },
     "finalReport": {
       "title": "4. Informe Final",
@@ -59,6 +79,19 @@
       "localResearchedInfor": "Se investigaron {{total}} recursos locales",
       "writingRequirementLabel": "Requisitos de redacción (opcional)",
       "writingRequirementPlaceholder": "Puedes indicar cualquier requisito relacionado con la redacción del informe."
+    },
+    "workflow": {
+      "title": "Flujo de investigación",
+      "summary": "{{progress}}% completado ({{completed}}/{{total}} etapas)",
+      "topic": "Tema",
+      "questions": "Preguntas",
+      "plan": "Plan",
+      "collection": "Recopilación",
+      "report": "Informe final",
+      "collectionDetail": "{{completed}}/{{total}} tareas completadas",
+      "done": "Completado",
+      "active": "En progreso",
+      "pending": "Pendiente"
     }
   },
   "history": {

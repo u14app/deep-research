@@ -34,6 +34,7 @@ import { Separator } from "@/components/ui/separator";
 import useAccurateTimer from "@/hooks/useAccurateTimer";
 import useDeepResearch from "@/hooks/useDeepResearch";
 import useKnowledge from "@/hooks/useKnowledge";
+import useSubmitShortcut from "@/hooks/useSubmitShortcut";
 import { useTaskStore } from "@/store/task";
 import { useKnowledgeStore } from "@/store/knowledge";
 import { useSettingStore } from "@/store/setting";
@@ -82,6 +83,9 @@ function FinalReport() {
     defaultValues: {
       requirement: taskStore.requirement,
     },
+  });
+  const handleFinalReportSubmitShortcut = useSubmitShortcut(() => {
+    void form.handleSubmit(handleSubmit)();
   });
 
   async function handleSubmit(values: z.infer<typeof formSchema>) {
@@ -326,9 +330,13 @@ function FinalReport() {
                           "research.finalReport.writingRequirementPlaceholder"
                         )}
                         disabled={isWriting}
+                        onKeyDown={handleFinalReportSubmitShortcut}
                         {...field}
                       />
                     </FormControl>
+                    <p className="text-xs text-muted-foreground">
+                      {t("research.common.submitShortcut")}
+                    </p>
                   </FormItem>
                 )}
               />

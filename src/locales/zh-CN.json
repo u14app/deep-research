@@ -29,12 +29,22 @@
       "save": "保存",
       "copy": "复制",
       "export": "导出",
-      "delete": "删除"
+      "delete": "删除",
+      "submitShortcut": "快捷键：Ctrl/Cmd + Enter"
     },
     "topic": {
       "title": "1. 研究方向",
       "topicLabel": "1.1 研究主题",
-      "topicPlaceholder": "任何您想了解的问题..."
+      "topicPlaceholder": "任何您想了解的问题...",
+      "presetsLabel": "快速模板",
+      "presets": {
+        "marketLabel": "市场全景",
+        "marketPrompt": "梳理 [你的主题] 的当前市场格局。对比主要厂商、定价模式、市场份额趋势，并评估未来 12 个月的关键风险。",
+        "technicalLabel": "技术深度分析",
+        "technicalPrompt": "对 [你的主题] 做技术深度分析。说明架构方案、实现权衡、性能约束，以及推荐的落地路线。",
+        "comparisonLabel": "方案对比",
+        "comparisonPrompt": "对比 [你的主题] 的主流方案。构建决策矩阵，覆盖功能、成本、集成难度、安全合规和长期可维护性。"
+      }
     },
     "feedback": {
       "title": "2. 提出您的想法",
@@ -50,7 +60,17 @@
       "suggestionLabel": "研究建议（可选）",
       "suggestionPlaceholder": "是否增加或者调整研究方向...",
       "references": "参考文献",
-      "relatedImages": "相关图片"
+      "relatedImages": "相关图片",
+      "taskSearchPlaceholder": "按主题或研究目标搜索任务...",
+      "statusFilterAll": "全部状态",
+      "statusUnprocessed": "未处理",
+      "statusProcessing": "处理中",
+      "statusCompleted": "已完成",
+      "statusFailed": "失败",
+      "retryFailed": "重试失败任务",
+      "removeFailed": "删除失败任务",
+      "showingTasks": "显示 {{shown}} / {{total}} 个任务",
+      "noFilteredTasks": "当前筛选条件下没有匹配任务。"
     },
     "finalReport": {
       "title": "4. 最终报告",
@@ -59,6 +79,19 @@
       "localResearchedInfor": "已研究 {{total}} 个本地资源",
       "writingRequirementLabel": "写作要求（可选）",
       "writingRequirementPlaceholder": "您可以提出任何与撰写报告相关的要求。"
+    },
+    "workflow": {
+      "title": "研究流程",
+      "summary": "已完成 {{progress}}%（{{completed}}/{{total}} 阶段）",
+      "topic": "主题",
+      "questions": "问题",
+      "plan": "计划",
+      "collection": "信息收集",
+      "report": "最终报告",
+      "collectionDetail": "已完成 {{completed}}/{{total}} 个任务",
+      "done": "已完成",
+      "active": "进行中",
+      "pending": "待开始"
     }
   },
   "history": {

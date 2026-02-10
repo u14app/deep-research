@@ -8,6 +8,9 @@ import { useSettingStore } from "@/store/setting";
 
 const Header = dynamic(() => import("@/components/Internal/Header"));
 const Setting = dynamic(() => import("@/components/Setting"));
+const WorkflowProgress = dynamic(
+  () => import("@/components/Research/WorkflowProgress")
+);
 const Topic = dynamic(() => import("@/components/Research/Topic"));
 const Feedback = dynamic(() => import("@/components/Research/Feedback"));
 const SearchResult = dynamic(
@@ -39,6 +42,7 @@ function Home() {
     <div className="max-lg:max-w-screen-md max-w-screen-lg mx-auto px-4">
       <Header />
       <main>
+        <WorkflowProgress />
         <Topic />
         <Feedback />
         <SearchResult />
