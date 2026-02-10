@@ -17,6 +17,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import useDeepResearch from "@/hooks/useDeepResearch";
 import useAccurateTimer from "@/hooks/useAccurateTimer";
+import useSubmitShortcut from "@/hooks/useSubmitShortcut";
 import { useTaskStore } from "@/store/task";
 
 const MagicDown = dynamic(() => import("@/components/MagicDown"));
@@ -42,6 +43,9 @@ function Feedback() {
     defaultValues: {
       feedback: taskStore.feedback,
     },
+  });
+  const handleFeedbackSubmitShortcut = useSubmitShortcut(() => {
+    void form.handleSubmit(handleSubmit)();
   });
 
   async function startDeepResearch() {
@@ -110,9 +114,13 @@ function Feedback() {
                         rows={3}
                         placeholder={t("research.feedback.feedbackPlaceholder")}
                         disabled={isThinking}
+                        onKeyDown={handleFeedbackSubmitShortcut}
                         {...field}
                       />
                     </FormControl>
+                    <p className="text-xs text-muted-foreground">
+                      {t("research.common.submitShortcut")}
+                    </p>
                   </FormItem>
                 )}
               />

@@ -29,12 +29,22 @@
       "save": "Save",
       "copy": "Copy",
       "export": "Export",
-      "delete": "Delete"
+      "delete": "Delete",
+      "submitShortcut": "Shortcut: Ctrl/Cmd + Enter"
     },
     "topic": {
       "title": "1. Research Topics",
       "topicLabel": "1.1 Research topics",
-      "topicPlaceholder": "Any questions you want to know..."
+      "topicPlaceholder": "Any questions you want to know...",
+      "presetsLabel": "Quick start templates",
+      "presets": {
+        "marketLabel": "Market map",
+        "marketPrompt": "Map the current market landscape for [your topic]. Compare major vendors, pricing models, market share trends, and key risks over the next 12 months.",
+        "technicalLabel": "Technical deep dive",
+        "technicalPrompt": "Perform a technical deep dive on [your topic]. Explain architecture options, implementation tradeoffs, performance constraints, and recommended rollout strategy.",
+        "comparisonLabel": "Compare options",
+        "comparisonPrompt": "Compare the top solutions for [your topic]. Build a decision matrix covering features, cost, integration effort, security/compliance, and long-term maintainability."
+      }
     },
     "feedback": {
       "title": "2. Ask Question",
@@ -50,7 +60,17 @@
       "suggestionLabel": "Research suggestions (Optional)",
       "suggestionPlaceholder": "Whether to add or adjust research directions...",
       "references": "References",
-      "relatedImages": "Related Images"
+      "relatedImages": "Related Images",
+      "taskSearchPlaceholder": "Search tasks by topic or goal...",
+      "statusFilterAll": "All statuses",
+      "statusUnprocessed": "Unprocessed",
+      "statusProcessing": "Processing",
+      "statusCompleted": "Completed",
+      "statusFailed": "Failed",
+      "retryFailed": "Retry failed",
+      "removeFailed": "Remove failed",
+      "showingTasks": "Showing {{shown}} of {{total}} tasks",
+      "noFilteredTasks": "No tasks match the current filters."
     },
     "finalReport": {
       "title": "4. Final Report",
@@ -59,6 +79,19 @@
       "localResearchedInfor": "Researched {{total}} local resources",
       "writingRequirementLabel": "Writing requirements (optional)",
       "writingRequirementPlaceholder": "You can raise any request related to report writing."
+    },
+    "workflow": {
+      "title": "Research Workflow",
+      "summary": "{{progress}}% complete ({{completed}}/{{total}} stages)",
+      "topic": "Topic",
+      "questions": "Questions",
+      "plan": "Plan",
+      "collection": "Collection",
+      "report": "Final report",
+      "collectionDetail": "{{completed}}/{{total}} tasks completed",
+      "done": "Done",
+      "active": "In progress",
+      "pending": "Pending"
     }
   },
   "history": {

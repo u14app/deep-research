@@ -30,10 +30,19 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import useAccurateTimer from "@/hooks/useAccurateTimer";
 import useDeepResearch from "@/hooks/useDeepResearch";
 import useKnowledge from "@/hooks/useKnowledge";
+import useSubmitShortcut from "@/hooks/useSubmitShortcut";
 import { useTaskStore } from "@/store/task";
 import { useKnowledgeStore } from "@/store/knowledge";
 import { downloadFile } from "@/utils/file";
@@ -45,6 +54,7 @@ const Lightbox = dynamic(() => import("@/components/Internal/Lightbox"));
 const formSchema = z.object({
   suggestion: z.string().optional(),
 });
+type TaskFilter = "all" | SearchTask["state"];
 
 function addQuoteBeforeAllLine(text: string = "") {
   return text
@@ -74,18 +84,37 @@ function SearchResult() {
     stop: accurateTimerStop,
   } = useAccurateTimer();
   const [isThinking, setIsThinking] = useState<boolean>(false);
+  const [taskQuery, setTaskQuery] = useState<string>("");
+  const [taskFilter, setTaskFilter] = useState<TaskFilter>("all");
   const unfinishedTasks = useMemo(() => {
     return taskStore.tasks.filter((item) => item.state !== "completed");
+  }, [taskStore.tasks]);
+  const failedTasks = useMemo(() => {
+    return taskStore.tasks.filter((item) => item.state === "failed");
   }, [taskStore.tasks]);
   const taskFinished = useMemo(() => {
     return taskStore.tasks.length > 0 && unfinishedTasks.length === 0;
   }, [taskStore.tasks, unfinishedTasks]);
+  const filteredTasks = useMemo(() => {
+    const search = taskQuery.trim().toLowerCase();
+    return taskStore.tasks.filter((task) => {
+      const matchesFilter = taskFilter === "all" || task.state === taskFilter;
+      const matchesSearch =
+        search.length === 0 ||
+        task.query.toLowerCase().includes(search) ||
+        task.researchGoal.toLowerCase().includes(search);
+      return matchesFilter && matchesSearch;
+    });
+  }, [taskFilter, taskQuery, taskStore.tasks]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       suggestion: taskStore.suggestion,
     },
+  });
+  const handleSuggestionSubmitShortcut = useSubmitShortcut(() => {
+    void form.handleSubmit(handleSubmit)();
   });
 
   function getSearchResultContent(item: SearchTask) {
@@ -165,6 +194,37 @@ function SearchResult() {
     removeTask(query);
   }
 
+  async function handleRetryFailedTasks() {
+    const { updateTask } = useTaskStore.getState();
+    const retryTasks = failedTasks.map((task) => ({
+      ...task,
+      state: "unprocessed" as const,
+      learning: "",
+      sources: [],
+      images: [],
+    }));
+    try {
+      accurateTimerStart();
+      setIsThinking(true);
+      retryTasks.forEach((task) => {
+        updateTask(task.query, task);
+      });
+      if (retryTasks.length > 0) {
+        await runSearchTask(retryTasks);
+      }
+    } finally {
+      setIsThinking(false);
+      accurateTimerStop();
+    }
+  }
+
+  function handleRemoveFailedTasks() {
+    const { removeTask } = useTaskStore.getState();
+    failedTasks.forEach((task) => {
+      removeTask(task.query);
+    });
+  }
+
   useEffect(() => {
     form.setValue("suggestion", taskStore.suggestion);
   }, [taskStore.suggestion, form]);
@@ -178,122 +238,191 @@ function SearchResult() {
         <div>{t("research.searchResult.emptyTip")}</div>
       ) : (
         <div>
-          <Accordion className="mb-4" type="multiple">
-            {taskStore.tasks.map((item, idx) => {
-              return (
-                <AccordionItem key={idx} value={item.query}>
-                  <AccordionTrigger>
-                    <div className="flex">
-                      <TaskState state={item.state} />
-                      <span className="ml-1">{item.query}</span>
-                    </div>
-                  </AccordionTrigger>
-                  <AccordionContent className="prose prose-slate dark:prose-invert max-w-full min-h-20">
-                    <MagicDownView>
-                      {addQuoteBeforeAllLine(item.researchGoal)}
-                    </MagicDownView>
-                    <Separator className="mb-4" />
-                    <MagicDown
-                      value={item.learning}
-                      onChange={(value) =>
-                        taskStore.updateTask(item.query, { learning: value })
-                      }
-                      tools={
-                        <>
-                          <div className="px-1">
-                            <Separator className="dark:bg-slate-700" />
-                          </div>
-                          <Button
-                            className="float-menu-button"
-                            type="button"
-                            size="icon"
-                            variant="ghost"
-                            title={t("research.common.restudy")}
-                            side="left"
-                            sideoffset={8}
-                            onClick={() =>
-                              handleRetry(item.query, item.researchGoal)
-                            }
-                          >
-                            <RotateCcw />
-                          </Button>
-                          <Button
-                            className="float-menu-button"
-                            type="button"
-                            size="icon"
-                            variant="ghost"
-                            title={t("research.common.delete")}
-                            side="left"
-                            sideoffset={8}
-                            onClick={() => handleRemove(item.query)}
-                          >
-                            <Trash />
-                          </Button>
-                          <div className="px-1">
-                            <Separator className="dark:bg-slate-700" />
-                          </div>
-                          <Button
-                            className="float-menu-button"
-                            type="button"
-                            size="icon"
-                            variant="ghost"
-                            title={t("research.common.addToKnowledgeBase")}
-                            side="left"
-                            sideoffset={8}
-                            onClick={() => addToKnowledgeBase(item)}
-                          >
-                            <NotebookText />
-                          </Button>
-                          <Button
-                            className="float-menu-button"
-                            type="button"
-                            size="icon"
-                            variant="ghost"
-                            title={t("research.common.export")}
-                            side="left"
-                            sideoffset={8}
-                            onClick={() =>
-                              downloadFile(
-                                getSearchResultContent(item),
-                                `${item.query}.md`,
-                                "text/markdown;charset=utf-8"
-                              )
-                            }
-                          >
-                            <Download />
-                          </Button>
-                        </>
-                      }
-                    ></MagicDown>
-                    {item.images?.length > 0 ? (
-                      <>
-                        <hr className="my-6" />
-                        <h4>{t("research.searchResult.relatedImages")}</h4>
-                        <Lightbox data={item.images}></Lightbox>
-                      </>
-                    ) : null}
-                    {item.sources?.length > 0 ? (
-                      <>
-                        <hr className="my-6" />
-                        <h4>{t("research.common.sources")}</h4>
-                        <ol>
-                          {item.sources.map((source, idx) => {
-                            return (
-                              <li className="ml-2" key={idx}>
-                                <a href={source.url} target="_blank">
-                                  {source.title || source.url}
-                                </a>
-                              </li>
-                            );
-                          })}
-                        </ol>
-                      </>
-                    ) : null}
-                  </AccordionContent>
-                </AccordionItem>
-              );
+          <div className="grid gap-2 lg:grid-cols-[1fr_200px]">
+            <Input
+              value={taskQuery}
+              onChange={(ev) => setTaskQuery(ev.target.value)}
+              placeholder={t("research.searchResult.taskSearchPlaceholder")}
+            />
+            <Select
+              value={taskFilter}
+              onValueChange={(value) => setTaskFilter(value as TaskFilter)}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">
+                  {t("research.searchResult.statusFilterAll")}
+                </SelectItem>
+                <SelectItem value="unprocessed">
+                  {t("research.searchResult.statusUnprocessed")}
+                </SelectItem>
+                <SelectItem value="processing">
+                  {t("research.searchResult.statusProcessing")}
+                </SelectItem>
+                <SelectItem value="completed">
+                  {t("research.searchResult.statusCompleted")}
+                </SelectItem>
+                <SelectItem value="failed">
+                  {t("research.searchResult.statusFailed")}
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex gap-2 mt-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={failedTasks.length === 0 || isThinking}
+              onClick={() => handleRetryFailedTasks()}
+            >
+              <RotateCcw />
+              <span>{t("research.searchResult.retryFailed")}</span>
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={failedTasks.length === 0 || isThinking}
+              onClick={() => handleRemoveFailedTasks()}
+            >
+              <Trash />
+              <span>{t("research.searchResult.removeFailed")}</span>
+            </Button>
+          </div>
+          <p className="text-xs text-muted-foreground mt-2">
+            {t("research.searchResult.showingTasks", {
+              shown: filteredTasks.length,
+              total: taskStore.tasks.length,
             })}
-          </Accordion>
+          </p>
+          {filteredTasks.length === 0 ? (
+            <p className="text-sm text-muted-foreground py-4">
+              {t("research.searchResult.noFilteredTasks")}
+            </p>
+          ) : (
+            <Accordion className="mb-4" type="multiple">
+              {filteredTasks.map((item, idx) => {
+                return (
+                  <AccordionItem
+                    key={`${item.query}-${idx}`}
+                    value={`${item.query}-${idx}`}
+                  >
+                    <AccordionTrigger>
+                      <div className="flex">
+                        <TaskState state={item.state} />
+                        <span className="ml-1">{item.query}</span>
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="prose prose-slate dark:prose-invert max-w-full min-h-20">
+                      <MagicDownView>
+                        {addQuoteBeforeAllLine(item.researchGoal)}
+                      </MagicDownView>
+                      <Separator className="mb-4" />
+                      <MagicDown
+                        value={item.learning}
+                        onChange={(value) =>
+                          taskStore.updateTask(item.query, { learning: value })
+                        }
+                        tools={
+                          <>
+                            <div className="px-1">
+                              <Separator className="dark:bg-slate-700" />
+                            </div>
+                            <Button
+                              className="float-menu-button"
+                              type="button"
+                              size="icon"
+                              variant="ghost"
+                              title={t("research.common.restudy")}
+                              side="left"
+                              sideoffset={8}
+                              onClick={() =>
+                                handleRetry(item.query, item.researchGoal)
+                              }
+                            >
+                              <RotateCcw />
+                            </Button>
+                            <Button
+                              className="float-menu-button"
+                              type="button"
+                              size="icon"
+                              variant="ghost"
+                              title={t("research.common.delete")}
+                              side="left"
+                              sideoffset={8}
+                              onClick={() => handleRemove(item.query)}
+                            >
+                              <Trash />
+                            </Button>
+                            <div className="px-1">
+                              <Separator className="dark:bg-slate-700" />
+                            </div>
+                            <Button
+                              className="float-menu-button"
+                              type="button"
+                              size="icon"
+                              variant="ghost"
+                              title={t("research.common.addToKnowledgeBase")}
+                              side="left"
+                              sideoffset={8}
+                              onClick={() => addToKnowledgeBase(item)}
+                            >
+                              <NotebookText />
+                            </Button>
+                            <Button
+                              className="float-menu-button"
+                              type="button"
+                              size="icon"
+                              variant="ghost"
+                              title={t("research.common.export")}
+                              side="left"
+                              sideoffset={8}
+                              onClick={() =>
+                                downloadFile(
+                                  getSearchResultContent(item),
+                                  `${item.query}.md`,
+                                  "text/markdown;charset=utf-8"
+                                )
+                              }
+                            >
+                              <Download />
+                            </Button>
+                          </>
+                        }
+                      ></MagicDown>
+                      {item.images?.length > 0 ? (
+                        <>
+                          <hr className="my-6" />
+                          <h4>{t("research.searchResult.relatedImages")}</h4>
+                          <Lightbox data={item.images}></Lightbox>
+                        </>
+                      ) : null}
+                      {item.sources?.length > 0 ? (
+                        <>
+                          <hr className="my-6" />
+                          <h4>{t("research.common.sources")}</h4>
+                          <ol>
+                            {item.sources.map((source, idx) => {
+                              return (
+                                <li className="ml-2" key={idx}>
+                                  <a href={source.url} target="_blank">
+                                    {source.title || source.url}
+                                  </a>
+                                </li>
+                              );
+                            })}
+                          </ol>
+                        </>
+                      ) : null}
+                    </AccordionContent>
+                  </AccordionItem>
+                );
+              })}
+            </Accordion>
+          )}
           <Form {...form}>
             <form onSubmit={form.handleSubmit(handleSubmit)}>
               <FormField
@@ -311,9 +440,13 @@ function SearchResult() {
                           "research.searchResult.suggestionPlaceholder"
                         )}
                         disabled={isThinking}
+                        onKeyDown={handleSuggestionSubmitShortcut}
                         {...field}
                       />
                     </FormControl>
+                    <p className="text-xs text-muted-foreground">
+                      {t("research.common.submitShortcut")}
+                    </p>
                   </FormItem>
                 )}
               />

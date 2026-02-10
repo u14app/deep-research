@@ -27,6 +27,7 @@ import useDeepResearch from "@/hooks/useDeepResearch";
 import useAiProvider from "@/hooks/useAiProvider";
 import useKnowledge from "@/hooks/useKnowledge";
 import useAccurateTimer from "@/hooks/useAccurateTimer";
+import useSubmitShortcut from "@/hooks/useSubmitShortcut";
 import { useGlobalStore } from "@/store/global";
 import { useSettingStore } from "@/store/setting";
 import { useTaskStore } from "@/store/task";
@@ -60,6 +61,33 @@ function Topic() {
       topic: taskStore.question,
     },
   });
+  const topicPresets: Array<{ id: string; label: string; value: string }> = [
+    {
+      id: "market",
+      label: t("research.topic.presets.marketLabel"),
+      value: t("research.topic.presets.marketPrompt"),
+    },
+    {
+      id: "technical",
+      label: t("research.topic.presets.technicalLabel"),
+      value: t("research.topic.presets.technicalPrompt"),
+    },
+    {
+      id: "comparison",
+      label: t("research.topic.presets.comparisonLabel"),
+      value: t("research.topic.presets.comparisonPrompt"),
+    },
+  ];
+  const handleTopicSubmitShortcut = useSubmitShortcut(() => {
+    void form.handleSubmit(handleSubmit)();
+  });
+
+  function applyTopicPreset(value: string): void {
+    form.setValue("topic", value, {
+      shouldDirty: true,
+      shouldTouch: true,
+    });
+  }
 
   function handleCheck(): boolean {
     const { mode } = useSettingStore.getState();
@@ -154,8 +182,30 @@ function Topic() {
                   id={TOPIC_FIELD_ID}
                   rows={3}
                   placeholder={t("research.topic.topicPlaceholder")}
+                  onKeyDown={handleTopicSubmitShortcut}
                   {...field}
                 />
+                <p className="text-xs text-muted-foreground">
+                  {t("research.common.submitShortcut")}
+                </p>
+                <div>
+                  <p className="text-xs text-muted-foreground mb-2">
+                    {t("research.topic.presetsLabel")}
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {topicPresets.map((preset) => (
+                      <Button
+                        key={preset.id}
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        onClick={() => applyTopicPreset(preset.value)}
+                      >
+                        {preset.label}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
               </div>
             )}
           />
