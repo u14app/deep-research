@@ -87,11 +87,54 @@ function useDeepResearch() {
     return Math.max(1, Math.min(20, Math.floor(value)));
   }
 
+  function getAutoReviewRounds() {
+    const { autoReviewRounds } = useSettingStore.getState();
+    const value = Number(autoReviewRounds);
+    if (!Number.isFinite(value)) {
+      return 0;
+    }
+    return Math.max(0, Math.min(5, Math.floor(value)));
+  }
+
+  function getReportPreferenceRequirement(
+    reportStyle: "balanced" | "executive" | "technical" | "concise",
+    reportLength: "brief" | "standard" | "comprehensive"
+  ) {
+    const stylePrompts: Record<
+      "balanced" | "executive" | "technical" | "concise",
+      string
+    > = {
+      balanced:
+        "Keep a balanced writing style with clear explanations, practical examples, and moderate technical depth.",
+      executive:
+        "Prioritize decision-ready insights. Begin sections with key findings and focus on business impact, risks, and recommendations.",
+      technical:
+        "Prioritize technical depth and precision. Include implementation details, tradeoffs, assumptions, and limitations.",
+      concise:
+        "Be concise and direct. Eliminate filler and keep each section tightly focused on essential information.",
+    };
+    const lengthPrompts: Record<"brief" | "standard" | "comprehensive", string> =
+      {
+        brief:
+          "Keep the report compact while preserving critical insights and evidence.",
+        standard:
+          "Write a standard-length report with good depth and practical detail.",
+        comprehensive:
+          "Write a comprehensive report with deep coverage, detailed analysis, and thorough supporting context.",
+      };
+
+    return [
+      "Additional report preferences:",
+      `- Style: ${stylePrompts[reportStyle]}`,
+      `- Length: ${lengthPrompts[reportLength]}`,
+    ].join("\n");
+  }
+
   async function generateSearchSettings(searchModel: string) {
     const { provider, enableSearch, searchProvider, searchMaxResult } =
       useSettingStore.getState();
 
-    if (enableSearch && searchProvider === "model") {
+    if (enableSearch === "1" && searchProvider === "model") {
       const createModel = (model: string) => {
         // Enable Gemini's built-in search tool
         if (
@@ -344,7 +387,7 @@ function useDeepResearch() {
             }
           }
 
-          if (enableSearch) {
+          if (enableSearch === "1") {
             if (searchProvider !== "model") {
               try {
                 const results = await search(item.query);
@@ -558,12 +601,19 @@ function useDeepResearch() {
     if (queries.length > 0) {
       taskStore.update([...tasks, ...queries]);
       await runSearchTask(queries);
+      return queries.length;
     }
+    return 0;
   }
 
   async function writeFinalReport() {
-    const { citationImage, references, useFileFormatResource } =
-      useSettingStore.getState();
+    const {
+      citationImage,
+      references,
+      useFileFormatResource,
+      reportStyle,
+      reportLength,
+    } = useSettingStore.getState();
     const {
       reportPlan,
       tasks,
@@ -592,6 +642,12 @@ function useDeepResearch() {
     const enableCitationImage = images.length > 0 && citationImage === "enable";
     const enableReferences = sources.length > 0 && references === "enable";
     const enableFileFormatResource = useFileFormatResource === "enable";
+    const mergedRequirement = [
+      requirement,
+      getReportPreferenceRequirement(reportStyle, reportLength),
+    ]
+      .filter((item) => item.trim().length > 0)
+      .join("\n\n");
     const thinkTagStreamProcessor = new ThinkTagStreamProcessor();
 
     const sourceList = enableReferences
@@ -633,7 +689,7 @@ function useDeepResearch() {
             learnings,
             sourceList,
             imageList,
-            requirement,
+            mergedRequirement,
             enableCitationImage,
             enableReferences,
             enableFileFormatResource,
@@ -771,7 +827,17 @@ function useDeepResearch() {
         );
       }
       if (reasoning) console.log(reasoning);
-      await runSearchTask(queries);
+      if (queries.length > 0) {
+        await runSearchTask(queries);
+        let remainingAutoRounds = getAutoReviewRounds();
+        while (remainingAutoRounds > 0) {
+          const generatedQueries = await reviewSearchResult();
+          if (generatedQueries === 0) {
+            break;
+          }
+          remainingAutoRounds -= 1;
+        }
+      }
     } catch (err) {
       console.error(err);
     }
