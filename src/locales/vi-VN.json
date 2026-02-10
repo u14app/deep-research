@@ -288,6 +288,8 @@
     "bocha": "Bocha",
     "parallelSearch": "Tìm kiếm song song",
     "parallelSearchTip": "Tăng tốc thu thập dữ liệu, nhưng có thể bị giới hạn số yêu cầu/phút.",
+    "maxCollectionTopics": "Chủ đề thu thập",
+    "maxCollectionTopicsTip": "Số lượng chủ đề thu thập thông tin tối đa được tạo và nghiên cứu trong mỗi vòng.",
     "searchResults": "Kết quả tìm kiếm",
     "searchResultsTip": "Số lượng kết quả tìm kiếm tối đa.",
     "searchApiKeyPlaceholder": "Vui lòng nhập khóa API tìm kiếm",

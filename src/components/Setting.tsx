@@ -168,6 +168,7 @@ const formSchema = z.object({
   searxngApiProxy: z.string().optional(),
   searxngScope: z.string().optional(),
   parallelSearch: z.number().min(1).max(5),
+  maxCollectionTopics: z.number().min(1).max(20),
   searchMaxResult: z.number().min(1).max(10),
   language: z.string().optional(),
   theme: z.string().optional(),
@@ -3449,6 +3450,36 @@ function Setting({ open, onClose }: SettingProps) {
                             min={1}
                             step={1}
                             disabled={form.getValues("enableSearch") === "0"}
+                            onValueChange={(values) =>
+                              field.onChange(values[0])
+                            }
+                          />
+                          <span className="w-[14%] text-center text-sm leading-10">
+                            {field.value}
+                          </span>
+                        </div>
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="maxCollectionTopics"
+                  render={({ field }) => (
+                    <FormItem className="from-item">
+                      <FormLabel className="from-label">
+                        <HelpTip tip={t("setting.maxCollectionTopicsTip")}>
+                          {t("setting.maxCollectionTopics")}
+                        </HelpTip>
+                      </FormLabel>
+                      <FormControl className="form-field">
+                        <div className="flex h-9">
+                          <Slider
+                            className="flex-1"
+                            value={[field.value]}
+                            max={20}
+                            min={1}
+                            step={1}
                             onValueChange={(values) =>
                               field.onChange(values[0])
                             }

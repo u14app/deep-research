@@ -72,6 +72,7 @@ export interface SettingStore {
   searxngApiProxy: string;
   searxngScope: string;
   parallelSearch: number;
+  maxCollectionTopics: number;
   searchMaxResult: number;
   crawler: string;
   language: string;
@@ -161,6 +162,7 @@ export const defaultValues: SettingStore = {
   searxngApiProxy: "",
   searxngScope: "all",
   parallelSearch: 1,
+  maxCollectionTopics: 5,
   searchMaxResult: 5,
   crawler: "jina",
   language: "",

@@ -78,6 +78,15 @@ function useDeepResearch() {
     }
   }
 
+  function getMaxCollectionTopics() {
+    const { maxCollectionTopics } = useSettingStore.getState();
+    const value = Number(maxCollectionTopics);
+    if (!Number.isFinite(value)) {
+      return 5;
+    }
+    return Math.max(1, Math.min(20, Math.floor(value)));
+  }
+
   async function generateSearchSettings(searchModel: string) {
     const { provider, enableSearch, searchProvider, searchMaxResult } =
       useSettingStore.getState();
@@ -536,6 +545,7 @@ function useDeepResearch() {
                   ...pick(item, ["query", "researchGoal"]),
                 })
               );
+              queries = queries.slice(0, getMaxCollectionTopics());
             }
           }
         },
@@ -749,6 +759,7 @@ function useDeepResearch() {
                       ...pick(item, ["query", "researchGoal"]),
                     })
                   );
+                  queries = queries.slice(0, getMaxCollectionTopics());
                   taskStore.update(queries);
                 }
               }
