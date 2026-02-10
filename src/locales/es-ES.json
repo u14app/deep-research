@@ -288,6 +288,8 @@
     "bocha": "Bocha",
     "parallelSearch": "Búsqueda Paralela",
     "parallelSearchTip": "La búsqueda paralela ayuda a acelerar el proceso de recopilación de datos, pero una tasa demasiado alta puede activar el límite de solicitudes por minuto del modelo.",
+    "maxCollectionTopics": "Temas de recopilación",
+    "maxCollectionTopicsTip": "Número máximo de temas de recopilación de información que se generan e investigan en cada ronda.",
     "searchResults": "Resultados de Búsqueda",
     "searchResultsTip": "El número máximo de búsquedas web. Algunos motores de búsqueda no admiten este parámetro.",
     "searchApiKeyPlaceholder": "Por favor, introduce tu Clave API",

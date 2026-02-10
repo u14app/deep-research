@@ -288,6 +288,8 @@
     "bocha": "博查",
     "parallelSearch": "并行搜索",
     "parallelSearchTip": "并行搜索能加快数据信息收集，但过高的并发率可能触发模型的每分钟请求次数限制。",
+    "maxCollectionTopics": "采集主题数",
+    "maxCollectionTopicsTip": "每轮信息采集中，最多生成并研究的主题数量。",
     "searchResults": "搜索数量",
     "searchResultsTip": "最大搜索数量。部分搜索引擎并不支持此参数。",
     "searchApiKeyPlaceholder": "请输入您的 API 密钥",

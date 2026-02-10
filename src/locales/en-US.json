@@ -288,6 +288,8 @@
     "bocha": "Bocha",
     "parallelSearch": "Parallel Search",
     "parallelSearchTip": "Parallel search helps speed up the data collection process, but too high a rate may trigger the model's request per minute limit.",
+    "maxCollectionTopics": "Collection Topics",
+    "maxCollectionTopicsTip": "Maximum number of information collection topics generated and researched in each round.",
     "searchResults": "Search Results",
     "searchResultsTip": "The maximum number of web searches. Some search engines do not support this parameter.",
     "searchApiKeyPlaceholder": "Please enter your Api Key",
