@@ -247,3 +247,120 @@ export const knowledgeGraphPrompt = `Based on the following article, please extr
 5. Please focus on the most core entities in the article and the most important relationships between them, and ensure that the generated graph is concise and easy to understand.
 6. All text content **MUST** be wrapped in \`"\` syntax. (e.g., "Any Text Content")
 7. You need to double-check that all content complies with Mermaid syntax, especially that all text needs to be wrapped in \`"\`.`;
+
+export const deepResearchPromptTemplateKeys = [
+  "systemInstruction",
+  "outputGuidelinesPrompt",
+  "systemQuestionPrompt",
+  "guidelinesPrompt",
+  "reportPlanPrompt",
+  "serpQuerySchemaPrompt",
+  "serpQueriesPrompt",
+  "queryResultPrompt",
+  "citationRulesPrompt",
+  "searchResultPrompt",
+  "searchKnowledgeResultPrompt",
+  "reviewPrompt",
+  "finalReportCitationImagePrompt",
+  "finalReportReferencesPrompt",
+  "finalReportPrompt",
+  "rewritingPrompt",
+  "knowledgeGraphPrompt",
+] as const;
+
+export type DeepResearchPromptTemplateKey =
+  (typeof deepResearchPromptTemplateKeys)[number];
+
+export type DeepResearchPromptTemplates = Record<
+  DeepResearchPromptTemplateKey,
+  string
+>;
+
+export type DeepResearchPromptOverrides = Partial<DeepResearchPromptTemplates>;
+
+export const defaultDeepResearchPromptTemplates: DeepResearchPromptTemplates = {
+  systemInstruction,
+  outputGuidelinesPrompt,
+  systemQuestionPrompt,
+  guidelinesPrompt,
+  reportPlanPrompt,
+  serpQuerySchemaPrompt,
+  serpQueriesPrompt,
+  queryResultPrompt,
+  citationRulesPrompt,
+  searchResultPrompt,
+  searchKnowledgeResultPrompt,
+  reviewPrompt,
+  finalReportCitationImagePrompt,
+  finalReportReferencesPrompt,
+  finalReportPrompt,
+  rewritingPrompt,
+  knowledgeGraphPrompt,
+};
+
+export function resolveDeepResearchPromptTemplates(
+  overrides: DeepResearchPromptOverrides = {}
+): DeepResearchPromptTemplates {
+  const templates: DeepResearchPromptTemplates = {
+    ...defaultDeepResearchPromptTemplates,
+    ...overrides,
+  };
+  if (
+    typeof overrides.guidelinesPrompt === "string" &&
+    typeof overrides.reportPlanPrompt === "undefined"
+  ) {
+    templates.reportPlanPrompt = reportPlanPrompt.replace(
+      guidelinesPrompt,
+      overrides.guidelinesPrompt
+    );
+  }
+  if (
+    typeof overrides.serpQuerySchemaPrompt === "string" &&
+    typeof overrides.serpQueriesPrompt === "undefined"
+  ) {
+    templates.serpQueriesPrompt = serpQueriesPrompt.replace(
+      serpQuerySchemaPrompt,
+      overrides.serpQuerySchemaPrompt
+    );
+  }
+  if (
+    typeof overrides.serpQuerySchemaPrompt === "string" &&
+    typeof overrides.reviewPrompt === "undefined"
+  ) {
+    templates.reviewPrompt = reviewPrompt.replace(
+      serpQuerySchemaPrompt,
+      overrides.serpQuerySchemaPrompt
+    );
+  }
+  return templates;
+}
+
+export function parseDeepResearchPromptOverrides(
+  value: unknown
+): DeepResearchPromptOverrides {
+  if (!value || value === "") {
+    return {};
+  }
+  if (typeof value === "string" && value.trim() === "") {
+    return {};
+  }
+  let raw: unknown = value;
+  if (typeof value === "string") {
+    try {
+      raw = JSON.parse(value);
+    } catch {
+      throw new Error("Prompt overrides must be a valid JSON object.");
+    }
+  }
+  if (typeof raw !== "object" || raw === null || Array.isArray(raw)) {
+    throw new Error("Prompt overrides must be a valid JSON object.");
+  }
+  const parsed: DeepResearchPromptOverrides = {};
+  for (const key of deepResearchPromptTemplateKeys) {
+    const item = (raw as Record<string, unknown>)[key];
+    if (typeof item === "string") {
+      parsed[key] = item;
+    }
+  }
+  return parsed;
+}

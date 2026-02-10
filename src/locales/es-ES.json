@@ -336,6 +336,10 @@
     "confirm": "Confirmar",
     "cancel": "Cancelar",
     "useLocalResource": "Solo usar recursos locales",
-    "useLocalResourceTip": "Al habilitarlo, solo se utilizarán recursos locales para la investigación y el rastreo web. No se realizarán solicitudes externas."
+    "useLocalResourceTip": "Al habilitarlo, solo se utilizarán recursos locales para la investigación y el rastreo web. No se realizarán solicitudes externas.",
+    "promptOverrides": "Sobrescritura de prompts",
+    "promptOverridesTip": "Usa un objeto JSON para sobrescribir los prompts integrados de investigación profunda. Solo se sobrescriben las claves proporcionadas.",
+    "promptOverridesPlaceholder": "{\n  \"systemInstruction\": \"You are an expert researcher...\",\n  \"reportPlanPrompt\": \"Given the following query...\"\n}",
+    "promptOverridesInvalid": "La sobrescritura de prompts debe ser un objeto JSON válido."
   }
 }

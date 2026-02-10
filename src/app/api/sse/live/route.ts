@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import DeepResearch from "@/utils/deep-research";
 import { multiApiKeyPolling } from "@/utils/model";
+import { parseDeepResearchPromptOverrides } from "@/constants/prompts";
 import {
   getAIProviderBaseURL,
   getAIProviderApiKey,
@@ -38,6 +39,16 @@ export async function GET(req: NextRequest) {
     getValueFromSearchParams("enableReferences") === "false";
   const enableFileFormatResource =
     getValueFromSearchParams("enableFileFormatResource") === "true";
+  let promptOverrides = {};
+  try {
+    promptOverrides = parseDeepResearchPromptOverrides(
+      getValueFromSearchParams("promptOverrides") || ""
+    );
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Invalid prompt overrides";
+    return NextResponse.json({ error: message }, { status: 400 });
+  }
 
   const encoder = new TextEncoder();
   const readableStream = new ReadableStream({
@@ -63,6 +74,7 @@ export async function GET(req: NextRequest) {
           provider: searchProvider,
           maxResult,
         },
+        promptOverrides,
         onMessage: (event, data) => {
           if (event === "message") {
             controller.enqueue(encoder.encode(data.text));

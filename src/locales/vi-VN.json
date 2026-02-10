@@ -336,6 +336,10 @@
     "confirm": "Xác nhận",
     "cancel": "Hủy",
     "useLocalResource": "Chỉ sử dụng tài nguyên cục bộ",
-    "useLocalResourceTip": "Khi bật, chỉ sử dụng tài nguyên cục bộ cho nghiên cứu và thu thập dữ liệu web. Không gửi yêu cầu ra ngoài."
+    "useLocalResourceTip": "Khi bật, chỉ sử dụng tài nguyên cục bộ cho nghiên cứu và thu thập dữ liệu web. Không gửi yêu cầu ra ngoài.",
+    "promptOverrides": "Ghi đè prompt",
+    "promptOverridesTip": "Dùng đối tượng JSON để ghi đè các prompt nghiên cứu sâu mặc định. Chỉ các khóa được cung cấp mới bị ghi đè.",
+    "promptOverridesPlaceholder": "{\n  \"systemInstruction\": \"You are an expert researcher...\",\n  \"reportPlanPrompt\": \"Given the following query...\"\n}",
+    "promptOverridesInvalid": "Ghi đè prompt phải là một đối tượng JSON hợp lệ."
   }
 }

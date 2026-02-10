@@ -36,6 +36,8 @@ import useDeepResearch from "@/hooks/useDeepResearch";
 import useKnowledge from "@/hooks/useKnowledge";
 import { useTaskStore } from "@/store/task";
 import { useKnowledgeStore } from "@/store/knowledge";
+import { useSettingStore } from "@/store/setting";
+import { parseDeepResearchPromptOverrides } from "@/constants/prompts";
 import { getSystemPrompt } from "@/utils/deep-research/prompts";
 import { downloadFile } from "@/utils/file";
 import { markdownToDoc } from "@/utils/markdown";
@@ -51,6 +53,7 @@ const formSchema = z.object({
 function FinalReport() {
   const { t } = useTranslation();
   const taskStore = useTaskStore();
+  const { deepResearchPromptOverrides } = useSettingStore();
   const { status, writeFinalReport } = useDeepResearch();
   const { generateId } = useKnowledge();
   const {
@@ -60,6 +63,13 @@ function FinalReport() {
   } = useAccurateTimer();
   const [isWriting, setIsWriting] = useState<boolean>(false);
   const [openKnowledgeGraph, setOpenKnowledgeGraph] = useState<boolean>(false);
+  const promptOverrides = useMemo(() => {
+    try {
+      return parseDeepResearchPromptOverrides(deepResearchPromptOverrides);
+    } catch {
+      return {};
+    }
+  }, [deepResearchPromptOverrides]);
   const taskFinished = useMemo(() => {
     const unfinishedTasks = taskStore.tasks.filter(
       (task) => task.state !== "completed"
@@ -183,7 +193,7 @@ function FinalReport() {
                   </div>
                   <Artifact
                     value={taskStore.finalReport}
-                    systemInstruction={getSystemPrompt()}
+                    systemInstruction={getSystemPrompt(promptOverrides)}
                     onChange={taskStore.updateFinalReport}
                     buttonClassName="float-menu-button"
                     dropdownMenuSideOffset={8}
