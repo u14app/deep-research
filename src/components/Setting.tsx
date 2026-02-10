@@ -31,6 +31,7 @@ import {
   FormLabel,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -69,6 +70,7 @@ import {
   SEARXNG_BASE_URL,
 } from "@/constants/urls";
 import locales from "@/constants/locales";
+import { parseDeepResearchPromptOverrides } from "@/constants/prompts";
 import {
   filterThinkingModelList,
   filterNetworkingModelList,
@@ -175,6 +177,7 @@ const formSchema = z.object({
   smoothTextStreamType: z.enum(["character", "word", "line"]).optional(),
   onlyUseLocalResource: z.enum(["enable", "disable"]).optional(),
   useFileFormatResource: z.enum(["enable", "disable"]).optional(),
+  deepResearchPromptOverrides: z.string().optional(),
 });
 
 function convertModelName(name: string) {
@@ -318,6 +321,12 @@ function Setting({ open, onClose }: SettingProps) {
   }
 
   function handleSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      parseDeepResearchPromptOverrides(values.deepResearchPromptOverrides);
+    } catch {
+      toast.error(t("setting.promptOverridesInvalid"));
+      return;
+    }
     update(values);
     onClose();
   }
@@ -3767,6 +3776,28 @@ function Setting({ open, onClose }: SettingProps) {
                             </SelectItem>
                           </SelectContent>
                         </Select>
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="deepResearchPromptOverrides"
+                  render={({ field }) => (
+                    <FormItem className="from-item">
+                      <FormLabel className="from-label">
+                        <HelpTip tip={t("setting.promptOverridesTip")}>
+                          {t("setting.promptOverrides")}
+                        </HelpTip>
+                      </FormLabel>
+                      <FormControl>
+                        <Textarea
+                          rows={8}
+                          className="form-field font-mono text-xs leading-5"
+                          placeholder={t("setting.promptOverridesPlaceholder")}
+                          {...field}
+                          value={field.value || ""}
+                        />
                       </FormControl>
                     </FormItem>
                   )}

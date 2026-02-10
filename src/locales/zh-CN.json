@@ -336,6 +336,10 @@
     "confirm": "确认",
     "cancel": "取消",
     "useLocalResource": "仅本地资源",
-    "useLocalResourceTip": "开启后，研究和网页爬取仅使用本地资源，不会发起外部网络请求。"
+    "useLocalResourceTip": "开启后，研究和网页爬取仅使用本地资源，不会发起外部网络请求。",
+    "promptOverrides": "提示词覆盖",
+    "promptOverridesTip": "使用 JSON 对象覆盖内置深度研究提示词。只会覆盖你提供的键。",
+    "promptOverridesPlaceholder": "{\n  \"systemInstruction\": \"You are an expert researcher...\",\n  \"reportPlanPrompt\": \"Given the following query...\"\n}",
+    "promptOverridesInvalid": "提示词覆盖必须是合法的 JSON 对象。"
   }
 }

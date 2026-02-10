@@ -4,6 +4,7 @@ import { createAIProvider } from "./provider";
 import { createSearchProvider } from "./search";
 import {
   getSystemPrompt,
+  getOutputGuidelinesPrompt,
   writeReportPlanPrompt,
   generateSerpQueriesPrompt,
   processResultPrompt,
@@ -11,7 +12,10 @@ import {
   writeFinalReportPrompt,
   getSERPQuerySchema,
 } from "./prompts";
-import { outputGuidelinesPrompt } from "@/constants/prompts";
+import {
+  parseDeepResearchPromptOverrides,
+  type DeepResearchPromptOverrides,
+} from "@/constants/prompts";
 import { isNetworkingModel } from "@/utils/model";
 import { ThinkTagStreamProcessor, removeJsonMarkdown } from "@/utils/text";
 import { pick, unique, flat, isFunction } from "radash";
@@ -31,6 +35,7 @@ export interface DeepResearchOptions {
     maxResult?: number;
   };
   language?: string;
+  promptOverrides?: DeepResearchPromptOverrides | string;
   onMessage?: (event: string, data: any) => void;
 }
 
@@ -70,9 +75,13 @@ function addQuoteBeforeAllLine(text: string = "") {
 
 class DeepResearch {
   protected options: DeepResearchOptions;
+  promptOverrides: DeepResearchPromptOverrides = {};
   onMessage: (event: string, data: any) => void = () => {};
   constructor(options: DeepResearchOptions) {
     this.options = options;
+    this.promptOverrides = parseDeepResearchPromptOverrides(
+      options.promptOverrides
+    );
     if (isFunction(options.onMessage)) {
       this.onMessage = options.onMessage;
     }
@@ -114,9 +123,9 @@ class DeepResearch {
     const thinkTagStreamProcessor = new ThinkTagStreamProcessor();
     const result = streamText({
       model: await this.getThinkingModel(),
-      system: getSystemPrompt(),
+      system: getSystemPrompt(this.promptOverrides),
       prompt: [
-        writeReportPlanPrompt(query),
+        writeReportPlanPrompt(query, this.promptOverrides),
         this.getResponseLanguagePrompt(),
       ].join("\n\n"),
     });
@@ -154,9 +163,9 @@ class DeepResearch {
     const thinkTagStreamProcessor = new ThinkTagStreamProcessor();
     const { text } = await generateText({
       model: await this.getThinkingModel(),
-      system: getSystemPrompt(),
+      system: getSystemPrompt(this.promptOverrides),
       prompt: [
-        generateSerpQueriesPrompt(reportPlan),
+        generateSerpQueriesPrompt(reportPlan, this.promptOverrides),
         this.getResponseLanguagePrompt(),
       ].join("\n\n"),
     });
@@ -246,9 +255,13 @@ class DeepResearch {
 
         searchResult = streamText({
           model: await this.getTaskModel(),
-          system: getSystemPrompt(),
+          system: getSystemPrompt(this.promptOverrides),
           prompt: [
-            processResultPrompt(item.query, item.researchGoal),
+            processResultPrompt(
+              item.query,
+              item.researchGoal,
+              this.promptOverrides
+            ),
             this.getResponseLanguagePrompt(),
           ].join("\n\n"),
           tools: await getTools(),
@@ -258,6 +271,7 @@ class DeepResearch {
         try {
           const result = await createSearchProvider({
             query: item.query,
+            promptOverrides: this.promptOverrides,
             ...this.options.searchProvider,
           });
 
@@ -271,13 +285,14 @@ class DeepResearch {
         }
         searchResult = streamText({
           model: await this.getTaskModel(),
-          system: getSystemPrompt(),
+          system: getSystemPrompt(this.promptOverrides),
           prompt: [
             processSearchResultPrompt(
               item.query,
               item.researchGoal,
               sources,
-              sources.length > 0 && enableReferences
+              sources.length > 0 && enableReferences,
+              this.promptOverrides
             ),
             this.getResponseLanguagePrompt(),
           ].join("\n\n"),
@@ -445,7 +460,8 @@ class DeepResearch {
             "",
             imageList.length > 0 && enableCitationImage,
             sourceList.length > 0 && enableReferences,
-            enableFileFormatResource
+            enableFileFormatResource,
+            this.promptOverrides
           ),
           this.getResponseLanguagePrompt(),
         ].join("\n\n"),
@@ -462,7 +478,10 @@ class DeepResearch {
 
     const result = streamText({
       model: await this.getThinkingModel(),
-      system: [getSystemPrompt(), outputGuidelinesPrompt].join("\n\n"),
+      system: [
+        getSystemPrompt(this.promptOverrides),
+        getOutputGuidelinesPrompt(this.promptOverrides),
+      ].join("\n\n"),
       messages: [
         {
           role: "user",

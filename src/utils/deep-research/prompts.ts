@@ -1,19 +1,13 @@
 import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 import {
-  systemInstruction,
-  systemQuestionPrompt,
-  reportPlanPrompt,
-  serpQueriesPrompt,
-  queryResultPrompt,
-  citationRulesPrompt,
-  searchResultPrompt,
-  searchKnowledgeResultPrompt,
-  reviewPrompt,
-  finalReportCitationImagePrompt,
-  finalReportReferencesPrompt,
-  finalReportPrompt,
+  resolveDeepResearchPromptTemplates,
+  type DeepResearchPromptOverrides,
 } from "@/constants/prompts";
+
+function getPromptTemplates(promptOverrides?: DeepResearchPromptOverrides) {
+  return resolveDeepResearchPromptTemplates(promptOverrides);
+}
 
 export function getSERPQuerySchema() {
   return z
@@ -37,25 +31,50 @@ export function getSERPQueryOutputSchema() {
   return JSON.stringify(zodToJsonSchema(SERPQuerySchema), null, 4);
 }
 
-export function getSystemPrompt() {
+export function getSystemPrompt(promptOverrides?: DeepResearchPromptOverrides) {
+  const { systemInstruction } = getPromptTemplates(promptOverrides);
   return systemInstruction.replace("{now}", new Date().toISOString());
 }
 
-export function generateQuestionsPrompt(query: string) {
+export function getOutputGuidelinesPrompt(
+  promptOverrides?: DeepResearchPromptOverrides
+) {
+  const { outputGuidelinesPrompt } = getPromptTemplates(promptOverrides);
+  return outputGuidelinesPrompt;
+}
+
+export function generateQuestionsPrompt(
+  query: string,
+  promptOverrides?: DeepResearchPromptOverrides
+) {
+  const { systemQuestionPrompt } = getPromptTemplates(promptOverrides);
   return systemQuestionPrompt.replace("{query}", query);
 }
 
-export function writeReportPlanPrompt(query: string) {
+export function writeReportPlanPrompt(
+  query: string,
+  promptOverrides?: DeepResearchPromptOverrides
+) {
+  const { reportPlanPrompt } = getPromptTemplates(promptOverrides);
   return reportPlanPrompt.replace("{query}", query);
 }
 
-export function generateSerpQueriesPrompt(plan: string) {
+export function generateSerpQueriesPrompt(
+  plan: string,
+  promptOverrides?: DeepResearchPromptOverrides
+) {
+  const { serpQueriesPrompt } = getPromptTemplates(promptOverrides);
   return serpQueriesPrompt
     .replace("{plan}", plan)
     .replace("{outputSchema}", getSERPQueryOutputSchema());
 }
 
-export function processResultPrompt(query: string, researchGoal: string) {
+export function processResultPrompt(
+  query: string,
+  researchGoal: string,
+  promptOverrides?: DeepResearchPromptOverrides
+) {
+  const { queryResultPrompt } = getPromptTemplates(promptOverrides);
   return queryResultPrompt
     .replace("{query}", query)
     .replace("{researchGoal}", researchGoal);
@@ -65,8 +84,11 @@ export function processSearchResultPrompt(
   query: string,
   researchGoal: string,
   results: Source[],
-  enableReferences: boolean
+  enableReferences: boolean,
+  promptOverrides?: DeepResearchPromptOverrides
 ) {
+  const { searchResultPrompt, citationRulesPrompt } =
+    getPromptTemplates(promptOverrides);
   const context = results.map(
     (result, idx) =>
       `<content index="${idx + 1}" url="${result.url}">\n${
@@ -84,8 +106,10 @@ export function processSearchResultPrompt(
 export function processSearchKnowledgeResultPrompt(
   query: string,
   researchGoal: string,
-  results: Knowledge[]
+  results: Knowledge[],
+  promptOverrides?: DeepResearchPromptOverrides
 ) {
+  const { searchKnowledgeResultPrompt } = getPromptTemplates(promptOverrides);
   const context = results.map(
     (result, idx) =>
       `<content index="${idx + 1}" url="${location.host}">\n${
@@ -101,8 +125,10 @@ export function processSearchKnowledgeResultPrompt(
 export function reviewSerpQueriesPrompt(
   plan: string,
   learning: string[],
-  suggestion: string
+  suggestion: string,
+  promptOverrides?: DeepResearchPromptOverrides
 ) {
+  const { reviewPrompt } = getPromptTemplates(promptOverrides);
   const learnings = learning.map(
     (detail) => `<learning>\n${detail}\n</learning>`
   );
@@ -121,8 +147,14 @@ export function writeFinalReportPrompt(
   requirement: string,
   enableCitationImage: boolean,
   enableReferences: boolean,
-  enableFileFormatResource: boolean
+  enableFileFormatResource: boolean,
+  promptOverrides?: DeepResearchPromptOverrides
 ) {
+  const {
+    finalReportPrompt,
+    finalReportCitationImagePrompt,
+    finalReportReferencesPrompt,
+  } = getPromptTemplates(promptOverrides);
   const learnings = learning.map(
     (detail) => `<learning>\n${detail}\n</learning>`
   );

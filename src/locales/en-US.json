@@ -336,6 +336,10 @@
     "confirm": "Confirm",
     "cancel": "Cancel",
     "useLocalResource": "Use Local Resource Only",
-    "useLocalResourceTip": "When enabled, only local resources will be used for research and web crawling. No external network requests will be made."
+    "useLocalResourceTip": "When enabled, only local resources will be used for research and web crawling. No external network requests will be made.",
+    "promptOverrides": "Prompt Overrides",
+    "promptOverridesTip": "Use a JSON object to override built-in deep research prompts. Only the provided keys are overridden.",
+    "promptOverridesPlaceholder": "{\n  \"systemInstruction\": \"You are an expert researcher...\",\n  \"reportPlanPrompt\": \"Given the following query...\"\n}",
+    "promptOverridesInvalid": "Prompt overrides must be a valid JSON object."
   }
 }

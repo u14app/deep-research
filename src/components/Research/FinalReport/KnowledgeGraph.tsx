@@ -1,6 +1,6 @@
 "use client";
 import dynamic from "next/dynamic";
-import { useLayoutEffect, useCallback, useState } from "react";
+import { useLayoutEffect, useCallback, useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { streamText } from "ai";
 import { toast } from "sonner";
@@ -15,7 +15,11 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import useModelProvider from "@/hooks/useAiProvider";
 import { useTaskStore } from "@/store/task";
-import { knowledgeGraphPrompt } from "@/constants/prompts";
+import { useSettingStore } from "@/store/setting";
+import {
+  parseDeepResearchPromptOverrides,
+  resolveDeepResearchPromptTemplates,
+} from "@/constants/prompts";
 import { parseError } from "@/utils/error";
 import { cn } from "@/utils/style";
 
@@ -35,9 +39,21 @@ function handleError(error: unknown) {
 function KnowledgeGraph({ open, onClose }: Props) {
   const { t } = useTranslation();
   const taskStore = useTaskStore.getState();
+  const { deepResearchPromptOverrides } = useSettingStore();
   const { createModelProvider, getModel } = useModelProvider();
   const [loading, setLoading] = useState<boolean>(false);
   const [mode, setMode] = useState<"view" | "editor">("view");
+  const promptOverrides = useMemo(() => {
+    try {
+      return parseDeepResearchPromptOverrides(deepResearchPromptOverrides);
+    } catch {
+      return {};
+    }
+  }, [deepResearchPromptOverrides]);
+  const knowledgeGraphPrompt = useMemo(() => {
+    return resolveDeepResearchPromptTemplates(promptOverrides)
+      .knowledgeGraphPrompt;
+  }, [promptOverrides]);
 
   const generateKnowledgeGraph = useCallback(async () => {
     const { finalReport, updateKnowledgeGraph } = useTaskStore.getState();
@@ -58,7 +74,7 @@ function KnowledgeGraph({ open, onClose }: Props) {
     updateKnowledgeGraph(text);
     text = "";
     setLoading(false);
-  }, [createModelProvider, getModel]);
+  }, [createModelProvider, getModel, knowledgeGraphPrompt]);
 
   function chnageMode() {
     if (mode === "view") {

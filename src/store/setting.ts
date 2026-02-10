@@ -82,6 +82,7 @@ export interface SettingStore {
   smoothTextStreamType: "character" | "word" | "line";
   onlyUseLocalResource: "enable" | "disable";
   useFileFormatResource: "enable" | "disable";
+  deepResearchPromptOverrides: string;
 }
 
 interface SettingActions {
@@ -170,6 +171,7 @@ export const defaultValues: SettingStore = {
   smoothTextStreamType: "word",
   onlyUseLocalResource: "disable",
   useFileFormatResource: "disable",
+  deepResearchPromptOverrides: "",
 };
 
 export const useSettingStore = create(

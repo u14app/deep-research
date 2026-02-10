@@ -6,7 +6,10 @@ import {
   BRAVE_BASE_URL,
   SEARXNG_BASE_URL,
 } from "@/constants/urls";
-import { rewritingPrompt } from "@/constants/prompts";
+import {
+  resolveDeepResearchPromptTemplates,
+  type DeepResearchPromptOverrides,
+} from "@/constants/prompts";
 import { completePath } from "@/utils/url";
 import { pick, sort } from "radash";
 
@@ -124,6 +127,7 @@ export interface SearchProviderOptions {
   query: string;
   maxResult?: number;
   scope?: string;
+  promptOverrides?: DeepResearchPromptOverrides;
 }
 
 type BraveSearchResult = {
@@ -178,7 +182,9 @@ export async function createSearchProvider({
   query,
   maxResult = 5,
   scope,
+  promptOverrides = {},
 }: SearchProviderOptions) {
+  const promptTemplates = resolveDeepResearchPromptTemplates(promptOverrides);
   const headers: HeadersInit = {
     "Content-Type": "application/json",
   };
@@ -259,7 +265,7 @@ export async function createSearchProvider({
           contents: {
             text: true,
             summary: {
-              query: `Given the following query from the user:\n<query>${query}</query>\n\n${rewritingPrompt}`,
+              query: `Given the following query from the user:\n<query>${query}</query>\n\n${promptTemplates.rewritingPrompt}`,
             },
             numResults: Number(maxResult) * 5,
             livecrawl: "auto",
