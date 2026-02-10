@@ -168,8 +168,11 @@ const formSchema = z.object({
   searxngApiProxy: z.string().optional(),
   searxngScope: z.string().optional(),
   parallelSearch: z.number().min(1).max(5),
+  autoReviewRounds: z.number().min(0).max(5),
   maxCollectionTopics: z.number().min(1).max(20),
   searchMaxResult: z.number().min(1).max(10),
+  searchIncludeDomains: z.string().optional(),
+  searchExcludeDomains: z.string().optional(),
   language: z.string().optional(),
   theme: z.string().optional(),
   debug: z.enum(["enable", "disable"]).optional(),
@@ -178,6 +181,10 @@ const formSchema = z.object({
   smoothTextStreamType: z.enum(["character", "word", "line"]).optional(),
   onlyUseLocalResource: z.enum(["enable", "disable"]).optional(),
   useFileFormatResource: z.enum(["enable", "disable"]).optional(),
+  reportStyle: z
+    .enum(["balanced", "executive", "technical", "concise"])
+    .optional(),
+  reportLength: z.enum(["brief", "standard", "comprehensive"]).optional(),
   deepResearchPromptOverrides: z.string().optional(),
 });
 
@@ -3464,6 +3471,37 @@ function Setting({ open, onClose }: SettingProps) {
                 />
                 <FormField
                   control={form.control}
+                  name="autoReviewRounds"
+                  render={({ field }) => (
+                    <FormItem className="from-item">
+                      <FormLabel className="from-label">
+                        <HelpTip tip={t("setting.autoReviewRoundsTip")}>
+                          {t("setting.autoReviewRounds")}
+                        </HelpTip>
+                      </FormLabel>
+                      <FormControl className="form-field">
+                        <div className="flex h-9">
+                          <Slider
+                            className="flex-1"
+                            value={[field.value]}
+                            max={5}
+                            min={0}
+                            step={1}
+                            disabled={form.getValues("enableSearch") === "0"}
+                            onValueChange={(values) =>
+                              field.onChange(values[0])
+                            }
+                          />
+                          <span className="w-[14%] text-center text-sm leading-10">
+                            {field.value}
+                          </span>
+                        </div>
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
                   name="maxCollectionTopics"
                   render={({ field }) => (
                     <FormItem className="from-item">
@@ -3519,6 +3557,58 @@ function Setting({ open, onClose }: SettingProps) {
                             {field.value}
                           </span>
                         </div>
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="searchIncludeDomains"
+                  render={({ field }) => (
+                    <FormItem className="from-item">
+                      <FormLabel className="from-label">
+                        <HelpTip tip={t("setting.searchIncludeDomainsTip")}>
+                          {t("setting.searchIncludeDomains")}
+                        </HelpTip>
+                      </FormLabel>
+                      <FormControl>
+                        <Textarea
+                          rows={2}
+                          className="form-field"
+                          placeholder={t("setting.searchDomainsPlaceholder")}
+                          disabled={
+                            form.getValues("enableSearch") === "0" ||
+                            form.getValues("searchProvider") === "model"
+                          }
+                          {...field}
+                          value={field.value || ""}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="searchExcludeDomains"
+                  render={({ field }) => (
+                    <FormItem className="from-item">
+                      <FormLabel className="from-label">
+                        <HelpTip tip={t("setting.searchExcludeDomainsTip")}>
+                          {t("setting.searchExcludeDomains")}
+                        </HelpTip>
+                      </FormLabel>
+                      <FormControl>
+                        <Textarea
+                          rows={2}
+                          className="form-field"
+                          placeholder={t("setting.searchDomainsPlaceholder")}
+                          disabled={
+                            form.getValues("enableSearch") === "0" ||
+                            form.getValues("searchProvider") === "model"
+                          }
+                          {...field}
+                          value={field.value || ""}
+                        />
                       </FormControl>
                     </FormItem>
                   )}
@@ -3748,6 +3838,71 @@ function Setting({ open, onClose }: SettingProps) {
                             </SelectItem>
                             <SelectItem value="line">
                               {t("setting.line")}
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="reportStyle"
+                  render={({ field }) => (
+                    <FormItem className="from-item">
+                      <FormLabel className="from-label">
+                        <HelpTip tip={t("setting.reportStyleTip")}>
+                          {t("setting.reportStyle")}
+                        </HelpTip>
+                      </FormLabel>
+                      <FormControl>
+                        <Select {...field} onValueChange={field.onChange}>
+                          <SelectTrigger className="form-field">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="balanced">
+                              {t("setting.reportStyleValue.balanced")}
+                            </SelectItem>
+                            <SelectItem value="executive">
+                              {t("setting.reportStyleValue.executive")}
+                            </SelectItem>
+                            <SelectItem value="technical">
+                              {t("setting.reportStyleValue.technical")}
+                            </SelectItem>
+                            <SelectItem value="concise">
+                              {t("setting.reportStyleValue.concise")}
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="reportLength"
+                  render={({ field }) => (
+                    <FormItem className="from-item">
+                      <FormLabel className="from-label">
+                        <HelpTip tip={t("setting.reportLengthTip")}>
+                          {t("setting.reportLength")}
+                        </HelpTip>
+                      </FormLabel>
+                      <FormControl>
+                        <Select {...field} onValueChange={field.onChange}>
+                          <SelectTrigger className="form-field">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="brief">
+                              {t("setting.reportLengthValue.brief")}
+                            </SelectItem>
+                            <SelectItem value="standard">
+                              {t("setting.reportLengthValue.standard")}
+                            </SelectItem>
+                            <SelectItem value="comprehensive">
+                              {t("setting.reportLengthValue.comprehensive")}
                             </SelectItem>
                           </SelectContent>
                         </Select>
