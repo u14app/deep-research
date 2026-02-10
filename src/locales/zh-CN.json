@@ -4,6 +4,24 @@
   "openSource": "开源代码",
   "copyright": "{{name}} 团队用 ❤️ 构建",
   "searchPlaceholder": "请输入关键词",
+  "header": {
+    "session": {
+      "export": "导出会话",
+      "import": "导入会话",
+      "exportSuccess": "当前会话已导出。",
+      "importSuccess": "会话导入成功。",
+      "importFailed": "会话导入失败。"
+    },
+    "shortcuts": {
+      "title": "高级快捷键",
+      "openSetting": "打开设置",
+      "openHistory": "打开历史记录",
+      "openKnowledge": "打开知识库",
+      "exportSession": "导出当前会话",
+      "importSession": "导入会话快照",
+      "toggleHelp": "切换快捷键帮助"
+    }
+  },
   "research": {
     "common": {
       "startThinking": "开始思考",
@@ -69,6 +87,16 @@
       "statusFailed": "失败",
       "retryFailed": "重试失败任务",
       "removeFailed": "删除失败任务",
+      "sortDefault": "排序：默认",
+      "sortQueryAsc": "排序：查询 (A-Z)",
+      "sortStatus": "排序：状态",
+      "sortSourcesDesc": "排序：来源最多",
+      "expandAll": "全部展开",
+      "collapseAll": "全部折叠",
+      "exportFilteredMarkdown": "导出筛选结果 Markdown",
+      "exportFilteredJSON": "导出筛选结果 JSON",
+      "exportEmpty": "没有可导出的筛选任务。",
+      "exportSuccess": "筛选任务已导出。",
       "showingTasks": "显示 {{shown}} / {{total}} 个任务",
       "noFilteredTasks": "当前筛选条件下没有匹配任务。"
     },
