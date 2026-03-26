@@ -78,6 +78,7 @@ FIRECRAWL_API_KEY=
 # (Optional) Server-side Firecrawl API Proxy URL. Default, `https://api.firecrawl.dev`
 # You can also use CRW (https://github.com/us/crw), an open-source Firecrawl-compatible alternative.
 # Self-hosted: FIRECRAWL_API_BASE_URL=http://localhost:3002
+# Note: In Docker, use host.docker.internal or docker-compose service name instead of localhost
 # Cloud: FIRECRAWL_API_BASE_URL=https://fastcrw.com
 FIRECRAWL_API_BASE_URL=
 

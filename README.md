@@ -194,7 +194,7 @@ pnpm build:export
 
 ## 🔍 Using CRW as a Firecrawl Alternative
 
-[CRW](https://github.com/us/crw) is an open-source, Firecrawl-compatible web scraper that you can self-host or use via the cloud ([fastcrw.com](https://fastcrw.com)). Since CRW is a drop-in replacement for Firecrawl, you can use it as your search provider without any code changes — just set the `FIRECRAWL_API_BASE_URL` environment variable.
+[CRW](https://github.com/us/crw) is an open-source, Firecrawl-compatible web scraper that you can self-host or use via the cloud ([fastcrw.com](https://fastcrw.com)). Since CRW is a drop-in replacement for Firecrawl, you can use it as your search provider without any code changes — just set the `FIRECRAWL_API_BASE_URL` environment variable. This variable is used for server-side API calls and the proxy path; client-side (browser) calls are not affected by this setting.
 
 ### Self-hosted CRW
 
@@ -209,6 +209,8 @@ pnpm build:export
    ```bash
    FIRECRAWL_API_BASE_URL=http://localhost:3002
    ```
+
+   > **Docker users:** If Deep Research is running inside a Docker container, `localhost` refers to the container itself. Use `host.docker.internal` (Docker Desktop) or the docker-compose service name instead (e.g., `http://host.docker.internal:3002`).
 
 3. Select **Firecrawl** as your search provider in the Deep Research settings.
 
