@@ -76,6 +76,9 @@ TAVILY_API_BASE_URL=
 # (Optional) Server-side Firecrawl API Key (Required for server API calls)
 FIRECRAWL_API_KEY=
 # (Optional) Server-side Firecrawl API Proxy URL. Default, `https://api.firecrawl.dev`
+# You can also use CRW (https://github.com/us/crw), an open-source Firecrawl-compatible alternative.
+# Self-hosted: FIRECRAWL_API_BASE_URL=http://localhost:3002
+# Cloud: FIRECRAWL_API_BASE_URL=https://fastcrw.com
 FIRECRAWL_API_BASE_URL=
 
 # (Optional) Server-side Exa API Key (Required for server API calls)
