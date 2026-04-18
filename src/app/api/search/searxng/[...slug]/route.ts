@@ -18,7 +18,8 @@ const API_PROXY_BASE_URL = process.env.SEARXNG_API_BASE_URL || SEARXNG_BASE_URL;
 export async function POST(req: NextRequest) {
   let body;
   if (req.method.toUpperCase() !== "GET") {
-    body = await req.json();
+    const text = await req.text();
+    body = text ? JSON.parse(text) : null;
   }
   const searchParams = req.nextUrl.searchParams;
   const path = searchParams.getAll("slug");
