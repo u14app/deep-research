@@ -31,7 +31,7 @@ Deep Research uses a variety of powerful AI models to generate in-depth research
 - **Powered by AI:** Utilizes the advanced AI models for accurate and insightful analysis.
 - **Privacy-Focused:** Your data remains private and secure, as all data is stored locally on your browser.
 - **Support for Multi-LLM:** Supports a variety of mainstream large language models, including Gemini, OpenAI, Anthropic, Deepseek, Grok, Mistral, Azure OpenAI, any OpenAI Compatible LLMs, OpenRouter, Ollama, etc.
-- **Support Web Search:** Supports search engines such as Searxng, Tavily, Firecrawl, Exa, Bocha, Brave, etc., allowing LLMs that do not support search to use the web search function more conveniently.
+- **Support Web Search:** Supports search engines such as Searxng, Tavily, Firecrawl, [CRW](https://github.com/us/crw), Exa, Bocha, Brave, etc., allowing LLMs that do not support search to use the web search function more conveniently.
 - **Thinking & Task Models:** Employs sophisticated "Thinking" and "Task" models to balance depth and speed, ensuring high-quality results quickly. Support switching research models.
 - **Support Further Research:** You can refine or adjust the research content at any stage of the project and support re-research from that stage.
 - **Local Knowledge Base:** Supports uploading and processing text, Office, PDF and other resource files to generate local knowledge base.
@@ -191,6 +191,39 @@ You can also build a static page version directly, and then upload all files in 
 ```bash
 pnpm build:export
 ```
+
+## 🔍 Using CRW as a Firecrawl Alternative
+
+[CRW](https://github.com/us/crw) is an open-source, Firecrawl-compatible web scraper that you can self-host or use via the cloud ([fastcrw.com](https://fastcrw.com)). Since CRW is a drop-in replacement for Firecrawl, you can use it as your search provider without any code changes — just set the `FIRECRAWL_API_BASE_URL` environment variable. This variable is used for server-side API calls and the proxy path; client-side (browser) calls are not affected by this setting.
+
+### Self-hosted CRW
+
+1. Start the CRW server (default port 3002):
+
+   ```bash
+   docker run -d --name crw -p 3002:3002 ghcr.io/us/crw
+   ```
+
+2. Set the environment variable to point to your CRW instance:
+
+   ```bash
+   FIRECRAWL_API_BASE_URL=http://localhost:3002
+   ```
+
+   > **Docker users:** If Deep Research is running inside a Docker container, `localhost` refers to the container itself. Use `host.docker.internal` (Docker Desktop) or the docker-compose service name instead (e.g., `http://host.docker.internal:3002`).
+
+3. Select **Firecrawl** as your search provider in the Deep Research settings.
+
+### Cloud CRW
+
+To use the hosted version at [fastcrw.com](https://fastcrw.com):
+
+```bash
+FIRECRAWL_API_BASE_URL=https://fastcrw.com
+FIRECRAWL_API_KEY=your-crw-api-key
+```
+
+> **Note:** When using self-hosted CRW, the `FIRECRAWL_API_KEY` may not be required depending on your CRW configuration.
 
 ## ⚙️ Configuration
 
