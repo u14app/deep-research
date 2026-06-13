@@ -31,7 +31,7 @@ Deep Research uses a variety of powerful AI models to generate in-depth research
 - **Powered by AI:** Utilizes the advanced AI models for accurate and insightful analysis.
 - **Privacy-Focused:** Your data remains private and secure, as all data is stored locally on your browser.
 - **Support for Multi-LLM:** Supports a variety of mainstream large language models, including Gemini, OpenAI, Anthropic, Deepseek, Grok, Mistral, Azure OpenAI, any OpenAI Compatible LLMs, OpenRouter, Ollama, etc.
-- **Support Web Search:** Supports search engines such as Searxng, Tavily, Firecrawl, Exa, Bocha, Brave, etc., allowing LLMs that do not support search to use the web search function more conveniently.
+- **Support Web Search:** Supports search engines such as Searxng, Tavily, Firecrawl, fastCRW, Exa, Bocha, Brave, etc., allowing LLMs that do not support search to use the web search function more conveniently.
 - **Thinking & Task Models:** Employs sophisticated "Thinking" and "Task" models to balance depth and speed, ensuring high-quality results quickly. Support switching research models.
 - **Support Further Research:** You can refine or adjust the research content at any stage of the project and support re-research from that stage.
 - **Local Knowledge Base:** Supports uploading and processing text, Office, PDF and other resource files to generate local knowledge base.
@@ -236,7 +236,7 @@ interface SSEConfig {
   thinkingModel: string;
   // Task model id
   taskModel: string;
-  // Search provider, Possible values ​​include: model, tavily, firecrawl, exa, bocha, searxng
+  // Search provider, Possible values ​​include: model, tavily, firecrawl, crw, exa, bocha, searxng
   searchProvider: string;
   // Response Language, also affects the search language. (optional)
   language?: string;
@@ -327,7 +327,7 @@ If your server sets `ACCESS_PASSWORD`, the MCP service will be protected and you
 # Possible values ​​include: google, openai, anthropic, deepseek, xai, mistral, azure, openrouter, openaicompatible, pollinations, ollama
 MCP_AI_PROVIDER=google
 # MCP Server search provider. Default, `model`
-# Possible values ​​include: model, tavily, firecrawl, exa, bocha, searxng
+# Possible values ​​include: model, tavily, firecrawl, crw, exa, bocha, searxng
 MCP_SEARCH_PROVIDER=tavily
 # MCP Server thinking model id, the core model used in deep research.
 MCP_THINKING_MODEL=gemini-2.0-flash-thinking-exp

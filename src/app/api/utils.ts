@@ -28,6 +28,8 @@ const TAVILY_API_BASE_URL =
   process.env.TAVILY_API_BASE_URL || "https://api.tavily.com";
 const FIRECRAWL_API_BASE_URL =
   process.env.FIRECRAWL_API_BASE_URL || "https://api.firecrawl.dev";
+const CRW_API_BASE_URL =
+  process.env.CRW_API_BASE_URL || "https://fastcrw.com/api";
 const EXA_API_BASE_URL = process.env.EXA_API_BASE_URL || "https://api.exa.ai";
 const BOCHA_API_BASE_URL =
   process.env.BOCHA_API_BASE_URL || "https://api.bochaai.com";
@@ -48,6 +50,7 @@ const GOOGLE_VERTEX_API_BASE_URL = `https://${process.env.GOOGLE_VERTEX_LOCATION
 // Search provider API key
 const TAVILY_API_KEY = process.env.TAVILY_API_KEY || "";
 const FIRECRAWL_API_KEY = process.env.FIRECRAWL_API_KEY || "";
+const CRW_API_KEY = process.env.CRW_API_KEY || "";
 const EXA_API_KEY = process.env.EXA_API_KEY || "";
 const BOCHA_API_KEY = process.env.BOCHA_API_KEY || "";
 
@@ -117,6 +120,8 @@ export function getSearchProviderBaseURL(provider: string) {
       return TAVILY_API_BASE_URL;
     case "firecrawl":
       return FIRECRAWL_API_BASE_URL;
+    case "crw":
+      return CRW_API_BASE_URL;
     case "exa":
       return EXA_API_BASE_URL;
     case "bocha":
@@ -136,6 +141,8 @@ export function getSearchProviderApiKey(provider: string) {
       return TAVILY_API_KEY;
     case "firecrawl":
       return FIRECRAWL_API_KEY;
+    case "crw":
+      return CRW_API_KEY;
     case "exa":
       return EXA_API_KEY;
     case "bocha":

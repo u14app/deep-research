@@ -106,6 +106,15 @@ function useWebSearch() {
           options.baseURL = location.origin + "/api/search/firecrawl";
         }
         break;
+      case "crw":
+        const { crwApiKey, crwApiProxy } = useSettingStore.getState();
+        if (mode === "local") {
+          options.baseURL = crwApiProxy;
+          options.apiKey = multiApiKeyPolling(crwApiKey);
+        } else {
+          options.baseURL = location.origin + "/api/search/crw";
+        }
+        break;
       case "exa":
         const { exaApiKey, exaApiProxy, exaScope } = useSettingStore.getState();
         if (mode === "local") {
