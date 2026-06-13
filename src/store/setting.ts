@@ -62,6 +62,8 @@ export interface SettingStore {
   tavilyScope: string;
   firecrawlApiKey: string;
   firecrawlApiProxy: string;
+  crwApiKey: string;
+  crwApiProxy: string;
   exaApiKey: string;
   exaApiProxy: string;
   exaScope: string;
@@ -157,6 +159,8 @@ export const defaultValues: SettingStore = {
   tavilyScope: "general",
   firecrawlApiKey: "",
   firecrawlApiProxy: "",
+  crwApiKey: "",
+  crwApiProxy: "",
   exaApiKey: "",
   exaApiProxy: "",
   exaScope: "research paper",

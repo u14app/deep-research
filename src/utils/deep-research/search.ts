@@ -1,6 +1,7 @@
 import {
   TAVILY_BASE_URL,
   FIRECRAWL_BASE_URL,
+  CRW_BASE_URL,
   EXA_BASE_URL,
   BOCHA_BASE_URL,
   BRAVE_BASE_URL,
@@ -225,6 +226,39 @@ export async function createSearchProvider({
   } else if (provider === "firecrawl") {
     const response = await fetch(
       `${completePath(baseURL || FIRECRAWL_BASE_URL, "/v1")}/search`,
+      {
+        method: "POST",
+        headers,
+        credentials: "omit",
+        body: JSON.stringify({
+          query,
+          limit: maxResult,
+          tbs: "qdr:w",
+          origin: "api",
+          scrapeOptions: {
+            formats: ["markdown"],
+          },
+          timeout: 60000,
+        }),
+      },
+    );
+    const { data = [] } = await response.json();
+    return {
+      sources: (data as FirecrawlDocument[])
+        .filter((item) => item.description && item.url)
+        .map((result) => ({
+          content: result.markdown || result.description,
+          url: result.url,
+          title: result.title,
+        })) as Source[],
+      images: [],
+    };
+  } else if (provider === "crw") {
+    // fastCRW is a Firecrawl-API-compatible web scraper (single binary,
+    // self-host or cloud), so it reuses the Firecrawl request/response shape
+    // with a different base URL.
+    const response = await fetch(
+      `${completePath(baseURL || CRW_BASE_URL, "/v1")}/search`,
       {
         method: "POST",
         headers,

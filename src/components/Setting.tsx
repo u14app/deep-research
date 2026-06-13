@@ -64,6 +64,7 @@ import {
   OLLAMA_BASE_URL,
   TAVILY_BASE_URL,
   FIRECRAWL_BASE_URL,
+  CRW_BASE_URL,
   EXA_BASE_URL,
   BOCHA_BASE_URL,
   BRAVE_BASE_URL,
@@ -158,6 +159,8 @@ const formSchema = z.object({
   tavilyScope: z.string().optional(),
   firecrawlApiKey: z.string().optional(),
   firecrawlApiProxy: z.string().optional(),
+  crwApiKey: z.string().optional(),
+  crwApiProxy: z.string().optional(),
   exaApiKey: z.string().optional(),
   exaApiProxy: z.string().optional(),
   exaScope: z.string().optional(),
@@ -3055,6 +3058,9 @@ function Setting({ open, onClose }: SettingProps) {
                                 Firecrawl
                               </SelectItem>
                             ) : null}
+                            {!isDisabledSearchProvider("crw") ? (
+                              <SelectItem value="crw">fastCRW</SelectItem>
+                            ) : null}
                             {!isDisabledSearchProvider("exa") &&
                             mode === "proxy" ? (
                               <SelectItem value="exa">Exa</SelectItem>
@@ -3191,6 +3197,52 @@ function Setting({ open, onClose }: SettingProps) {
                           <FormControl className="form-field">
                             <Input
                               placeholder={FIRECRAWL_BASE_URL}
+                              disabled={form.getValues("enableSearch") === "0"}
+                              {...field}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <div
+                    className={cn("space-y-4", {
+                      hidden: searchProvider !== "crw",
+                    })}
+                  >
+                    <FormField
+                      control={form.control}
+                      name="crwApiKey"
+                      render={({ field }) => (
+                        <FormItem className="from-item">
+                          <FormLabel className="from-label">
+                            {t("setting.apiKeyLabel")}
+                            <span className="ml-1 text-red-500 max-sm:hidden">
+                              *
+                            </span>
+                          </FormLabel>
+                          <FormControl className="form-field">
+                            <Password
+                              type="text"
+                              placeholder={t("setting.searchApiKeyPlaceholder")}
+                              disabled={form.getValues("enableSearch") === "0"}
+                              {...field}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="crwApiProxy"
+                      render={({ field }) => (
+                        <FormItem className="from-item">
+                          <FormLabel className="from-label">
+                            {t("setting.apiUrlLabel")}
+                          </FormLabel>
+                          <FormControl className="form-field">
+                            <Input
+                              placeholder={CRW_BASE_URL}
                               disabled={form.getValues("enableSearch") === "0"}
                               {...field}
                             />

@@ -78,6 +78,11 @@ FIRECRAWL_API_KEY=
 # (Optional) Server-side Firecrawl API Proxy URL. Default, `https://api.firecrawl.dev`
 FIRECRAWL_API_BASE_URL=
 
+# (Optional) Server-side fastCRW API Key (Required for server API calls)
+CRW_API_KEY=
+# (Optional) Server-side fastCRW API Proxy URL. Default, `https://fastcrw.com/api`
+CRW_API_BASE_URL=
+
 # (Optional) Server-side Exa API Key (Required for server API calls)
 EXA_API_KEY=
 # (Optional) Server-side Exa API Proxy URL. Default, `https://api.exa.ai`
@@ -100,7 +105,7 @@ SEARXNG_API_BASE_URL=
 # Possible values ​​include: google, openai, anthropic, deepseek, xai, mistral, azure, openrouter, openaicompatible, pollinations, ollama
 MCP_AI_PROVIDER=
 # (Optional) MCP Server search provider. Default, `model`
-# Possible values ​​include: model, tavily, firecrawl, exa, bocha, searxng
+# Possible values ​​include: model, tavily, firecrawl, crw, exa, bocha, searxng
 MCP_SEARCH_PROVIDER=
 # (Optional) MCP Server thinking model id, the core model used in deep research.
 MCP_THINKING_MODEL=
@@ -111,7 +116,7 @@ MCP_TASK_MODEL=
 # Possible values ​​include: google, openai, anthropic, deepseek, xai, mistral, azure, openrouter, openaicompatible, pollinations, ollama
 NEXT_PUBLIC_DISABLED_AI_PROVIDER=
 # (Optional) Disable server-side search provider usage permissions
-# Possible values ​​include: model, tavily, firecrawl, exa, bocha, searxng
+# Possible values ​​include: model, tavily, firecrawl, crw, exa, bocha, searxng
 NEXT_PUBLIC_DISABLED_SEARCH_PROVIDER=
 # (Optional) Customize the model list, add or delete models
 NEXT_PUBLIC_MODEL_LIST=
