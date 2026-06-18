@@ -58,6 +58,7 @@ import {
   OPENAI_BASE_URL,
   ANTHROPIC_BASE_URL,
   DEEPSEEK_BASE_URL,
+  ATLASCLOUD_BASE_URL,
   XAI_BASE_URL,
   MISTRAL_BASE_URL,
   POLLINATIONS_BASE_URL,
@@ -128,6 +129,10 @@ const formSchema = z.object({
   deepseekApiProxy: z.string().optional(),
   deepseekThinkingModel: z.string().optional(),
   deepseekNetworkingModel: z.string().optional(),
+  atlasCloudApiKey: z.string().optional(),
+  atlasCloudApiProxy: z.string().optional(),
+  atlasCloudThinkingModel: z.string().optional(),
+  atlasCloudNetworkingModel: z.string().optional(),
   xAIApiKey: z.string().optional(),
   xAIApiProxy: z.string().optional(),
   xAIThinkingModel: z.string().optional(),
@@ -248,6 +253,8 @@ function Setting({ open, onClose }: SettingProps) {
     } else if (provider === "openrouter") {
       return filterOpenRouterModelList(modelList);
     } else if (provider === "deepseek") {
+      return filterDeepSeekModelList(modelList);
+    } else if (provider === "atlascloud") {
       return filterDeepSeekModelList(modelList);
     } else if (provider === "mistral") {
       return filterMistralModelList(modelList);
@@ -499,6 +506,11 @@ function Setting({ open, onClose }: SettingProps) {
                             ) : null}
                             {!isDisabledAIProvider("deepseek") ? (
                               <SelectItem value="deepseek">DeepSeek</SelectItem>
+                            ) : null}
+                            {!isDisabledAIProvider("atlascloud") ? (
+                              <SelectItem value="atlascloud">
+                                Atlas Cloud
+                              </SelectItem>
                             ) : null}
                             {!isDisabledAIProvider("xai") ? (
                               <SelectItem value="xai">xAI Grok</SelectItem>
@@ -941,6 +953,62 @@ function Setting({ open, onClose }: SettingProps) {
                                 updateSetting(
                                   "deepseekApiProxy",
                                   form.getValues("deepseekApiProxy"),
+                                )
+                              }
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <div
+                    className={cn("space-y-4", {
+                      hidden: provider !== "atlascloud",
+                    })}
+                  >
+                    <FormField
+                      control={form.control}
+                      name="atlasCloudApiKey"
+                      render={({ field }) => (
+                        <FormItem className="from-item">
+                          <FormLabel className="from-label">
+                            {t("setting.apiKeyLabel")}
+                            <span className="ml-1 text-red-500 max-sm:hidden">
+                              *
+                            </span>
+                          </FormLabel>
+                          <FormControl className="form-field">
+                            <Password
+                              type="text"
+                              placeholder={t("setting.apiKeyPlaceholder")}
+                              {...field}
+                              onBlur={() =>
+                                updateSetting(
+                                  "atlasCloudApiKey",
+                                  form.getValues("atlasCloudApiKey"),
+                                )
+                              }
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="atlasCloudApiProxy"
+                      render={({ field }) => (
+                        <FormItem className="from-item">
+                          <FormLabel className="from-label">
+                            {t("setting.apiUrlLabel")}
+                          </FormLabel>
+                          <FormControl className="form-field">
+                            <Input
+                              placeholder={ATLASCLOUD_BASE_URL}
+                              {...field}
+                              onBlur={() =>
+                                updateSetting(
+                                  "atlasCloudApiProxy",
+                                  form.getValues("atlasCloudApiProxy"),
                                 )
                               }
                             />
@@ -2099,6 +2167,180 @@ function Setting({ open, onClose }: SettingProps) {
                   <FormField
                     control={form.control}
                     name="deepseekNetworkingModel"
+                    render={({ field }) => (
+                      <FormItem className="from-item">
+                        <FormLabel className="from-label">
+                          <HelpTip tip={t("setting.networkingModelTip")}>
+                            {t("setting.networkingModel")}
+                            <span className="ml-1 text-red-500 max-sm:hidden">
+                              *
+                            </span>
+                          </HelpTip>
+                        </FormLabel>
+                        <FormControl>
+                          <div className="form-field w-full">
+                            <Select
+                              value={field.value}
+                              onValueChange={field.onChange}
+                            >
+                              <SelectTrigger
+                                className={cn({
+                                  hidden: modelList.length === 0,
+                                })}
+                              >
+                                <SelectValue
+                                  placeholder={t(
+                                    "setting.modelListLoadingPlaceholder",
+                                  )}
+                                />
+                              </SelectTrigger>
+                              <SelectContent className="max-sm:max-h-72">
+                                {networkingModelList[0].length > 0 ? (
+                                  <SelectGroup>
+                                    <SelectLabel>
+                                      {t("setting.recommendedModels")}
+                                    </SelectLabel>
+                                    {networkingModelList[0].map((name) => {
+                                      return !isDisabledAIModel(name) ? (
+                                        <SelectItem key={name} value={name}>
+                                          {convertModelName(name)}
+                                        </SelectItem>
+                                      ) : null;
+                                    })}
+                                  </SelectGroup>
+                                ) : null}
+                                <SelectGroup>
+                                  <SelectLabel>
+                                    {t("setting.basicModels")}
+                                  </SelectLabel>
+                                  {networkingModelList[1].map((name) => {
+                                    return !isDisabledAIModel(name) ? (
+                                      <SelectItem key={name} value={name}>
+                                        {convertModelName(name)}
+                                      </SelectItem>
+                                    ) : null;
+                                  })}
+                                </SelectGroup>
+                              </SelectContent>
+                            </Select>
+                            <Button
+                              className={cn("w-full", {
+                                hidden: modelList.length > 0,
+                              })}
+                              type="button"
+                              variant="outline"
+                              disabled={isRefreshing}
+                              onClick={() => fetchModelList()}
+                            >
+                              {isRefreshing ? (
+                                <>
+                                  <RefreshCw className="animate-spin" />{" "}
+                                  {t("setting.modelListLoading")}
+                                </>
+                              ) : (
+                                <>
+                                  <RefreshCw /> {t("setting.refresh")}
+                                </>
+                              )}
+                            </Button>
+                          </div>
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div
+                  className={cn("space-y-4", {
+                    hidden: provider !== "atlascloud",
+                  })}
+                >
+                  <FormField
+                    control={form.control}
+                    name="atlasCloudThinkingModel"
+                    render={({ field }) => (
+                      <FormItem className="from-item">
+                        <FormLabel className="from-label">
+                          <HelpTip tip={t("setting.thinkingModelTip")}>
+                            {t("setting.thinkingModel")}
+                            <span className="ml-1 text-red-500 max-sm:hidden">
+                              *
+                            </span>
+                          </HelpTip>
+                        </FormLabel>
+                        <FormControl>
+                          <div className="form-field w-full">
+                            <Select
+                              value={field.value}
+                              onValueChange={field.onChange}
+                            >
+                              <SelectTrigger
+                                className={cn({
+                                  hidden: modelList.length === 0,
+                                })}
+                              >
+                                <SelectValue
+                                  placeholder={t(
+                                    "setting.modelListLoadingPlaceholder",
+                                  )}
+                                />
+                              </SelectTrigger>
+                              <SelectContent className="max-sm:max-h-72">
+                                {thinkingModelList[0].length > 0 ? (
+                                  <SelectGroup>
+                                    <SelectLabel>
+                                      {t("setting.recommendedModels")}
+                                    </SelectLabel>
+                                    {thinkingModelList[0].map((name) => {
+                                      return !isDisabledAIModel(name) ? (
+                                        <SelectItem key={name} value={name}>
+                                          {convertModelName(name)}
+                                        </SelectItem>
+                                      ) : null;
+                                    })}
+                                  </SelectGroup>
+                                ) : null}
+                                <SelectGroup>
+                                  <SelectLabel>
+                                    {t("setting.basicModels")}
+                                  </SelectLabel>
+                                  {thinkingModelList[1].map((name) => {
+                                    return !isDisabledAIModel(name) ? (
+                                      <SelectItem key={name} value={name}>
+                                        {convertModelName(name)}
+                                      </SelectItem>
+                                    ) : null;
+                                  })}
+                                </SelectGroup>
+                              </SelectContent>
+                            </Select>
+                            <Button
+                              className={cn("w-full", {
+                                hidden: modelList.length > 0,
+                              })}
+                              type="button"
+                              variant="outline"
+                              disabled={isRefreshing}
+                              onClick={() => fetchModelList()}
+                            >
+                              {isRefreshing ? (
+                                <>
+                                  <RefreshCw className="animate-spin" />{" "}
+                                  {t("setting.modelListLoading")}
+                                </>
+                              ) : (
+                                <>
+                                  <RefreshCw /> {t("setting.refresh")}
+                                </>
+                              )}
+                            </Button>
+                          </div>
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="atlasCloudNetworkingModel"
                     render={({ field }) => (
                       <FormItem className="from-item">
                         <FormLabel className="from-label">

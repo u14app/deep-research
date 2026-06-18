@@ -6,6 +6,7 @@ import {
   OPENAI_BASE_URL,
   ANTHROPIC_BASE_URL,
   DEEPSEEK_BASE_URL,
+  ATLASCLOUD_BASE_URL,
   XAI_BASE_URL,
   MISTRAL_BASE_URL,
   POLLINATIONS_BASE_URL,
@@ -235,6 +236,28 @@ function useModelList() {
           ? completePath(deepseekApiProxy || DEEPSEEK_BASE_URL, "/v1") +
               "/models"
           : "/api/ai/deepseek/v1/models",
+        {
+          headers: {
+            authorization: `Bearer ${mode === "local" ? apiKey : accessKey}`,
+          },
+        }
+      );
+      const { data = [] } = await response.json();
+      const newModelList = (data as OpenAIModel[]).map((item) => item.id);
+      setModelList(newModelList);
+      return newModelList;
+    } else if (provider === "atlascloud") {
+      const { atlasCloudApiKey = "", atlasCloudApiProxy } =
+        useSettingStore.getState();
+      if (mode === "local" && !atlasCloudApiKey) {
+        return [];
+      }
+      const apiKey = multiApiKeyPolling(atlasCloudApiKey);
+      const response = await fetch(
+        mode === "local"
+          ? completePath(atlasCloudApiProxy || ATLASCLOUD_BASE_URL, "/v1") +
+              "/models"
+          : "/api/ai/atlascloud/v1/models",
         {
           headers: {
             authorization: `Bearer ${mode === "local" ? apiKey : accessKey}`,

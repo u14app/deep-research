@@ -12,6 +12,8 @@ const ANTHROPIC_API_BASE_URL =
   process.env.ANTHROPIC_API_BASE_URL || "https://api.anthropic.com";
 const DEEPSEEK_API_BASE_URL =
   process.env.DEEPSEEK_API_BASE_URL || "https://api.deepseek.com";
+const ATLASCLOUD_API_BASE_URL =
+  process.env.ATLASCLOUD_API_BASE_URL || "https://api.atlascloud.ai";
 const XAI_API_BASE_URL = process.env.XAI_API_BASE_URL || "https://api.x.ai";
 const MISTRAL_API_BASE_URL =
   process.env.MISTRAL_API_BASE_URL || "https://api.mistral.ai";
@@ -42,6 +44,7 @@ const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || "";
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY || "";
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY || "";
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY || "";
+const ATLASCLOUD_API_KEY = process.env.ATLASCLOUD_API_KEY || "";
 const XAI_API_KEY = process.env.XAI_API_KEY || "";
 const MISTRAL_API_KEY = process.env.MISTRAL_API_KEY || "";
 const AZURE_API_KEY = process.env.AZURE_API_KEY || "";
@@ -64,6 +67,8 @@ export function getAIProviderBaseURL(provider: string) {
       return completePath(ANTHROPIC_API_BASE_URL, "/v1");
     case "deepseek":
       return completePath(DEEPSEEK_API_BASE_URL, "/v1");
+    case "atlascloud":
+      return completePath(ATLASCLOUD_API_BASE_URL, "/v1");
     case "xai":
       return completePath(XAI_API_BASE_URL, "/v1");
     case "mistral":
@@ -95,6 +100,8 @@ export function getAIProviderApiKey(provider: string) {
       return ANTHROPIC_API_KEY;
     case "deepseek":
       return DEEPSEEK_API_KEY;
+    case "atlascloud":
+      return ATLASCLOUD_API_KEY;
     case "xai":
       return XAI_API_KEY;
     case "mistral":

@@ -72,6 +72,13 @@ export async function createAIProvider({
       apiKey,
     });
     return deepseek(model, settings);
+  } else if (provider === "atlascloud") {
+    const { createOpenAI } = await import("@ai-sdk/openai");
+    const atlascloud = createOpenAI({
+      baseURL,
+      apiKey,
+    });
+    return atlascloud(model, settings);
   } else if (provider === "xai") {
     const { createXai } = await import("@ai-sdk/xai");
     const xai = createXai({

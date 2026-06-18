@@ -40,6 +40,11 @@ DEEPSEEK_API_KEY=
 # (Optional) Server-side DeepSeek API Proxy URL. Default, `https://api.deepseek.com`
 DEEPSEEK_API_BASE_URL=
 
+# (Optional) Server-side Atlas Cloud API Key (Required for server API calls)
+ATLASCLOUD_API_KEY=
+# (Optional) Server-side Atlas Cloud API Proxy URL. Default, `https://api.atlascloud.ai`
+ATLASCLOUD_API_BASE_URL=
+
 # (Optional) Server-side XAI API Key (Required for server API calls)
 XAI_API_KEY=
 # (Optional) Server-side XAI API Proxy URL. Default, `https://api.x.ai`
@@ -102,7 +107,7 @@ BRAVE_API_BASE_URL=
 SEARXNG_API_BASE_URL=
 
 # (Optional) MCP Server AI provider
-# Possible values ​​include: google, openai, anthropic, deepseek, xai, mistral, azure, openrouter, openaicompatible, pollinations, ollama
+# Possible values ​​include: google, openai, anthropic, deepseek, atlascloud, xai, mistral, azure, openrouter, openaicompatible, pollinations, ollama
 MCP_AI_PROVIDER=
 # (Optional) MCP Server search provider. Default, `model`
 # Possible values ​​include: model, tavily, firecrawl, crw, exa, bocha, searxng
@@ -113,7 +118,7 @@ MCP_THINKING_MODEL=
 MCP_TASK_MODEL=
 
 # (Optional) Disable server-side AI provider usage permissions
-# Possible values ​​include: google, openai, anthropic, deepseek, xai, mistral, azure, openrouter, openaicompatible, pollinations, ollama
+# Possible values ​​include: google, openai, anthropic, deepseek, atlascloud, xai, mistral, azure, openrouter, openaicompatible, pollinations, ollama
 NEXT_PUBLIC_DISABLED_AI_PROVIDER=
 # (Optional) Disable server-side search provider usage permissions
 # Possible values ​​include: model, tavily, firecrawl, crw, exa, bocha, searxng

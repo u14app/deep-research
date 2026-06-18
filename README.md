@@ -30,7 +30,7 @@ Deep Research uses a variety of powerful AI models to generate in-depth research
 - **Multi-platform Support:** Supports rapid deployment to Vercel, Cloudflare and other platforms.
 - **Powered by AI:** Utilizes the advanced AI models for accurate and insightful analysis.
 - **Privacy-Focused:** Your data remains private and secure, as all data is stored locally on your browser.
-- **Support for Multi-LLM:** Supports a variety of mainstream large language models, including Gemini, OpenAI, Anthropic, Deepseek, Grok, Mistral, Azure OpenAI, any OpenAI Compatible LLMs, OpenRouter, Ollama, etc.
+- **Support for Multi-LLM:** Supports a variety of mainstream large language models, including Gemini, OpenAI, Anthropic, Deepseek, Atlas Cloud, Grok, Mistral, Azure OpenAI, any OpenAI Compatible LLMs, OpenRouter, Ollama, etc.
 - **Support Web Search:** Supports search engines such as Searxng, Tavily, Firecrawl, fastCRW, Exa, Bocha, Brave, etc., allowing LLMs that do not support search to use the web search function more conveniently.
 - **Thinking & Task Models:** Employs sophisticated "Thinking" and "Task" models to balance depth and speed, ensuring high-quality results quickly. Support switching research models.
 - **Support Further Research:** You can refine or adjust the research content at any stage of the project and support re-research from that stage.
@@ -230,7 +230,7 @@ Body:
 interface SSEConfig {
   // Research topic
   query: string;
-  // AI provider, Possible values ​​include: google, openai, anthropic, deepseek, xai, mistral, azure, openrouter, openaicompatible, pollinations, ollama
+  // AI provider, Possible values ​​include: google, openai, anthropic, deepseek, atlascloud, xai, mistral, azure, openrouter, openaicompatible, pollinations, ollama
   provider: string;
   // Thinking model id
   thinkingModel: string;
@@ -324,7 +324,7 @@ If your server sets `ACCESS_PASSWORD`, the MCP service will be protected and you
 
 ```bash
 # MCP Server AI provider
-# Possible values ​​include: google, openai, anthropic, deepseek, xai, mistral, azure, openrouter, openaicompatible, pollinations, ollama
+# Possible values ​​include: google, openai, anthropic, deepseek, atlascloud, xai, mistral, azure, openrouter, openaicompatible, pollinations, ollama
 MCP_AI_PROVIDER=google
 # MCP Server search provider. Default, `model`
 # Possible values ​​include: model, tavily, firecrawl, crw, exa, bocha, searxng

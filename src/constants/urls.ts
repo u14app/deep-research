@@ -4,6 +4,7 @@ export const OPENROUTER_BASE_URL = "https://openrouter.ai";
 export const OPENAI_BASE_URL = "https://api.openai.com";
 export const ANTHROPIC_BASE_URL = "https://api.anthropic.com";
 export const DEEPSEEK_BASE_URL = "https://api.deepseek.com";
+export const ATLASCLOUD_BASE_URL = "https://api.atlascloud.ai";
 export const XAI_BASE_URL = "https://api.x.ai";
 export const MISTRAL_BASE_URL = "https://api.mistral.ai";
 export const POLLINATIONS_BASE_URL = "https://text.pollinations.ai/openai";

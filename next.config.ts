@@ -17,6 +17,8 @@ const ANTHROPIC_API_BASE_URL =
   process.env.ANTHROPIC_API_BASE_URL || "https://api.anthropic.com";
 const DEEPSEEK_API_BASE_URL =
   process.env.DEEPSEEK_API_BASE_URL || "https://api.deepseek.com";
+const ATLASCLOUD_API_BASE_URL =
+  process.env.ATLASCLOUD_API_BASE_URL || "https://api.atlascloud.ai";
 const XAI_API_BASE_URL = process.env.XAI_API_BASE_URL || "https://api.x.ai";
 const MISTRAL_API_BASE_URL =
   process.env.MISTRAL_API_BASE_URL || "https://api.mistral.ai";
@@ -102,6 +104,10 @@ export default async function Config(phase: string) {
         {
           source: "/api/ai/deepseek/:path*",
           destination: `${DEEPSEEK_API_BASE_URL}/:path*`,
+        },
+        {
+          source: "/api/ai/atlascloud/:path*",
+          destination: `${ATLASCLOUD_API_BASE_URL}/:path*`,
         },
         {
           source: "/api/ai/xai/:path*",
