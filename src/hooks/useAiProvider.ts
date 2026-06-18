@@ -9,6 +9,7 @@ import {
   OPENAI_BASE_URL,
   ANTHROPIC_BASE_URL,
   DEEPSEEK_BASE_URL,
+  ATLASCLOUD_BASE_URL,
   XAI_BASE_URL,
   MISTRAL_BASE_URL,
   OLLAMA_BASE_URL,
@@ -106,6 +107,19 @@ function useModelProvider() {
           options.apiKey = multiApiKeyPolling(deepseekApiKey);
         } else {
           options.baseURL = location.origin + "/api/ai/deepseek/v1";
+        }
+        break;
+      case "atlascloud":
+        const { atlasCloudApiKey = "", atlasCloudApiProxy } =
+          useSettingStore.getState();
+        if (mode === "local") {
+          options.baseURL = completePath(
+            atlasCloudApiProxy || ATLASCLOUD_BASE_URL,
+            "/v1"
+          );
+          options.apiKey = multiApiKeyPolling(atlasCloudApiKey);
+        } else {
+          options.baseURL = location.origin + "/api/ai/atlascloud/v1";
         }
         break;
       case "xai":
@@ -241,6 +255,13 @@ function useModelProvider() {
           thinkingModel: deepseekThinkingModel,
           networkingModel: deepseekNetworkingModel,
         };
+      case "atlascloud":
+        const { atlasCloudThinkingModel, atlasCloudNetworkingModel } =
+          useSettingStore.getState();
+        return {
+          thinkingModel: atlasCloudThinkingModel,
+          networkingModel: atlasCloudNetworkingModel,
+        };
       case "xai":
         const { xAIThinkingModel, xAINetworkingModel } =
           useSettingStore.getState();
@@ -317,6 +338,9 @@ function useModelProvider() {
       case "deepseek":
         const { deepseekApiKey } = useSettingStore.getState();
         return deepseekApiKey.length > 0;
+      case "atlascloud":
+        const { atlasCloudApiKey } = useSettingStore.getState();
+        return atlasCloudApiKey.length > 0;
       case "xai":
         const { xAIApiKey } = useSettingStore.getState();
         return xAIApiKey.length > 0;

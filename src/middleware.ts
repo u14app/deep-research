@@ -13,6 +13,7 @@ const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || "";
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY || "";
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY || "";
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY || "";
+const ATLASCLOUD_API_KEY = process.env.ATLASCLOUD_API_KEY || "";
 const XAI_API_KEY = process.env.XAI_API_KEY || "";
 const MISTRAL_API_KEY = process.env.MISTRAL_API_KEY || "";
 const AZURE_API_KEY = process.env.AZURE_API_KEY || "";
@@ -306,6 +307,46 @@ export async function middleware(request: NextRequest) {
       );
     } else {
       const apiKey = multiApiKeyPolling(DEEPSEEK_API_KEY);
+      if (apiKey) {
+        const requestHeaders = new Headers();
+        requestHeaders.set(
+          "Content-Type",
+          request.headers.get("Content-Type") || "application/json",
+        );
+        requestHeaders.set("Authorization", `Bearer ${apiKey}`);
+        return NextResponse.next({
+          request: {
+            headers: requestHeaders,
+          },
+        });
+      } else {
+        return NextResponse.json(
+          {
+            error: ERRORS.NO_API_KEY,
+          },
+          { status: 500 },
+        );
+      }
+    }
+  }
+  if (request.nextUrl.pathname.startsWith("/api/ai/atlascloud")) {
+    const authorization = request.headers.get("authorization") || "";
+    const isDisabledModel = await hasDisabledAIModel();
+    if (
+      !verifySignature(
+        authorization.substring(7),
+        accessPassword,
+        Date.now(),
+      ) ||
+      disabledAIProviders.includes("atlascloud") ||
+      isDisabledModel
+    ) {
+      return NextResponse.json(
+        { error: ERRORS.NO_PERMISSIONS },
+        { status: 403 },
+      );
+    } else {
+      const apiKey = multiApiKeyPolling(ATLASCLOUD_API_KEY);
       if (apiKey) {
         const requestHeaders = new Headers();
         requestHeaders.set(
