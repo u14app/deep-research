@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/u14app-deep-research-badge.png)](https://mseep.ai/app/u14app-deep-research)
+
 <div align="center">
 <h1>Deep Research</h1>
 
