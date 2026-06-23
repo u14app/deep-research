@@ -1,0 +1,24 @@
+{
+  "name": "deep-research",
+  "version": "0.1.0",
+  "description": "Deep research on any topic using LLMs from Codex via MCP",
+  "author": {
+    "name": "u14app",
+    "url": "https://github.com/u14app/deep-research"
+  },
+  "homepage": "https://github.com/u14app/deep-research",
+  "repository": "https://github.com/u14app/deep-research",
+  "keywords": [
+    "mcp",
+    "codex"
+  ],
+  "mcpServers": "./.mcp.json",
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Deep Research",
+    "shortDescription": "Deep research on any topic using LLMs from Codex via MCP",
+    "longDescription": "Use any LLMs for Deep Research. Support SSE API and MCP server. Docker-based deployment.",
+    "category": "Research",
+    "websiteURL": "https://github.com/u14app/deep-research"
+  }
+}
