@@ -10,6 +10,8 @@ export function verifySignature(
   key: string,
   timestamp: number
 ): boolean {
+  // Check the current 100s window and the previous 100s window (offset by 10^5 ms)
   const generatedSignature = generateSignature(key, timestamp);
-  return signature === generatedSignature;
+  const generatedPreviousSignature = generateSignature(key, timestamp - 100000);
+  return signature === generatedSignature || signature === generatedPreviousSignature;
 }
