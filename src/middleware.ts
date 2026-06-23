@@ -51,6 +51,13 @@ const ERRORS = {
   },
 };
 
+function extractAuthorization(request: NextRequest) {
+  const authorization = request.headers.get("authorization") || "";
+  return authorization.startsWith("Bearer ")
+          ? authorization.substring(7)
+          : authorization;
+}
+
 export async function middleware(request: NextRequest) {
   if (NODE_ENV === "production") console.debug(request);
 
@@ -130,11 +137,11 @@ export async function middleware(request: NextRequest) {
     }
   }
   if (request.nextUrl.pathname.startsWith("/api/ai/openrouter")) {
-    const authorization = request.headers.get("authorization") || "";
+    const authorization = extractAuthorization(request);
     const isDisabledModel = await hasDisabledAIModel();
     if (
       !verifySignature(
-        authorization.substring(7),
+        authorization,
         accessPassword,
         Date.now(),
       ) ||
@@ -170,11 +177,11 @@ export async function middleware(request: NextRequest) {
     }
   }
   if (request.nextUrl.pathname.startsWith("/api/ai/openaicompatible")) {
-    const authorization = request.headers.get("authorization") || "";
+    const authorization = extractAuthorization(request);
     const isDisabledModel = await hasDisabledAIModel();
     if (
       !verifySignature(
-        authorization.substring(7),
+        authorization,
         accessPassword,
         Date.now(),
       ) ||
@@ -210,11 +217,11 @@ export async function middleware(request: NextRequest) {
     }
   }
   if (request.nextUrl.pathname.startsWith("/api/ai/openai")) {
-    const authorization = request.headers.get("authorization") || "";
+    const authorization = extractAuthorization(request);
     const isDisabledModel = await hasDisabledAIModel();
     if (
       !verifySignature(
-        authorization.substring(7),
+        authorization,
         accessPassword,
         Date.now(),
       ) ||
@@ -290,11 +297,11 @@ export async function middleware(request: NextRequest) {
     }
   }
   if (request.nextUrl.pathname.startsWith("/api/ai/deepseek")) {
-    const authorization = request.headers.get("authorization") || "";
+    const authorization = extractAuthorization(request);
     const isDisabledModel = await hasDisabledAIModel();
     if (
       !verifySignature(
-        authorization.substring(7),
+        authorization,
         accessPassword,
         Date.now(),
       ) ||
@@ -370,11 +377,11 @@ export async function middleware(request: NextRequest) {
     }
   }
   if (request.nextUrl.pathname.startsWith("/api/ai/xai")) {
-    const authorization = request.headers.get("authorization") || "";
+    const authorization = extractAuthorization(request);
     const isDisabledModel = await hasDisabledAIModel();
     if (
       !verifySignature(
-        authorization.substring(7),
+        authorization,
         accessPassword,
         Date.now(),
       ) ||
@@ -410,11 +417,11 @@ export async function middleware(request: NextRequest) {
     }
   }
   if (request.nextUrl.pathname.startsWith("/api/ai/mistral")) {
-    const authorization = request.headers.get("authorization") || "";
+    const authorization = extractAuthorization(request);
     const isDisabledModel = await hasDisabledAIModel();
     if (
       !verifySignature(
-        authorization.substring(7),
+        authorization,
         accessPassword,
         Date.now(),
       ) ||
@@ -486,11 +493,11 @@ export async function middleware(request: NextRequest) {
     }
   }
   if (request.nextUrl.pathname.startsWith("/api/ai/google-vertex")) {
-    const authorization = request.headers.get("authorization") || "";
+    const authorization = extractAuthorization(request);
     const isDisabledModel = await hasDisabledAIModel();
     if (
       !verifySignature(
-        authorization.substring(7),
+        authorization,
         accessPassword,
         Date.now(),
       ) ||
@@ -532,11 +539,11 @@ export async function middleware(request: NextRequest) {
   }
   // The pollinations model only verifies access to the backend API
   if (request.nextUrl.pathname.startsWith("/api/ai/pollinations")) {
-    const authorization = request.headers.get("authorization") || "";
+    const authorization = extractAuthorization(request);
     const isDisabledModel = await hasDisabledAIModel();
     if (
       !verifySignature(
-        authorization.substring(7),
+        authorization,
         accessPassword,
         Date.now(),
       ) ||
@@ -562,13 +569,11 @@ export async function middleware(request: NextRequest) {
   }
   // The ollama model only verifies access to the backend API
   if (request.nextUrl.pathname.startsWith("/api/ai/ollama")) {
-    const authorization = request.headers.get("authorization") || "";
+    const authorization = extractAuthorization(request);
     const isDisabledModel = await hasDisabledAIModel();
     if (
       !verifySignature(
-        authorization.startsWith("Bearer ")
-          ? authorization.substring(7)
-          : authorization,
+        authorization,
         accessPassword,
         Date.now(),
       ) ||
@@ -593,11 +598,11 @@ export async function middleware(request: NextRequest) {
     }
   }
   if (request.nextUrl.pathname.startsWith("/api/search/tavily")) {
-    const authorization = request.headers.get("authorization") || "";
+    const authorization = extractAuthorization(request);
     if (
       request.method.toUpperCase() !== "POST" ||
       !verifySignature(
-        authorization.substring(7),
+        authorization,
         accessPassword,
         Date.now(),
       ) ||
@@ -632,11 +637,11 @@ export async function middleware(request: NextRequest) {
     }
   }
   if (request.nextUrl.pathname.startsWith("/api/search/firecrawl")) {
-    const authorization = request.headers.get("authorization") || "";
+    const authorization = extractAuthorization(request);
     if (
       request.method.toUpperCase() !== "POST" ||
       !verifySignature(
-        authorization.substring(7),
+        authorization,
         accessPassword,
         Date.now(),
       ) ||
@@ -710,11 +715,11 @@ export async function middleware(request: NextRequest) {
     }
   }
   if (request.nextUrl.pathname.startsWith("/api/search/exa")) {
-    const authorization = request.headers.get("authorization") || "";
+    const authorization = extractAuthorization(request);
     if (
       request.method.toUpperCase() !== "POST" ||
       !verifySignature(
-        authorization.substring(7),
+        authorization,
         accessPassword,
         Date.now(),
       ) ||
@@ -749,11 +754,11 @@ export async function middleware(request: NextRequest) {
     }
   }
   if (request.nextUrl.pathname.startsWith("/api/search/bocha")) {
-    const authorization = request.headers.get("authorization") || "";
+    const authorization = extractAuthorization(request);
     if (
       request.method.toUpperCase() !== "POST" ||
       !verifySignature(
-        authorization.substring(7),
+        authorization,
         accessPassword,
         Date.now(),
       ) ||
@@ -788,11 +793,11 @@ export async function middleware(request: NextRequest) {
     }
   }
   if (request.nextUrl.pathname.startsWith("/api/search/searxng")) {
-    const authorization = request.headers.get("authorization") || "";
+    const authorization = extractAuthorization(request);
     if (
       request.method.toUpperCase() !== "POST" ||
       !verifySignature(
-        authorization.substring(7),
+        authorization,
         accessPassword,
         Date.now(),
       ) ||
@@ -817,10 +822,10 @@ export async function middleware(request: NextRequest) {
     }
   }
   if (request.nextUrl.pathname.startsWith("/api/crawler")) {
-    const authorization = request.headers.get("authorization") || "";
+    const authorization = extractAuthorization(request);
     if (
       request.method.toUpperCase() !== "POST" ||
-      !verifySignature(authorization.substring(7), accessPassword, Date.now())
+      !verifySignature(authorization, accessPassword, Date.now())
     ) {
       return NextResponse.json(
         { error: ERRORS.NO_PERMISSIONS },
@@ -841,10 +846,8 @@ export async function middleware(request: NextRequest) {
     }
   }
   if (request.nextUrl.pathname.startsWith("/api/sse")) {
-    let authorization = request.headers.get("authorization") || "";
-    if (authorization !== "") {
-      authorization = authorization.substring(7);
-    } else if (request.method.toUpperCase() === "GET") {
+    let authorization = extractAuthorization(request);
+    if (authorization == "" && request.method.toUpperCase() === "GET") {
       authorization = request.nextUrl.searchParams.get("password") || "";
     }
     if (authorization !== accessPassword) {
@@ -867,8 +870,8 @@ export async function middleware(request: NextRequest) {
     }
   }
   if (request.nextUrl.pathname.startsWith("/api/mcp")) {
-    const authorization = request.headers.get("authorization") || "";
-    if (authorization.substring(7) !== accessPassword) {
+    const authorization = extractAuthorization(request);
+    if (authorization !== accessPassword) {
       const responseHeaders = new Headers();
       responseHeaders.set("WWW-Authenticate", ERRORS.NO_PERMISSIONS.message);
       return NextResponse.json(
