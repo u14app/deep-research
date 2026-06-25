@@ -55,6 +55,7 @@ import { useSettingStore } from "@/store/setting";
 import {
   GEMINI_BASE_URL,
   OPENROUTER_BASE_URL,
+  REQUESTY_BASE_URL,
   OPENAI_BASE_URL,
   ANTHROPIC_BASE_URL,
   DEEPSEEK_BASE_URL,
@@ -117,6 +118,10 @@ const formSchema = z.object({
   openRouterApiProxy: z.string().optional(),
   openRouterThinkingModel: z.string().optional(),
   openRouterNetworkingModel: z.string().optional(),
+  requestyApiKey: z.string().optional(),
+  requestyApiProxy: z.string().optional(),
+  requestyThinkingModel: z.string().optional(),
+  requestyNetworkingModel: z.string().optional(),
   openAIApiKey: z.string().optional(),
   openAIApiProxy: z.string().optional(),
   openAIThinkingModel: z.string().optional(),
@@ -252,6 +257,8 @@ function Setting({ open, onClose }: SettingProps) {
       return filterThinkingModelList(modelList);
     } else if (provider === "openrouter") {
       return filterOpenRouterModelList(modelList);
+    } else if (provider === "requesty") {
+      return filterOpenRouterModelList(modelList);
     } else if (provider === "deepseek") {
       return filterDeepSeekModelList(modelList);
     } else if (provider === "atlascloud") {
@@ -268,6 +275,8 @@ function Setting({ open, onClose }: SettingProps) {
     if (provider === "google") {
       return filterNetworkingModelList(modelList);
     } else if (provider === "openrouter") {
+      return filterOpenRouterModelList(modelList);
+    } else if (provider === "requesty") {
       return filterOpenRouterModelList(modelList);
     } else if (provider === "openai") {
       return filterOpenAIModelList(modelList);
@@ -543,6 +552,11 @@ function Setting({ open, onClose }: SettingProps) {
                                 OpenRouter
                               </SelectItem>
                             ) : null}
+                            {!isDisabledAIProvider("requesty") ? (
+                              <SelectItem value="requesty">
+                                Requesty
+                              </SelectItem>
+                            ) : null}
                             {!isDisabledAIProvider("ollama") ? (
                               <SelectItem value="ollama">Ollama</SelectItem>
                             ) : null}
@@ -785,6 +799,62 @@ function Setting({ open, onClose }: SettingProps) {
                                 updateSetting(
                                   "openRouterApiProxy",
                                   form.getValues("openRouterApiProxy"),
+                                )
+                              }
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <div
+                    className={cn("space-y-4", {
+                      hidden: provider !== "requesty",
+                    })}
+                  >
+                    <FormField
+                      control={form.control}
+                      name="requestyApiKey"
+                      render={({ field }) => (
+                        <FormItem className="from-item">
+                          <FormLabel className="from-label">
+                            {t("setting.apiKeyLabel")}
+                            <span className="ml-1 text-red-500 max-sm:hidden">
+                              *
+                            </span>
+                          </FormLabel>
+                          <FormControl className="form-field">
+                            <Password
+                              type="text"
+                              placeholder={t("setting.apiKeyPlaceholder")}
+                              {...field}
+                              onBlur={() =>
+                                updateSetting(
+                                  "requestyApiKey",
+                                  form.getValues("requestyApiKey"),
+                                )
+                              }
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="requestyApiProxy"
+                      render={({ field }) => (
+                        <FormItem className="from-item">
+                          <FormLabel className="from-label">
+                            {t("setting.apiUrlLabel")}
+                          </FormLabel>
+                          <FormControl className="form-field">
+                            <Input
+                              placeholder={REQUESTY_BASE_URL}
+                              {...field}
+                              onBlur={() =>
+                                updateSetting(
+                                  "requestyApiProxy",
+                                  form.getValues("requestyApiProxy"),
                                 )
                               }
                             />
@@ -1627,6 +1697,180 @@ function Setting({ open, onClose }: SettingProps) {
                   <FormField
                     control={form.control}
                     name="openRouterNetworkingModel"
+                    render={({ field }) => (
+                      <FormItem className="from-item">
+                        <FormLabel className="from-label">
+                          <HelpTip tip={t("setting.networkingModelTip")}>
+                            {t("setting.networkingModel")}
+                            <span className="ml-1 text-red-500 max-sm:hidden">
+                              *
+                            </span>
+                          </HelpTip>
+                        </FormLabel>
+                        <FormControl>
+                          <div className="form-field w-full">
+                            <Select
+                              value={field.value}
+                              onValueChange={field.onChange}
+                            >
+                              <SelectTrigger
+                                className={cn({
+                                  hidden: modelList.length === 0,
+                                })}
+                              >
+                                <SelectValue
+                                  placeholder={t(
+                                    "setting.modelListLoadingPlaceholder",
+                                  )}
+                                />
+                              </SelectTrigger>
+                              <SelectContent className="max-sm:max-h-72">
+                                {networkingModelList[0].length > 0 ? (
+                                  <SelectGroup>
+                                    <SelectLabel>
+                                      {t("setting.recommendedModels")}
+                                    </SelectLabel>
+                                    {networkingModelList[0].map((name) => {
+                                      return !isDisabledAIModel(name) ? (
+                                        <SelectItem key={name} value={name}>
+                                          {convertModelName(name)}
+                                        </SelectItem>
+                                      ) : null;
+                                    })}
+                                  </SelectGroup>
+                                ) : null}
+                                <SelectGroup>
+                                  <SelectLabel>
+                                    {t("setting.basicModels")}
+                                  </SelectLabel>
+                                  {networkingModelList[1].map((name) => {
+                                    return !isDisabledAIModel(name) ? (
+                                      <SelectItem key={name} value={name}>
+                                        {convertModelName(name)}
+                                      </SelectItem>
+                                    ) : null;
+                                  })}
+                                </SelectGroup>
+                              </SelectContent>
+                            </Select>
+                            <Button
+                              className={cn("w-full", {
+                                hidden: modelList.length > 0,
+                              })}
+                              type="button"
+                              variant="outline"
+                              disabled={isRefreshing}
+                              onClick={() => fetchModelList()}
+                            >
+                              {isRefreshing ? (
+                                <>
+                                  <RefreshCw className="animate-spin" />{" "}
+                                  {t("setting.modelListLoading")}
+                                </>
+                              ) : (
+                                <>
+                                  <RefreshCw /> {t("setting.refresh")}
+                                </>
+                              )}
+                            </Button>
+                          </div>
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div
+                  className={cn("space-y-4", {
+                    hidden: provider !== "requesty",
+                  })}
+                >
+                  <FormField
+                    control={form.control}
+                    name="requestyThinkingModel"
+                    render={({ field }) => (
+                      <FormItem className="from-item">
+                        <FormLabel className="from-label">
+                          <HelpTip tip={t("setting.thinkingModelTip")}>
+                            {t("setting.thinkingModel")}
+                            <span className="ml-1 text-red-500 max-sm:hidden">
+                              *
+                            </span>
+                          </HelpTip>
+                        </FormLabel>
+                        <FormControl>
+                          <div className="form-field w-full">
+                            <Select
+                              value={field.value}
+                              onValueChange={field.onChange}
+                            >
+                              <SelectTrigger
+                                className={cn({
+                                  hidden: modelList.length === 0,
+                                })}
+                              >
+                                <SelectValue
+                                  placeholder={t(
+                                    "setting.modelListLoadingPlaceholder",
+                                  )}
+                                />
+                              </SelectTrigger>
+                              <SelectContent className="max-sm:max-h-72">
+                                {thinkingModelList[0].length > 0 ? (
+                                  <SelectGroup>
+                                    <SelectLabel>
+                                      {t("setting.recommendedModels")}
+                                    </SelectLabel>
+                                    {thinkingModelList[0].map((name) => {
+                                      return !isDisabledAIModel(name) ? (
+                                        <SelectItem key={name} value={name}>
+                                          {convertModelName(name)}
+                                        </SelectItem>
+                                      ) : null;
+                                    })}
+                                  </SelectGroup>
+                                ) : null}
+                                <SelectGroup>
+                                  <SelectLabel>
+                                    {t("setting.basicModels")}
+                                  </SelectLabel>
+                                  {thinkingModelList[1].map((name) => {
+                                    return !isDisabledAIModel(name) ? (
+                                      <SelectItem key={name} value={name}>
+                                        {convertModelName(name)}
+                                      </SelectItem>
+                                    ) : null;
+                                  })}
+                                </SelectGroup>
+                              </SelectContent>
+                            </Select>
+                            <Button
+                              className={cn("w-full", {
+                                hidden: modelList.length > 0,
+                              })}
+                              type="button"
+                              variant="outline"
+                              disabled={isRefreshing}
+                              onClick={() => fetchModelList()}
+                            >
+                              {isRefreshing ? (
+                                <>
+                                  <RefreshCw className="animate-spin" />{" "}
+                                  {t("setting.modelListLoading")}
+                                </>
+                              ) : (
+                                <>
+                                  <RefreshCw /> {t("setting.refresh")}
+                                </>
+                              )}
+                            </Button>
+                          </div>
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="requestyNetworkingModel"
                     render={({ field }) => (
                       <FormItem className="from-item">
                         <FormLabel className="from-label">

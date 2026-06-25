@@ -6,6 +6,7 @@ import {
 import {
   GEMINI_BASE_URL,
   OPENROUTER_BASE_URL,
+  REQUESTY_BASE_URL,
   OPENAI_BASE_URL,
   ANTHROPIC_BASE_URL,
   DEEPSEEK_BASE_URL,
@@ -174,6 +175,19 @@ function useModelProvider() {
           options.baseURL = location.origin + "/api/ai/openrouter/api/v1";
         }
         break;
+      case "requesty":
+        const { requestyApiKey = "", requestyApiProxy } =
+          useSettingStore.getState();
+        if (mode === "local") {
+          options.baseURL = completePath(
+            requestyApiProxy || REQUESTY_BASE_URL,
+            "/v1"
+          );
+          options.apiKey = multiApiKeyPolling(requestyApiKey);
+        } else {
+          options.baseURL = location.origin + "/api/ai/requesty/v1";
+        }
+        break;
       case "openaicompatible":
         const { openAICompatibleApiKey = "", openAICompatibleApiProxy } =
           useSettingStore.getState();
@@ -290,6 +304,13 @@ function useModelProvider() {
           thinkingModel: openRouterThinkingModel,
           networkingModel: openRouterNetworkingModel,
         };
+      case "requesty":
+        const { requestyThinkingModel, requestyNetworkingModel } =
+          useSettingStore.getState();
+        return {
+          thinkingModel: requestyThinkingModel,
+          networkingModel: requestyNetworkingModel,
+        };
       case "openaicompatible":
         const {
           openAICompatibleThinkingModel,
@@ -353,6 +374,9 @@ function useModelProvider() {
       case "openrouter":
         const { openRouterApiKey } = useSettingStore.getState();
         return openRouterApiKey.length > 0;
+      case "requesty":
+        const { requestyApiKey } = useSettingStore.getState();
+        return requestyApiKey.length > 0;
       case "openaicompatible":
         const { openAICompatibleApiKey } = useSettingStore.getState();
         return openAICompatibleApiKey.length > 0;

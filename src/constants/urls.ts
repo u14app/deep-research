@@ -1,6 +1,7 @@
 // Models API Base URL
 export const GEMINI_BASE_URL = "https://generativelanguage.googleapis.com";
 export const OPENROUTER_BASE_URL = "https://openrouter.ai";
+export const REQUESTY_BASE_URL = "https://router.requesty.ai";
 export const OPENAI_BASE_URL = "https://api.openai.com";
 export const ANTHROPIC_BASE_URL = "https://api.anthropic.com";
 export const DEEPSEEK_BASE_URL = "https://api.deepseek.com";

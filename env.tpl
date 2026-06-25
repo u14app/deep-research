@@ -25,6 +25,11 @@ OPENROUTER_API_KEY=
 # (Optional) Server-side OpenRouter API Proxy URL. Default, `https://openrouter.ai/api`
 OPENROUTER_API_BASE_URL=
 
+# (Optional) Server-side Requesty API Key (Required for server API calls)
+REQUESTY_API_KEY=
+# (Optional) Server-side Requesty API Proxy URL. Default, `https://router.requesty.ai`
+REQUESTY_API_BASE_URL=
+
 # (Optional) Server-side OpenAI API Key (Required for server API calls)
 OPENAI_API_KEY=
 # (Optional) Server-side OpenAI API Proxy URL. Default, `https://api.openai.com`
