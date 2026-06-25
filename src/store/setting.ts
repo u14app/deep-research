@@ -17,6 +17,10 @@ export interface SettingStore {
   openRouterApiProxy: string;
   openRouterThinkingModel: string;
   openRouterNetworkingModel: string;
+  requestyApiKey: string;
+  requestyApiProxy: string;
+  requestyThinkingModel: string;
+  requestyNetworkingModel: string;
   openAIApiKey: string;
   openAIApiProxy: string;
   openAIThinkingModel: string;
@@ -120,6 +124,10 @@ export const defaultValues: SettingStore = {
   openRouterApiProxy: "",
   openRouterThinkingModel: "",
   openRouterNetworkingModel: "",
+  requestyApiKey: "",
+  requestyApiProxy: "",
+  requestyThinkingModel: "",
+  requestyNetworkingModel: "",
   openAIApiKey: "",
   openAIApiProxy: "",
   openAIThinkingModel: "gpt-5",

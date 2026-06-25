@@ -10,6 +10,7 @@ const accessPassword = process.env.ACCESS_PASSWORD || "";
 const GOOGLE_GENERATIVE_AI_API_KEY =
   process.env.GOOGLE_GENERATIVE_AI_API_KEY || "";
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || "";
+const REQUESTY_API_KEY = process.env.REQUESTY_API_KEY || "";
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY || "";
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY || "";
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY || "";
@@ -147,6 +148,46 @@ export async function middleware(request: NextRequest) {
       );
     } else {
       const apiKey = multiApiKeyPolling(OPENROUTER_API_KEY);
+      if (apiKey) {
+        const requestHeaders = new Headers();
+        requestHeaders.set(
+          "Content-Type",
+          request.headers.get("Content-Type") || "application/json",
+        );
+        requestHeaders.set("Authorization", `Bearer ${apiKey}`);
+        return NextResponse.next({
+          request: {
+            headers: requestHeaders,
+          },
+        });
+      } else {
+        return NextResponse.json(
+          {
+            error: ERRORS.NO_API_KEY,
+          },
+          { status: 500 },
+        );
+      }
+    }
+  }
+  if (request.nextUrl.pathname.startsWith("/api/ai/requesty")) {
+    const authorization = request.headers.get("authorization") || "";
+    const isDisabledModel = await hasDisabledAIModel();
+    if (
+      !verifySignature(
+        authorization.substring(7),
+        accessPassword,
+        Date.now(),
+      ) ||
+      disabledAIProviders.includes("requesty") ||
+      isDisabledModel
+    ) {
+      return NextResponse.json(
+        { error: ERRORS.NO_PERMISSIONS },
+        { status: 403 },
+      );
+    } else {
+      const apiKey = multiApiKeyPolling(REQUESTY_API_KEY);
       if (apiKey) {
         const requestHeaders = new Headers();
         requestHeaders.set(

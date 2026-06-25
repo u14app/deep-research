@@ -6,6 +6,8 @@ const GOOGLE_GENERATIVE_AI_API_BASE_URL =
   "https://generativelanguage.googleapis.com";
 const OPENROUTER_API_BASE_URL =
   process.env.OPENROUTER_API_BASE_URL || "https://openrouter.ai/api";
+const REQUESTY_API_BASE_URL =
+  process.env.REQUESTY_API_BASE_URL || "https://router.requesty.ai";
 const OPENAI_API_BASE_URL =
   process.env.OPENAI_API_BASE_URL || "https://api.openai.com";
 const ANTHROPIC_API_BASE_URL =
@@ -41,6 +43,7 @@ const SEARXNG_API_BASE_URL =
 const GOOGLE_GENERATIVE_AI_API_KEY =
   process.env.GOOGLE_GENERATIVE_AI_API_KEY || "";
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || "";
+const REQUESTY_API_KEY = process.env.REQUESTY_API_KEY || "";
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY || "";
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY || "";
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY || "";
@@ -77,6 +80,8 @@ export function getAIProviderBaseURL(provider: string) {
       return AZURE_API_BASE_URL;
     case "openrouter":
       return completePath(OPENROUTER_API_BASE_URL, "/api/v1");
+    case "requesty":
+      return completePath(REQUESTY_API_BASE_URL, "/v1");
     case "openaicompatible":
       return completePath(OPENAI_COMPATIBLE_API_BASE_URL, "/v1");
     case "pollinations":
@@ -110,6 +115,8 @@ export function getAIProviderApiKey(provider: string) {
       return AZURE_API_KEY;
     case "openrouter":
       return OPENROUTER_API_KEY;
+    case "requesty":
+      return REQUESTY_API_KEY;
     case "openaicompatible":
       return OPENAI_COMPATIBLE_API_KEY;
     case "google-vertex":

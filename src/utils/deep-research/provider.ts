@@ -114,6 +114,15 @@ export async function createAIProvider({
       apiKey,
     });
     return openrouter(model, settings);
+  } else if (provider === "requesty") {
+    // Requesty is an OpenAI-compatible LLM gateway. It uses the same
+    // baseURL + apiKey client shape as OpenRouter, so we reuse it here.
+    const { createOpenRouter } = await import("@openrouter/ai-sdk-provider");
+    const requesty = createOpenRouter({
+      baseURL,
+      apiKey,
+    });
+    return requesty(model, settings);
   } else if (provider === "openaicompatible") {
     const { createOpenAICompatible } = await import(
       "@ai-sdk/openai-compatible"

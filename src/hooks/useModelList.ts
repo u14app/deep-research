@@ -3,6 +3,7 @@ import { useSettingStore } from "@/store/setting";
 import {
   GEMINI_BASE_URL,
   OPENROUTER_BASE_URL,
+  REQUESTY_BASE_URL,
   OPENAI_BASE_URL,
   ANTHROPIC_BASE_URL,
   DEEPSEEK_BASE_URL,
@@ -158,6 +159,28 @@ function useModelList() {
           ? completePath(openRouterApiProxy || OPENROUTER_BASE_URL, "/api/v1") +
               "/models"
           : "/api/ai/openrouter/v1/models",
+        {
+          headers: {
+            authorization: `Bearer ${mode === "local" ? apiKey : accessKey}`,
+          },
+        }
+      );
+      const { data = [] } = await response.json();
+      const newModelList = (data as OpenRouterModel[]).map((item) => item.id);
+      setModelList(newModelList);
+      return newModelList;
+    } else if (provider === "requesty") {
+      const { requestyApiKey = "", requestyApiProxy } =
+        useSettingStore.getState();
+      if (mode === "local" && !requestyApiKey) {
+        return [];
+      }
+      const apiKey = multiApiKeyPolling(requestyApiKey);
+      const response = await fetch(
+        mode === "local"
+          ? completePath(requestyApiProxy || REQUESTY_BASE_URL, "/v1") +
+              "/models"
+          : "/api/ai/requesty/v1/models",
         {
           headers: {
             authorization: `Bearer ${mode === "local" ? apiKey : accessKey}`,

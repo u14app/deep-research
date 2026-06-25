@@ -11,6 +11,8 @@ const GOOGLE_GENERATIVE_AI_API_BASE_URL =
   "https://generativelanguage.googleapis.com";
 const OPENROUTER_API_BASE_URL =
   process.env.OPENROUTER_API_BASE_URL || "https://openrouter.ai/api";
+const REQUESTY_API_BASE_URL =
+  process.env.REQUESTY_API_BASE_URL || "https://router.requesty.ai";
 const OPENAI_API_BASE_URL =
   process.env.OPENAI_API_BASE_URL || "https://api.openai.com";
 const ANTHROPIC_API_BASE_URL =
@@ -92,6 +94,10 @@ export default async function Config(phase: string) {
         {
           source: "/api/ai/openrouter/:path*",
           destination: `${OPENROUTER_API_BASE_URL}/:path*`,
+        },
+        {
+          source: "/api/ai/requesty/:path*",
+          destination: `${REQUESTY_API_BASE_URL}/:path*`,
         },
         {
           source: "/api/ai/openai/:path*",
