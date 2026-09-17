@@ -152,6 +152,15 @@ function useWebSearch() {
         }
         options.scope = searxngScope;
         break;
+      case "youcom":
+        const { youcomApiKey, youcomApiProxy } = useSettingStore.getState();
+        if (mode === "local") {
+          options.baseURL = youcomApiProxy;
+          options.apiKey = multiApiKeyPolling(youcomApiKey);
+        } else {
+          options.baseURL = location.origin + "/api/search/youcom";
+        }
+        break;
       default:
         break;
     }

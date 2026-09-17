@@ -6,6 +6,7 @@ import {
   BOCHA_BASE_URL,
   BRAVE_BASE_URL,
   SEARXNG_BASE_URL,
+  YOUCOM_BASE_URL,
 } from "@/constants/urls";
 import {
   resolveDeepResearchPromptTemplates,
@@ -119,6 +120,21 @@ type SearxngSearchResult = {
   img_src?: string;
   thumbnail_src?: string;
   img_format?: "jpeg" | "Culture Snaxx" | "png";
+};
+
+type YoucomSearchResult = {
+  url: string;
+  title: string;
+  description: string;
+  snippets?: string[];
+  thumbnail_url?: string;
+  page_age?: string;
+  favicon_url?: string;
+  contents?: {
+    markdown?: string;
+    html?: string;
+    highlights?: string[];
+  };
 };
 
 export interface SearchProviderOptions {
@@ -485,6 +501,47 @@ export async function createSearchProvider({
             description: result.title,
           };
         }) as ImageSource[],
+    };
+  } else if (provider === "youcom") {
+    // You.com Web Search API: POST /v1/search with X-API-Key auth.
+    // Highlights extraction returns query-relevant passages per result.
+    const response = await fetch(
+      `${completePath(baseURL || YOUCOM_BASE_URL)}/v1/search`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-API-Key": apiKey,
+        },
+        credentials: "omit",
+        body: JSON.stringify({
+          query,
+          count: Number(maxResult),
+          extraction: {
+            extraction_mode: "highlights",
+          },
+        }),
+      },
+    );
+    const { results = {} } = await response.json();
+    const webResults = results.web || [];
+    return {
+      sources: (webResults as YoucomSearchResult[])
+        .filter((item) => (item.description || item.contents) && item.url)
+        .map((result) => ({
+          content:
+            result.contents?.highlights?.join("\n") ||
+            result.description ||
+            "",
+          url: result.url,
+          title: result.title,
+        })) as Source[],
+      images: (webResults as YoucomSearchResult[])
+        .filter((item) => item.thumbnail_url)
+        .map((result) => ({
+          url: result.thumbnail_url as string,
+          description: result.title,
+        })) as ImageSource[],
     };
   } else {
     throw new Error("Unsupported Provider: " + provider);

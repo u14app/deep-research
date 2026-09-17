@@ -45,6 +45,8 @@ const BRAVE_API_BASE_URL =
   process.env.BRAVE_API_BASE_URL || "https://api.search.brave.com/res";
 const SEARXNG_API_BASE_URL =
   process.env.SEARXNG_API_BASE_URL || "http://0.0.0.0:8080";
+const YOUCOM_API_BASE_URL =
+  process.env.YOUCOM_API_BASE_URL || "https://api.you.com";
 
 export default async function Config(phase: string) {
   const nextConfig: NextConfig = {
@@ -160,6 +162,10 @@ export default async function Config(phase: string) {
         {
           source: "/api/search/searxng/:path*",
           destination: `${SEARXNG_API_BASE_URL}/:path*`,
+        },
+        {
+          source: "/api/search/youcom/:path*",
+          destination: `${YOUCOM_API_BASE_URL}/:path*`,
         },
       ];
     };

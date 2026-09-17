@@ -106,11 +106,16 @@ BRAVE_API_BASE_URL=
 # (Optional) Server-side Searxng API Proxy URL. Default, `http://0.0.0.0:8080`
 SEARXNG_API_BASE_URL=
 
+# (Optional) Server-side You.com API Key (Required for server API calls)
+YOUCOM_API_KEY=
+# (Optional) Server-side You.com API Proxy URL. Default, `https://api.you.com`
+YOUCOM_API_BASE_URL=
+
 # (Optional) MCP Server AI provider
 # Possible values ​​include: google, openai, anthropic, deepseek, atlascloud, xai, mistral, azure, openrouter, openaicompatible, pollinations, ollama
 MCP_AI_PROVIDER=
 # (Optional) MCP Server search provider. Default, `model`
-# Possible values ​​include: model, tavily, firecrawl, crw, exa, bocha, searxng
+# Possible values ​​include: model, tavily, firecrawl, crw, exa, bocha, searxng, youcom
 MCP_SEARCH_PROVIDER=
 # (Optional) MCP Server thinking model id, the core model used in deep research.
 MCP_THINKING_MODEL=
@@ -121,7 +126,7 @@ MCP_TASK_MODEL=
 # Possible values ​​include: google, openai, anthropic, deepseek, atlascloud, xai, mistral, azure, openrouter, openaicompatible, pollinations, ollama
 NEXT_PUBLIC_DISABLED_AI_PROVIDER=
 # (Optional) Disable server-side search provider usage permissions
-# Possible values ​​include: model, tavily, firecrawl, crw, exa, bocha, searxng
+# Possible values ​​include: model, tavily, firecrawl, crw, exa, bocha, searxng, youcom
 NEXT_PUBLIC_DISABLED_SEARCH_PROVIDER=
 # (Optional) Customize the model list, add or delete models
 NEXT_PUBLIC_MODEL_LIST=

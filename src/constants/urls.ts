@@ -17,3 +17,4 @@ export const EXA_BASE_URL = "https://api.exa.ai";
 export const BOCHA_BASE_URL = "https://api.bochaai.com";
 export const BRAVE_BASE_URL = "https://api.search.brave.com/res";
 export const SEARXNG_BASE_URL = "http://localhost:8080";
+export const YOUCOM_BASE_URL = "https://api.you.com";

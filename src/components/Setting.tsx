@@ -70,6 +70,7 @@ import {
   BOCHA_BASE_URL,
   BRAVE_BASE_URL,
   SEARXNG_BASE_URL,
+  YOUCOM_BASE_URL,
 } from "@/constants/urls";
 import locales from "@/constants/locales";
 import { parseDeepResearchPromptOverrides } from "@/constants/prompts";
@@ -175,6 +176,8 @@ const formSchema = z.object({
   braveApiProxy: z.string().optional(),
   searxngApiProxy: z.string().optional(),
   searxngScope: z.string().optional(),
+  youcomApiKey: z.string().optional(),
+  youcomApiProxy: z.string().optional(),
   parallelSearch: z.number().min(1).max(5),
   autoReviewRounds: z.number().min(0).max(5),
   maxCollectionTopics: z.number().min(1).max(20),
@@ -3319,6 +3322,9 @@ function Setting({ open, onClose }: SettingProps) {
                             {!isDisabledSearchProvider("searxng") ? (
                               <SelectItem value="searxng">SearXNG</SelectItem>
                             ) : null}
+                            {!isDisabledSearchProvider("youcom") ? (
+                              <SelectItem value="youcom">You.com</SelectItem>
+                            ) : null}
                           </SelectContent>
                         </Select>
                       </FormControl>
@@ -3726,6 +3732,52 @@ function Setting({ open, onClose }: SettingProps) {
                                 </SelectItem>
                               </SelectContent>
                             </Select>
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <div
+                    className={cn("space-y-4", {
+                      hidden: searchProvider !== "youcom",
+                    })}
+                  >
+                    <FormField
+                      control={form.control}
+                      name="youcomApiKey"
+                      render={({ field }) => (
+                        <FormItem className="from-item">
+                          <FormLabel className="from-label">
+                            {t("setting.apiKeyLabel")}
+                            <span className="ml-1 text-red-500 max-sm:hidden">
+                              *
+                            </span>
+                          </FormLabel>
+                          <FormControl className="form-field">
+                            <Password
+                              type="text"
+                              placeholder={t("setting.searchApiKeyPlaceholder")}
+                              disabled={form.getValues("enableSearch") === "0"}
+                              {...field}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="youcomApiProxy"
+                      render={({ field }) => (
+                        <FormItem className="from-item">
+                          <FormLabel className="from-label">
+                            {t("setting.apiUrlLabel")}
+                          </FormLabel>
+                          <FormControl className="form-field">
+                            <Input
+                              placeholder={YOUCOM_BASE_URL}
+                              disabled={form.getValues("enableSearch") === "0"}
+                              {...field}
+                            />
                           </FormControl>
                         </FormItem>
                       )}

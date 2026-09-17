@@ -77,6 +77,8 @@ export interface SettingStore {
   braveApiProxy: string;
   searxngApiProxy: string;
   searxngScope: string;
+  youcomApiKey: string;
+  youcomApiProxy: string;
   parallelSearch: number;
   autoReviewRounds: number;
   maxCollectionTopics: number;
@@ -178,6 +180,8 @@ export const defaultValues: SettingStore = {
   braveApiProxy: "",
   searxngApiProxy: "",
   searxngScope: "all",
+  youcomApiKey: "",
+  youcomApiProxy: "",
   parallelSearch: 1,
   autoReviewRounds: 0,
   maxCollectionTopics: 5,
