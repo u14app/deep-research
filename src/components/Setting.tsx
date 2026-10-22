@@ -66,6 +66,7 @@ import {
   TAVILY_BASE_URL,
   FIRECRAWL_BASE_URL,
   CRW_BASE_URL,
+  CONTEXTFETCH_BASE_URL,
   EXA_BASE_URL,
   BOCHA_BASE_URL,
   BRAVE_BASE_URL,
@@ -166,6 +167,8 @@ const formSchema = z.object({
   firecrawlApiProxy: z.string().optional(),
   crwApiKey: z.string().optional(),
   crwApiProxy: z.string().optional(),
+  contextfetchApiKey: z.string().optional(),
+  contextfetchApiProxy: z.string().optional(),
   exaApiKey: z.string().optional(),
   exaApiProxy: z.string().optional(),
   exaScope: z.string().optional(),
@@ -3303,6 +3306,11 @@ function Setting({ open, onClose }: SettingProps) {
                             {!isDisabledSearchProvider("crw") ? (
                               <SelectItem value="crw">fastCRW</SelectItem>
                             ) : null}
+                            {!isDisabledSearchProvider("contextfetch") ? (
+                              <SelectItem value="contextfetch">
+                                ContextFetch
+                              </SelectItem>
+                            ) : null}
                             {!isDisabledSearchProvider("exa") &&
                             mode === "proxy" ? (
                               <SelectItem value="exa">Exa</SelectItem>
@@ -3485,6 +3493,52 @@ function Setting({ open, onClose }: SettingProps) {
                           <FormControl className="form-field">
                             <Input
                               placeholder={CRW_BASE_URL}
+                              disabled={form.getValues("enableSearch") === "0"}
+                              {...field}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <div
+                    className={cn("space-y-4", {
+                      hidden: searchProvider !== "contextfetch",
+                    })}
+                  >
+                    <FormField
+                      control={form.control}
+                      name="contextfetchApiKey"
+                      render={({ field }) => (
+                        <FormItem className="from-item">
+                          <FormLabel className="from-label">
+                            {t("setting.apiKeyLabel")}
+                            <span className="ml-1 text-red-500 max-sm:hidden">
+                              *
+                            </span>
+                          </FormLabel>
+                          <FormControl className="form-field">
+                            <Password
+                              type="text"
+                              placeholder={t("setting.searchApiKeyPlaceholder")}
+                              disabled={form.getValues("enableSearch") === "0"}
+                              {...field}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="contextfetchApiProxy"
+                      render={({ field }) => (
+                        <FormItem className="from-item">
+                          <FormLabel className="from-label">
+                            {t("setting.apiUrlLabel")}
+                          </FormLabel>
+                          <FormControl className="form-field">
+                            <Input
+                              placeholder={CONTEXTFETCH_BASE_URL}
                               disabled={form.getValues("enableSearch") === "0"}
                               {...field}
                             />

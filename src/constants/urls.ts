@@ -13,6 +13,7 @@ export const OLLAMA_BASE_URL = "http://localhost:11434";
 export const TAVILY_BASE_URL = "https://api.tavily.com";
 export const FIRECRAWL_BASE_URL = "https://api.firecrawl.dev";
 export const CRW_BASE_URL = "https://fastcrw.com/api";
+export const CONTEXTFETCH_BASE_URL = "https://api.contextfetch.dev/tavily";
 export const EXA_BASE_URL = "https://api.exa.ai";
 export const BOCHA_BASE_URL = "https://api.bochaai.com";
 export const BRAVE_BASE_URL = "https://api.search.brave.com/res";
