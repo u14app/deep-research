@@ -115,6 +115,16 @@ function useWebSearch() {
           options.baseURL = location.origin + "/api/search/crw";
         }
         break;
+      case "contextfetch":
+        const { contextfetchApiKey, contextfetchApiProxy } =
+          useSettingStore.getState();
+        if (mode === "local") {
+          options.baseURL = contextfetchApiProxy;
+          options.apiKey = multiApiKeyPolling(contextfetchApiKey);
+        } else {
+          options.baseURL = location.origin + "/api/search/contextfetch";
+        }
+        break;
       case "exa":
         const { exaApiKey, exaApiProxy, exaScope } = useSettingStore.getState();
         if (mode === "local") {

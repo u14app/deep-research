@@ -68,6 +68,8 @@ export interface SettingStore {
   firecrawlApiProxy: string;
   crwApiKey: string;
   crwApiProxy: string;
+  contextfetchApiKey: string;
+  contextfetchApiProxy: string;
   exaApiKey: string;
   exaApiProxy: string;
   exaScope: string;
@@ -169,6 +171,8 @@ export const defaultValues: SettingStore = {
   firecrawlApiProxy: "",
   crwApiKey: "",
   crwApiProxy: "",
+  contextfetchApiKey: "",
+  contextfetchApiProxy: "",
   exaApiKey: "",
   exaApiProxy: "",
   exaScope: "research paper",

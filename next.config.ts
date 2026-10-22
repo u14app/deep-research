@@ -38,6 +38,9 @@ const FIRECRAWL_API_BASE_URL =
   process.env.FIRECRAWL_API_BASE_URL || "https://api.firecrawl.dev";
 const CRW_API_BASE_URL =
   process.env.CRW_API_BASE_URL || "https://fastcrw.com/api";
+const CONTEXTFETCH_API_BASE_URL =
+  process.env.CONTEXTFETCH_API_BASE_URL ||
+  "https://api.contextfetch.dev/tavily";
 const EXA_API_BASE_URL = process.env.EXA_API_BASE_URL || "https://api.exa.ai";
 const BOCHA_API_BASE_URL =
   process.env.BOCHA_API_BASE_URL || "https://api.bochaai.com";
@@ -144,6 +147,10 @@ export default async function Config(phase: string) {
         {
           source: "/api/search/crw/:path*",
           destination: `${CRW_API_BASE_URL}/:path*`,
+        },
+        {
+          source: "/api/search/contextfetch/:path*",
+          destination: `${CONTEXTFETCH_API_BASE_URL}/:path*`,
         },
         {
           source: "/api/search/exa/:path*",

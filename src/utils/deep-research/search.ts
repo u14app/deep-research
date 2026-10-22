@@ -2,6 +2,7 @@ import {
   TAVILY_BASE_URL,
   FIRECRAWL_BASE_URL,
   CRW_BASE_URL,
+  CONTEXTFETCH_BASE_URL,
   EXA_BASE_URL,
   BOCHA_BASE_URL,
   BRAVE_BASE_URL,
@@ -191,9 +192,13 @@ export async function createSearchProvider({
   };
   if (apiKey) headers.Authorization = `Bearer ${apiKey}`;
 
-  if (provider === "tavily") {
+  if (provider === "tavily" || provider === "contextfetch") {
+    // ContextFetch serves a Tavily-compatible API under /tavily, so it reuses
+    // the Tavily request/response shape with a different base URL.
+    const defaultBaseURL =
+      provider === "contextfetch" ? CONTEXTFETCH_BASE_URL : TAVILY_BASE_URL;
     const response = await fetch(
-      `${completePath(baseURL || TAVILY_BASE_URL)}/search`,
+      `${completePath(baseURL || defaultBaseURL)}/search`,
       {
         method: "POST",
         headers,
