@@ -133,6 +133,10 @@ Custom model lists use `,` to separate multiple models. If you want to disable a
 
 Currently the project supports deployment to Cloudflare, but you need to follow [How to deploy to Cloudflare Pages](./docs/How-to-deploy-to-Cloudflare-Pages.md) to do it.
 
+### ZopDay
+
+[![Deploy to ZopDay](https://zop.dev/deploytozopday-inkhard.svg)](https://zop.dev/zopday/app/deploy?image=xiangfa/deep-research:latest&port=3000&name=deep-research&utm_source=github&utm_medium=one_click&utm_content=deep-research)
+
 ### Docker
 
 > The Docker version needs to be 20 or above, otherwise it will prompt that the image cannot be found.
